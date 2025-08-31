@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Цепочка бизнеса — кликабельная</title>
+<style>
+  :root{--t:#0f172a;--muted:#64748b;--b:#e2e8f0;--bg:#ffffff}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:transparent;color:var(--t)}
+  .wrap{max-width:1100px;margin:32px auto;padding:16px}
+  .chain{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center}
+  .pill{padding:10px 14px;border:2px solid var(--b);border-radius:16px;cursor:pointer;user-select:none;background:#f8fafc;transition:.15s}
+  .pill:focus,.pill:hover{transform:translateY(-1px);outline:none;border-color:#bfdbfe}
+  .arrow{color:var(--muted)}
+  .panel{margin-top:18px;border:1px solid var(--b);border-radius:12px;padding:14px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.06);min-height:72px}
+  .title{font-weight:700;margin:0 0 6px}
+  .hint{margin:0;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="chain" id="chain">
+    <button class="pill" data-k="Продукт" data-v="Ценность для клиента: товар/услуга/решение задачи.">🟠 Продукт</button>
+    <span class="arrow">→</span>
+    <button class="pill" data-k="Клиенты" data-v="Тот, кто покупает и/или пользуется. Важно различать пользователя и плательщика.">🟢 Клиенты</button>
+    <span class="arrow">→</span>
+    <button class="pill" data-k="Выручка" data-v="Цена × количество. Факт оплаты, но ещё не свободные деньги.">💸 Выручка</button>
+    <span class="arrow">→</span>
+    <button class="pill" data-k="Расходы" data-v="Переменные и постоянные траты для работы бизнеса.">📉 Расходы</button>
+    <span class="arrow">→</span>
+    <button class="pill" data-k="Прибыль" data-v="То, что осталось после расходов (бывает валовая/операционная/чистая).">✅ Прибыль</button>
+    <span class="arrow">→</span>
+    <button class="pill" data-k="Денежный поток" data-v="Реальные деньги по календарю. Возможен кассовый разрыв.">💵 Денежный поток</button>
+  </div>
+  <div class="panel" id="panel">
+    <p class="title">Нажмите на любой элемент цепочки</p>
+    <p class="hint">Появится короткое пояснение и подсказка.</p>
+  </div>
+</div>
+<script>
+  const panel=document.getElementById('panel');
+  document.getElementById('chain').addEventListener('click',e=>{
+    const b=e.target.closest('.pill'); if(!b) return;
+    panel.innerHTML = `<p class="title">${b.dataset.k}</p><p class="hint">${b.dataset.v}</p>`;
+  });
+</script>
+</body>
+</html>
