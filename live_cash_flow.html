@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Живой денежный поток</title>
+<style>
+  body{margin:0;font-family:system-ui,Arial,sans-serif;background:transparent;color:#0f172a}
+  .wrap{max-width:900px;margin:28px auto;padding:16px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .card{border:1px solid #e2e8f0;border-radius:12px;padding:14px;background:#fff}
+  .row{display:flex;align-items:center;gap:8px;margin:8px 0}
+  input[type=range]{width:100%}
+  .num{font-variant-numeric:tabular-nums}
+  .ok{color:#059669}.warn{color:#ea580c}.bad{color:#dc2626}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="grid">
+    <div class="card">
+      <h3>Параметры</h3>
+      <div class="row">Клиенты/мес: <span id="vClients" class="num"></span></div>
+      <input id="clients" type="range" min="0" max="500" value="100">
+      <div class="row">Цена, ₽: <span id="vPrice" class="num"></span></div>
+      <input id="price" type="range" min="0" max="10000" value="2000" step="100">
+      <div class="row">Расходы/мес, ₽: <span id="vCost" class="num"></span></div>
+      <input id="cost" type="range" min="0" max="300000" value="120000" step="5000">
+      <div class="row">Задержка оплаты, дней: <span id="vLag" class="num"></span></div>
+      <input id="lag" type="range" min="0" max="60" value="15">
+    </div>
+    <div class="card">
+      <h3>Итоги</h3>
+      <p>Выручка: <b class="num" id="rev"></b></p>
+      <p>Прибыль (на бумаге): <b class="num" id="profit"></b></p>
+      <p>Денежный поток (сегодня): <b class="num" id="cash"></b> <span id="flag"></span></p>
+      <small>Модель упрощена: считаем, что задержка оплаты уменьшает поступления текущего месяца.</small>
+    </div>
+  </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const fmt=v=>v.toLocaleString('ru-RU');
+
+function calc(){
+  const clients=+$('clients').value;
+  const price=+$('price').value;
+  const cost=+$('cost').value;
+  const lag=+$('lag').value;
+  $('vClients').textContent=fmt(clients);
+  $('vPrice').textContent=fmt(price);
+  $('vCost').textContent=fmt(cost);
+  $('vLag').textContent=lag;
+
+  const revenue=clients*price;
+  const profit=revenue - cost;
+  // простая модель: часть выручки сдвигается на следующий месяц
+  const lagFrac=Math.min(lag/30,1);
+  const cashToday=Math.round(revenue*(1-lagFrac)) - cost;
+
+  $('rev').textContent = fmt(revenue)+' ₽';
+  $('profit').textContent = fmt(profit)+' ₽';
+  $('cash').textContent = fmt(cashToday)+' ₽';
+  const flag=$('flag');
+  flag.textContent = cashToday>=0 ? (lagFrac>0? ' — кэш ок, но есть задержка' : ' — кэш ок') : ' — кассовый разрыв';
+  flag.className = cashToday>=0 ? (lagFrac>0? 'warn':'ok') : 'bad';
+}
+
+['clients','price','cost','lag'].forEach(id=>$(id).addEventListener('input',calc));
+calc();
+</script>
+</body>
+</html>
