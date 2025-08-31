@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Интерактивный график</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+  <div id="plot" style="width:700px;height:500px;"></div>
+  <script>
+    // Значения X
+    var x = [];
+    for (var i = -10; i <= 10; i++) { x.push(i); }
+
+    // Создаем несколько наборов данных для разных углов наклона
+    var data = [];
+    for (var k = 1; k <= 5; k++) {
+      data.push({
+        x: x,
+        y: x.map(v => k * v),
+        mode: 'lines',
+        name: 'y = ' + k + 'x',
+        visible: (k === 1) // показываем только первый график при старте
+      });
+    }
+
+    // Настройка слайдера
+    var steps = [];
+    for (var i = 0; i < data.length; i++) {
+      steps.push({
+        method: 'restyle',
+        args: ['visible', data.map((_, j) => j === i)],
+        label: 'k = ' + (i+1)
+      });
+    }
+
+    var layout = {
+      title: 'Интерактивный график y = kx',
+      sliders: [{
+        active: 0,
+        currentvalue: { prefix: "Параметр k: " },
+        steps: steps
+      }]
+    };
+
+    Plotly.newPlot('plot', data, layout);
+  </script>
+</body>
+</html>
