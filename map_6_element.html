@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Экосистема вокруг цепочки</title>
+<style>
+  body{margin:0;font-family:system-ui,Arial,sans-serif;background:transparent;color:#0f172a}
+  .wrap{max-width:1000px;margin:24px auto;padding:12px}
+  .center{position:relative;display:flex;align-items:center;justify-content:center;height:420px}
+  .core{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center;padding:12px 16px;border:1px solid #e2e8f0;border-radius:14px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.06)}
+  .pill{padding:8px 10px;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc}
+  .arrow{opacity:.6}
+  .orb{position:absolute;padding:8px 12px;border:1px solid #e2e8f0;background:#ffffff;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.05);cursor:default}
+  .orb[data-pos="top"]{top:12px}
+  .orb[data-pos="bottom"]{bottom:12px}
+  .orb[data-pos="left"]{left:12px}
+  .orb[data-pos="right"]{right:12px}
+  .tip{position:absolute;left:50%;transform:translateX(-50%);bottom:-44px;white-space:nowrap;background:#111827;color:#fff;padding:6px 8px;border-radius:8px;font-size:12px;opacity:0;pointer-events:none;transition:.15s}
+  .orb:hover .tip{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="center">
+    <!-- ядро -->
+    <div class="core">
+      <span class="pill">🟠 Продукт</span><span class="arrow">→</span>
+      <span class="pill">🟢 Клиенты</span><span class="arrow">→</span>
+      <span class="pill">💸 Выручка</span><span class="arrow">→</span>
+      <span class="pill">📉 Расходы</span><span class="arrow">→</span>
+      <span class="pill">✅ Прибыль</span><span class="arrow">→</span>
+      <span class="pill">💵 Денежный поток</span>
+    </div>
+    <!-- орбиты -->
+    <div class="orb" style="top:24px;left:50%;transform:translate(-50%,0);" title="Учёт, бюджет, отчётность">Финансы <span class="tip">Учёт, бюджеты, отчётность</span></div>
+    <div class="orb" style="top:120px;right:18px;" title="Договоры, права, риски">Право <span class="tip">Договоры, права, риски</span></div>
+    <div class="orb" style="bottom:120px;right:18px;" title="Системы налогообложения, обязанности">Налоги <span class="tip">Режимы, обязательства</span></div>
+    <div class="orb" style="bottom:24px;left:50%;transform:translate(-50%,0);" title="Процессы, логистика, контроль качества">Операции <span class="tip">Процессы и логистика</span></div>
+    <div class="orb" style="bottom:120px;left:18px;" title="Роли, культура, найм">Команда <span class="tip">Роли, культура, найм</span></div>
+    <div class="orb" style="top:120px;left:18px;" title="Сайт, CRM, автоматизация, безопасность">IT <span class="tip">Сайт, CRM, автоматизация</span></div>
+  </div>
+</div>
+</body>
+</html>
