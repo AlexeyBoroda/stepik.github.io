@@ -3,83 +3,80 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Цепочка бизнеса + Экосистема (интерактив с линиями)</title>
-<meta name="color-scheme" content="light dark">
+<title>Цепочка бизнеса + Экосистема (светлый фон, видимые подписи)</title>
+<!-- ВАЖНО: форсим светлую тему -->
+<meta name="color-scheme" content="light">
 <style>
-  :root{
-    --t:#0f172a; --muted:#64748b; --b:#e2e8f0; --bg:#ffffff;
-    --accent:#2563eb; --ok:#10b981; --warn:#ea580c; --bad:#dc2626;
-    --core-bg:#ffffff; --chip:#f8fafc; --chip-b:#e2e8f0; --chip-bh:#bfdbfe;
-    --line:#cbd5e1;
+  /* ФОН И БАЗА */
+  html, body { height:100%; margin:0; background:#ffffff !important; color:#0f172a; }
+  body { font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif; overflow-x:hidden; }
+
+  .wrap { width:100%; max-width:1200px; margin:0 auto; padding:16px; box-sizing:border-box; background:#fff; }
+  .heading { margin:0 0 10px; font-size:1.3rem; font-weight:700; }
+  .sub { margin:0 0 14px; color:#64748b; font-size:.95rem; }
+
+  .stage { position:relative; width:100%; min-height:520px; }
+  .links { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; display:block; }
+
+  /* ЯДРО (цепочка) */
+  .core {
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:center;
+    padding:16px 20px; border:1px solid #e2e8f0; border-radius:16px; background:#fff;
+    box-shadow:0 10px 30px rgba(0,0,0,.06); max-width:calc(100% - 40px);
   }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:transparent;color:var(--t)}
-  .wrap{max-width:1100px;margin:32px auto;padding:16px}
-  .heading{margin:0 0 10px 0;font-size:1.35rem;font-weight:700}
-  .sub{margin:0 0 18px 0;color:var(--muted);font-size:.95rem}
-
-  /* холст с SVG-линиями */
-  .stage{position:relative;min-height:520px}
-  .links{position:absolute;inset:0;pointer-events:none}
-
-  /* ядро */
-  .core{
-    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-    display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center;
-    padding:16px 20px;border:1px solid var(--b);border-radius:16px;background:var(--core-bg);
-    box-shadow:0 10px 30px rgba(0,0,0,.06)
+  .pill {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:10px 12px; border:2px solid #e2e8f0; border-radius:14px;
+    background:#f8fafc; cursor:pointer; user-select:none;
+    transition:transform .12s, border-color .12s, box-shadow .12s;
+    white-space:nowrap; font-weight:600;
+    color:#0f172a !important; -webkit-text-fill-color:#0f172a;
   }
-  .pill{
-    padding:10px 12px;border:2px solid var(--chip-b);border-radius:14px;
-    background:var(--chip);cursor:pointer;user-select:none;transition:transform .12s,border-color .12s, box-shadow .12s;
+  .pill:hover, .pill:focus { transform:translateY(-1px); outline:none; border-color:#bfdbfe; }
+  .pill.active { box-shadow:0 0 0 3px rgba(37,99,235,.18); border-color:#93c5fd; }
+  .arrow { opacity:.6; color:#64748b !important; }
+
+  /* ЭКОСИСТЕМА */
+  .orb {
+    position:absolute; padding:8px 12px; border:1px solid #e2e8f0; background:#fff; border-radius:999px;
+    box-shadow:0 6px 18px rgba(0,0,0,.05); cursor:pointer; white-space:nowrap;
+    transition:transform .12s, border-color .12s, box-shadow .12s;
+    font-weight:600; color:#0f172a !important; -webkit-text-fill-color:#0f172a;
   }
-  .pill:hover,.pill:focus{transform:translateY(-1px);outline:none;border-color:var(--chip-bh)}
-  .pill.active{box-shadow:0 0 0 3px rgba(37,99,235,.2);border-color:#93c5fd}
-  .arrow{opacity:.6}
-
-  /* орбиты */
-  .orb{
-    position:absolute;padding:8px 12px;border:1px solid var(--b);background:#ffffff;border-radius:999px;
-    box-shadow:0 6px 18px rgba(0,0,0,.05);cursor:pointer;white-space:nowrap;transition:transform .12s,border-color .12s, box-shadow .12s;
+  .orb:hover { transform:translateY(-2px); border-color:#c7d2fe; }
+  .orb.active { box-shadow:0 0 0 3px rgba(37,99,235,.18); border-color:#93c5fd; }
+  .tip {
+    position:absolute; left:50%; transform:translateX(-50%); bottom:-44px;
+    background:#111827; color:#fff; padding:6px 8px; border-radius:8px; font-size:12px;
+    opacity:0; pointer-events:none; transition:opacity .12s; white-space:nowrap;
   }
-  .orb:hover{transform:translateY(-2px);border-color:#c7d2fe}
-  .orb.active{box-shadow:0 0 0 3px rgba(37,99,235,.2);border-color:#93c5fd}
-  .tip{
-    position:absolute;left:50%;transform:translateX(-50%);bottom:-44px;
-    background:#111827;color:#fff;padding:6px 8px;border-radius:8px;font-size:12px;
-    opacity:0;pointer-events:none;transition:opacity .12s;white-space:nowrap
-  }
-  .orb:hover .tip{opacity:1}
+  .orb:hover .tip { opacity:1; }
 
-  /* координаты орбит (на десктопе) */
-  .orb.fin   {top:20px;left:50%;transform:translate(-50%,0)}
-  .orb.legal {top:140px;right:4px}
-  .orb.tax   {bottom:140px;right:4px}
-  .orb.ops   {bottom:20px;left:50%;transform:translate(-50%,0)}
-  .orb.team  {bottom:140px;left:4px}
-  .orb.it    {top:140px;left:4px}
+  /* Расположение орбит */
+  .orb.fin   { top:20px; left:50%; transform:translate(-50%,0); }
+  .orb.legal { top:140px; right:6px; }
+  .orb.tax   { bottom:140px; right:6px; }
+  .orb.ops   { bottom:20px; left:50%; transform:translate(-50%,0); }
+  .orb.team  { bottom:140px; left:6px; }
+  .orb.it    { top:140px; left:6px; }
 
-  /* панель пояснений */
-  .panel{margin-top:16px;border:1px solid var(--b);border-radius:12px;padding:14px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.06);min-height:76px}
-  .title{font-weight:700;margin:0 0 6px}
-  .hint{margin:0;color:var(--muted)}
-  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-  .tag{background:#eef2ff;border:1px solid #e0e7ff;color:#1e40af;font-size:12px;border-radius:999px;padding:3px 8px}
+  /* Пояснения */
+  .panel { margin-top:16px; border:1px solid #e2e8f0; border-radius:12px; padding:14px; background:#fff; box-shadow:0 8px 24px rgba(0,0,0,.06); min-height:76px; }
+  .title { font-weight:700; margin:0 0 6px; }
+  .hint { margin:0; color:#64748b; }
+  .tags { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+  .tag { background:#eef2ff; border:1px solid #e0e7ff; color:#1e40af; font-size:12px; border-radius:999px; padding:3px 8px; }
 
-  .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-  .btn{padding:9px 12px;border:1px solid var(--b);background:#fff;border-radius:10px;cursor:pointer}
-  .btn:hover{border-color:#cbd5e1}
-  .note{color:var(--muted);font-size:.9rem;margin:8px 0 0}
+  .controls { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+  .btn { padding:9px 12px; border:1px solid #e2e8f0; background:#fff; border-radius:10px; cursor:pointer; }
+  .btn:hover { border-color:#cbd5e1; }
+  .note { color:#64748b; font-size:.9rem; margin:8px 0 0; }
 
-  /* адаптивность */
-  @media (max-width: 760px){
-    .stage{min-height:640px}
-    .orb.fin   {top:6px}
-    .orb.ops   {bottom:6px}
-    .orb.legal {top:120px}
-    .orb.it    {top:120px}
-    .orb.tax   {bottom:120px}
-    .orb.team  {bottom:120px}
+  @media (max-width:760px){
+    .stage{ min-height:640px; }
+    .orb.fin{ top:6px } .orb.ops{ bottom:6px }
+    .orb.legal,.orb.it{ top:120px } .orb.tax,.orb.team{ bottom:120px }
   }
 </style>
 </head>
@@ -89,52 +86,35 @@
   <p class="sub">Кликните по элементам в ядре (цепочка) или по «спутникам» вокруг (экосистема). Линии показывают связь экосистемы с ядром.</p>
 
   <div class="stage" id="stage">
-    <!-- SVG-слой для линий -->
-    <svg class="links" id="links" viewBox="0 0 1100 520" preserveAspectRatio="none" aria-hidden="true"></svg>
+    <svg class="links" id="links" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
 
-    <!-- ЯДРО: кликабельная цепочка -->
     <div class="core" id="core">
-      <button class="pill" data-k="Продукт" data-v="Ценность для клиента: товар, услуга или решение задачи." data-tags="custdev, JTBD, проверка спроса">🟠 Продукт</button>
+      <button class="pill" data-k="Продукт" data-v="Ценность для клиента: товар, услуга или решение задачи." data-tags="custdev, JTBD, проверка спроса"><span>🟠</span><span>Продукт</span></button>
       <span class="arrow">→</span>
-      <button class="pill" data-k="Клиенты" data-v="Пользователь и плательщик могут быть разными людьми — учитывайте это в продукте и продаже." data-tags="сегментация, мотивы, LTV">🟢 Клиенты</button>
+      <button class="pill" data-k="Клиенты" data-v="Пользователь и плательщик могут быть разными — учитывайте это." data-tags="сегментация, мотивы, LTV"><span>🟢</span><span>Клиенты</span></button>
       <span class="arrow">→</span>
-      <button class="pill" data-k="Выручка" data-v="Цена × количество. Факт оплаты, но ещё не свободные деньги." data-tags="юнит-экономика, масштабирование">💸 Выручка</button>
+      <button class="pill" data-k="Выручка" data-v="Цена × количество. Факт оплаты, но ещё не свободные деньги." data-tags="юнит-экономика, масштабирование"><span>💸</span><span>Выручка</span></button>
       <span class="arrow">→</span>
-      <button class="pill" data-k="Расходы" data-v="Переменные и постоянные траты. Управляйте структурой, иначе они «съедят» маржу." data-tags="переменные/постоянные, оптимизация">📉 Расходы</button>
+      <button class="pill" data-k="Расходы" data-v="Переменные и постоянные траты. Управляйте структурой." data-tags="переменные/постоянные, оптимизация"><span>📉</span><span>Расходы</span></button>
       <span class="arrow">→</span>
-      <button class="pill" data-k="Прибыль" data-v="Что осталось после расходов. Смотрите уровни: валовая, операционная, чистая." data-tags="маржа, устойчивость">✅ Прибыль</button>
+      <button class="pill" data-k="Прибыль" data-v="Что осталось после расходов. Уровни: валовая, операционная, чистая." data-tags="маржа, устойчивость"><span>✅</span><span>Прибыль</span></button>
       <span class="arrow">→</span>
-      <button class="pill" data-k="Денежный поток" data-v="Реальные деньги по календарю. Прибыль возможна при отрицательном кэше (кассовый разрыв)." data-tags="авансы, сроки оплат, дисциплина платежей">💵 Денежный поток</button>
+      <button class="pill" data-k="Денежный поток" data-v="Реальные деньги по календарю. Возможен кассовый разрыв." data-tags="авансы, сроки оплат"><span>💵</span><span>Денежный поток</span></button>
     </div>
 
-    <!-- ОРБИТЫ: экосистема -->
-    <div class="orb fin"   data-k="Финансы"  data-v="Учёт, бюджеты, отчётность: видимость выручки/расходов/кэша." data-tags="P&L, Cash Flow, бюджет">
-      Финансы <span class="tip">Учёт и бюджеты</span>
-    </div>
-    <div class="orb legal" data-k="Право"     data-v="Договоры, права, риски: надёжные условия и ответственность." data-tags="договоры, ИС, комплаенс">
-      Право <span class="tip">Договоры и риски</span>
-    </div>
-    <div class="orb tax"   data-k="Налоги"    data-v="Режим налогообложения и обязанности: влияет на чистую прибыль." data-tags="УСН/ОСНО, ставки">
-      Налоги <span class="tip">Режим и ставки</span>
-    </div>
-    <div class="orb ops"   data-k="Операции"  data-v="Процессы, логистика, контроль качества: скорость и надёжность." data-tags="SLA, логистика, процессы">
-      Операции <span class="tip">Процессы и логистика</span>
-    </div>
-    <div class="orb team"  data-k="Команда"   data-v="Роли, культура, найм: кто делает работу и как принимаются решения." data-tags="рутины, роли, найм">
-      Команда <span class="tip">Роли и культура</span>
-    </div>
-    <div class="orb it"    data-k="IT"        data-v="Сайт, CRM, автоматизация, безопасность: инструменты эффективности." data-tags="CRM, автоматизация, безопасность">
-      IT <span class="tip">Сайт и CRM</span>
-    </div>
+    <div class="orb fin"   data-k="Финансы" data-v="Учёт, бюджеты, отчётность: видимость выручки/расходов/кэша." data-tags="P&L, Cash Flow, бюджет">Финансы <span class="tip">Учёт и бюджеты</span></div>
+    <div class="orb legal" data-k="Право"    data-v="Договоры, права, риски: надёжные условия и ответственность." data-tags="договоры, ИС, комплаенс">Право <span class="tip">Договоры и риски</span></div>
+    <div class="orb tax"   data-k="Налоги"   data-v="Режим налогообложения и обязанности: влияет на чистую прибыль." data-tags="УСН/ОСНО, ставки">Налоги <span class="tip">Режим и ставки</span></div>
+    <div class="orb ops"   data-k="Операции" data-v="Процессы, логистика, контроль качества: скорость и надёжность." data-tags="SLA, логистика, процессы">Операции <span class="tip">Процессы и логистика</span></div>
+    <div class="orb team"  data-k="Команда"  data-v="Роли, культура, найм: кто делает работу и как принимаются решения." data-tags="рутины, роли, найм">Команда <span class="tip">Роли и культура</span></div>
+    <div class="orb it"    data-k="IT"       data-v="Сайт, CRM, автоматизация, безопасность: инструменты эффективности." data-tags="CRM, автоматизация, безопасность">IT <span class="tip">Сайт и CRM</span></div>
   </div>
 
-  <!-- Панель пояснений -->
   <div class="panel" id="panel">
     <p class="title">Нажмите на любой элемент</p>
     <p class="hint">Появится краткое объяснение и полезные теги.</p>
   </div>
 
-  <!-- Быстрые сценарии (по желанию) -->
   <div class="controls">
     <button class="btn" data-demo="cashgap">Показать: кассовый разрыв</button>
     <button class="btn" data-demo="costs">Показать: расходы «съели» прибыль</button>
@@ -150,10 +130,8 @@
   const svg   = document.getElementById('links');
 
   function showInfo(title, text, tagsStr, el){
-    // активные состояния
     document.querySelectorAll('.pill,.orb').forEach(n=>n.classList.remove('active'));
     if(el) el.classList.add('active');
-
     const tags = (tagsStr||'').split(',').map(s=>s.trim()).filter(Boolean);
     panel.innerHTML = `
       <p class="title">${title}</p>
@@ -162,71 +140,53 @@
     `;
   }
 
-  // клики по ядру
   core.addEventListener('click', e=>{
     const b = e.target.closest('.pill'); if(!b) return;
     showInfo(b.dataset.k, b.dataset.v, b.dataset.tags, b);
   });
-
-  // клики по орбитам
   document.querySelectorAll('.orb').forEach(orb=>{
     orb.addEventListener('click', ()=> showInfo(orb.dataset.k, orb.dataset.v, orb.dataset.tags, orb));
   });
 
-  // отрисовка линий от орбит к ядру (к центру ядра)
   function drawLinks(){
-    const sRect = stage.getBoundingClientRect();
-    const cRect = core.getBoundingClientRect();
-    const cX = (cRect.left + cRect.right)/2 - sRect.left;
-    const cY = (cRect.top  + cRect.bottom)/2 - sRect.top;
+    const s = stage.getBoundingClientRect();
+    const c = core.getBoundingClientRect();
+    const cx = (c.left + c.right)/2 - s.left;
+    const cy = (c.top  + c.bottom)/2 - s.top;
 
-    // установить viewBox по текущим размерам
-    svg.setAttribute('viewBox', `0 0 ${sRect.width} ${sRect.height}`);
-    svg.innerHTML = ''; // очистка
+    svg.setAttribute('viewBox', `0 0 ${s.width} ${s.height}`);
+    svg.innerHTML = '';
 
     document.querySelectorAll('.orb').forEach(orb=>{
-      const oRect = orb.getBoundingClientRect();
-      const oX = (oRect.left + oRect.right)/2 - sRect.left;
-      const oY = (oRect.top  + oRect.bottom)/2 - sRect.top;
-
-      // лёгкая кривизна линии (квадратичная Bezier)
-      const mx = (oX + cX)/2;
-      const my = (oY + cY)/2 + ((oY < cY) ? 20 : -20);
+      const r = orb.getBoundingClientRect();
+      const ox = (r.left + r.right)/2 - s.left;
+      const oy = (r.top  + r.bottom)/2 - s.top;
+      const mx = (ox + cx)/2;
+      const my = (oy + cy)/2 + ((oy < cy) ? 20 : -20);
 
       const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-      path.setAttribute('d', `M ${oX} ${oY} Q ${mx} ${my} ${cX} ${cY}`);
+      path.setAttribute('d', `M ${ox} ${oy} Q ${mx} ${my} ${cx} ${cy}`);
       path.setAttribute('fill','none');
-      path.setAttribute('stroke','var(--line)');
+      path.setAttribute('stroke','#cbd5e1');
       path.setAttribute('stroke-width','2');
       path.setAttribute('stroke-linecap','round');
       svg.appendChild(path);
     });
   }
 
-  // начальная инициализация
-  drawLinks();
-  // пересчёт при изменении размера/ориентации/шрифта
+  const init = () => drawLinks();
+  window.addEventListener('load', init);
   window.addEventListener('resize', drawLinks);
-  // перерисовать после рендеринга шрифтов
   document.fonts && document.fonts.ready && document.fonts.ready.then(drawLinks);
+  new ResizeObserver(drawLinks).observe(stage);
 
-  // демо-сценарии
   const demos = {
-    cashgap(){
-      showInfo('Кассовый разрыв', 'Прибыль на бумаге есть, но деньги ещё не пришли: сегодня на счёте может быть минус. Управляйте сроками оплат и авансами.', 'авансы, условия оплаты, дисциплина');
-    },
-    costs(){
-      showInfo('Расходы «съели» прибыль', 'Если издержки растут или непрозрачны, маржа падает. Делите расходы на переменные/постоянные и оптимизируйте статьи.', 'юнит-экономика, оптимизация, бюджет');
-    },
-    product(){
-      showInfo('Нет ценности — нет цепочки', 'Если продукт не решает задачу клиента, цепочка не стартует: нет клиентов → нет выручки.', 'custdev, JTBD, проверка спроса');
-    }
+    cashgap(){ showInfo('Кассовый разрыв', 'Прибыль есть, но деньги не пришли: сегодня на счету может быть минус. Управляйте сроками оплат/авансами.', 'авансы, условия оплаты, дисциплина'); },
+    costs(){   showInfo('Расходы «съели» прибыль', 'Если издержки растут, маржа падает. Делите расходы на переменные/постоянные и оптимизируйте статьи.', 'юнит-экономика, оптимизация, бюджет'); },
+    product(){ showInfo('Нет ценности — нет цепочки', 'Если продукт не решает задачу клиента, цепочка не стартует: нет клиентов → нет выручки.', 'custdev, JTBD, проверка спроса'); }
   };
   document.querySelectorAll('.btn[data-demo]').forEach(btn=>{
-    btn.addEventListener('click', ()=> {
-      const key = btn.getAttribute('data-demo');
-      demos[key] && demos[key]();
-    });
+    btn.addEventListener('click', ()=> { const k = btn.getAttribute('data-demo'); demos[k] && demos[k](); });
   });
 </script>
 </body>
