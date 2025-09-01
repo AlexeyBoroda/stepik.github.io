@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Пирамида продукта</title>
+  <style>
+    body {
+      font-family: system-ui, Arial, sans-serif;
+      margin: 0;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .pyramid {
+      width: 300px;
+      text-align: center;
+    }
+    .layer {
+      position: relative;
+      padding: 40px 0;
+      margin: 4px 0;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+    .layer:hover {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+    .hobby   { background: #94a3b8; } /* серый */
+    .skill   { background: #3b82f6; } /* синий */
+    .product { background: #10b981; } /* зелёный */
+
+    .tooltip {
+      position: absolute;
+      bottom: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111827;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      opacity: 0;
+      white-space: nowrap;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .layer:hover .tooltip {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="pyramid">
+    <div class="layer hobby">
+      Хобби
+      <div class="tooltip">Ты делаешь это для себя или близких, без оплаты</div>
+    </div>
+    <div class="layer skill">
+      Навык
+      <div class="tooltip">Ты умеешь делать это хорошо, но ценность ещё не проверена</div>
+    </div>
+    <div class="layer product">
+      Продукт
+      <div class="tooltip">Это решает чужую задачу, за это готовы платить</div>
+    </div>
+  </div>
+</body>
+</html>
