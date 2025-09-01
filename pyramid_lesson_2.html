@@ -2,86 +2,86 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Пирамида продукта</title>
+  <title>Пирамида продукта — фикс видимости текста</title>
+  <meta name="color-scheme" content="light">
   <style>
-    body {
-      font-family: system-ui, Arial, sans-serif;
-      margin: 0;
-      background: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+    :root{
+      --bg:#ffffff; --t:#0f172a;
+      --hobby:#94a3b8;  /* серый */
+      --skill:#3b82f6;  /* синий */
+      --product:#10b981;/* зелёный */
+      --shadow:0 12px 30px rgba(0,0,0,.08);
     }
-    .pyramid {
-      width: 320px;
-      text-align: center;
-    }
-    .layer {
-      position: relative;
-      padding: 40px 0;
-      margin: 6px 0;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-      transition: transform 0.3s, opacity 0.3s;
-      opacity: 0;
-      transform: translateY(-30px);
-      animation: fadeInUp 0.8s forwards;
-    }
-    .layer:nth-child(1) { animation-delay: 0.2s; }
-    .layer:nth-child(2) { animation-delay: 0.6s; }
-    .layer:nth-child(3) { animation-delay: 1s; }
-
-    .layer:hover {
-      transform: scale(1.05);
-      opacity: 0.9;
-    }
-    .hobby   { background: #94a3b8; } /* серый */
-    .skill   { background: #3b82f6; } /* синий */
-    .product { background: #10b981; } /* зелёный */
-
-    .tooltip {
-      position: absolute;
-      bottom: -40px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #111827;
-      color: #fff;
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      opacity: 0;
-      white-space: nowrap;
-      pointer-events: none;
-      transition: opacity 0.2s;
-    }
-    .layer:hover .tooltip {
-      opacity: 1;
+    html,body{margin:0;height:100%;background:#fff}
+    body{
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+      display:flex;align-items:center;justify-content:center;
+      padding:32px;color:var(--t);overflow-x:hidden
     }
 
-    @keyframes fadeInUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .pyramid{width:min(520px,92vw);text-align:center;position:relative;overflow:visible}
+    .layer{
+      position:relative; margin:12px 0; padding:42px 0; border-radius:12px;
+      font-weight:800; letter-spacing:.2px; font-size:20px;
+      color:#fff !important; -webkit-text-fill-color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.25);
+      cursor:pointer; transition:transform .25s, opacity .25s, box-shadow .25s; box-shadow:var(--shadow);
+      overflow:visible; z-index:1;
     }
+    .layer:hover{transform:scale(1.02)}
+    .hobby{background:var(--hobby)}
+    .skill{background:var(--skill)}
+    .product{background:var(--product)}
+
+    /* Подсказка поверх соседей */
+    .tooltip{
+      position:absolute; left:50%; transform:translateX(-50%);
+      top:50%; /* центр по высоте, можно сместить, если нужно снизу: bottom:-44px; */
+      translate:0 calc(-50% + 56px);
+      background:#111827; color:#fff; -webkit-text-fill-color:#fff;
+      padding:8px 12px; border-radius:8px; font-size:.9rem;
+      white-space:nowrap; box-shadow:0 8px 20px rgba(17,24,39,.25);
+      opacity:0; pointer-events:none; transition:opacity .18s, translate .18s;
+      z-index:3;
+    }
+    .layer:hover .tooltip{opacity:1; translate:0 calc(-50% + 48px)}
+
+    /* Анимация появления слоёв сверху вниз (lf) */
+    .layer{opacity:0; transform:translateY(-26px)}
+    .layer.show{opacity:1; transform:none}
   </style>
 </head>
 <body>
-  <div class="pyramid">
+  <div class="pyramid" id="py">
     <div class="layer hobby">
       Хобби
-      <div class="tooltip">Ты делаешь это для себя или близких, без оплаты</div>
+      <div class="tooltip">Делаю для себя/близких, спрос не проверен, оплаты нет</div>
     </div>
     <div class="layer skill">
       Навык
-      <div class="tooltip">Ты умеешь делать это хорошо, но ценность ещё не проверена</div>
+      <div class="tooltip">Умею делать стабильно и качественно — но это ещё не продукт</div>
     </div>
     <div class="layer product">
       Продукт
-      <div class="tooltip">Это решает чужую задачу, за это готовы платить</div>
+      <div class="tooltip">Решаю чужую задачу — за это платят. Здесь начинается бизнес</div>
     </div>
   </div>
+
+  <script>
+    // плавное «въезжание» слоёв сверху вниз
+    const layers = [...document.querySelectorAll('.layer')];
+    layers.forEach((el, i)=> setTimeout(()=> el.classList.add('show'), 200 + i*220));
+
+    // доступность с клавиатуры (Enter/Space = показать подсказку)
+    layers.forEach(el=>{
+      el.tabIndex = 0;
+      el.addEventListener('keypress', e=>{
+        if(e.key==='Enter' || e.key===' '){
+          e.preventDefault();
+          el.classList.add('hover');
+          setTimeout(()=> el.classList.remove('hover'), 800);
+        }
+      });
+    });
+  </script>
 </body>
 </html>
