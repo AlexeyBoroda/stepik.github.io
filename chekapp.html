@@ -4,22 +4,14 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Чек-лист: как избежать блокировки счёта</title>
-<meta name="color-scheme" content="light dark">
 <style>
   :root{
     --bg:#ffffff; --fg:#0f172a; --muted:#475569; --line:#e5e7eb;
     --primary:#0b3b7e; --accent:#16a34a; --accent-200:#bbf7d0; --accent-50:#ecfdf5;
     --card:#f8fafc; --note:#f1f5f9; --warn:#fb923c1a; --warn-line:#fed7aa;
   }
-  @media (prefers-color-scheme: dark){
-    :root{
-      --bg:#0b1220; --fg:#e5e7eb; --muted:#94a3b8; --line:#223147;
-      --primary:#7aa2ff; --accent:#22c55e; --accent-200:#14532d; --accent-50:#042817;
-      --card:#0f172a; --note:#0b1220; --warn:#1f1307; --warn-line:#513515;
-    }
-  }
   html,body{height:100%}
-  body{margin:0; font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:var(--fg);}
+  body{margin:0; font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:#ffffff; color:var(--fg);}
   .container{max-width:980px;margin:auto;padding:22px 16px;}
   h1{margin:0 0 6px; font-size:28px; color:var(--primary);}
   .sub{margin:0 0 18px; color:var(--muted); font-size:14px}
@@ -46,7 +38,7 @@
   input[type="checkbox"]:checked + .box::after{content:"✓"; color:#fff; font-weight:800; font-size:14px}
   .label{font-weight:600}
   .note{grid-column:1/-1; margin:6px 0 0}
-  .note textarea{width:100%; min-height:70px; padding:8px 10px; border:1px solid var(--line); border-radius:10px; background:var(--bg); color:var(--fg);}
+  .note textarea{width:100%; min-height:70px; padding:8px 10px; border:1px solid var(--line); border-radius:10px; background:#ffffff; color:var(--fg);}
   .section-progress{display:flex; align-items:center; gap:8px; margin:6px 2px 2px}
   .mini{flex:1; height:8px; background:var(--note); border:1px solid var(--line); border-radius:999px; overflow:hidden}
   .mini>span{display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--accent),#22c55e)}
@@ -67,12 +59,12 @@
         <div class="hint"><span id="totalCount">0</span> из <span id="totalAll">0</span> выполнено</div>
       </div>
       <div class="toolbar">
-        <button id="btnPrint" title="Печать или сохранить в PDF">Печать / PDF</button>
-        <button id="btnExport" title="Экспорт прогресса в файл">Экспорт</button>
-        <label class="btn" for="fileImport" title="Импорт сохранённого прогресса" style="cursor:pointer">Импорт
+        <button id="btnPrint">Печать / PDF</button>
+        <button id="btnExport">Экспорт</button>
+        <label class="btn" for="fileImport">Импорт
           <input id="fileImport" type="file" accept="application/json" style="display:none">
         </label>
-        <button id="btnReset" title="Сбросить все отметки">Сброс</button>
+        <button id="btnReset">Сброс</button>
       </div>
     </div>
 
@@ -85,7 +77,6 @@
   </div>
 
 <script>
-/* ---------- ДАННЫЕ ЧЕК-ЛИСТА ---------- */
 const DATA = [
   { id:"ops",  title:"Быстрая самопроверка операций", items:[
     {id:"ops1", text:"Нет транзитов без смысла — деньги не уходят сразу после зачисления; назначение платежа понятное."},
@@ -122,15 +113,12 @@ const DATA = [
 ];
 
 const STORAGE_KEY = "safe_checklist_v1";
-
-/* ---------- УТИЛИТЫ ---------- */
 const $ = (s,r=document)=>r.querySelector(s);
 function loadState(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? {}; }catch(_){ return {}; } }
 function saveState(x){ localStorage.setItem(STORAGE_KEY, JSON.stringify(x)); }
 function pct(a,b){ return b ? Math.round(a/b*100) : 0; }
 
-/* ---------- РЕНДЕР ---------- */
-const state = loadState(); // { sectionId: { itemId: {checked, note} } }
+const state = loadState();
 
 function render(){
   const wrap = $("#sections"); wrap.innerHTML = "";
@@ -157,10 +145,10 @@ function render(){
       label.className = "task";
       label.innerHTML = `
         <input type="checkbox" ${s.checked?"checked":""} data-sec="${sec.id}" data-id="${it.id}">
-        <span class="box" aria-hidden="true"></span>
+        <span class="box"></span>
         <div>
           <div class="label">${it.text}</div>
-          <div class="note"><textarea placeholder="Заметка, ссылка на документы..." data-note="${sec.id}:${it.id}">${s.note??""}</textarea></div>
+          <div class="note"><textarea placeholder="Заметка..." data-note="${sec.id}:${it.id}">${s.note??""}</textarea></div>
         </div>`;
       tasks.appendChild(label);
     }
@@ -182,7 +170,6 @@ function render(){
 }
 render();
 
-/* ---------- СЛУШАТЕЛИ ---------- */
 document.addEventListener("change", e=>{
   if(e.target.matches('input[type="checkbox"][data-id]')){
     const sec = e.target.dataset.sec, id = e.target.dataset.id;
