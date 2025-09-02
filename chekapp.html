@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Чек-лист: как избежать блокировки счёта</title>
+<meta name="color-scheme" content="light dark">
+<style>
+  :root{
+    --bg:#ffffff; --fg:#0f172a; --muted:#475569; --line:#e5e7eb;
+    --primary:#0b3b7e; --accent:#16a34a; --accent-200:#bbf7d0; --accent-50:#ecfdf5;
+    --card:#f8fafc; --note:#f1f5f9; --warn:#fb923c1a; --warn-line:#fed7aa;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b1220; --fg:#e5e7eb; --muted:#94a3b8; --line:#223147;
+      --primary:#7aa2ff; --accent:#22c55e; --accent-200:#14532d; --accent-50:#042817;
+      --card:#0f172a; --note:#0b1220; --warn:#1f1307; --warn-line:#513515;
+    }
+  }
+  html,body{height:100%}
+  body{margin:0; font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:var(--fg);}
+  .container{max-width:980px;margin:auto;padding:22px 16px;}
+  h1{margin:0 0 6px; font-size:28px; color:var(--primary);}
+  .sub{margin:0 0 18px; color:var(--muted); font-size:14px}
+  .topbar{display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:space-between; margin:8px 0 18px}
+  .progress{position:relative; width:100%; height:12px; background:var(--note); border:1px solid var(--line); border-radius:999px; overflow:hidden;}
+  .progress>span{display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--accent),#22c55e); transition:width .2s;}
+  .hint{color:var(--muted); font-size:13px}
+  .toolbar{display:flex; gap:8px; flex-wrap:wrap}
+  button, .btn {appearance:none; border:1px solid var(--line); background:var(--card); color:var(--fg);
+    border-radius:10px; padding:8px 12px; font-weight:600; cursor:pointer;}
+  button:hover{filter:brightness(1.05)}
+  .sections{display:grid; gap:14px}
+  details.card{border:1px solid var(--line); border-radius:14px; background:var(--card); padding:10px 12px;}
+  summary{list-style:none; cursor:pointer; display:flex; align-items:center; gap:10px; padding:4px 4px;}
+  summary::-webkit-details-marker{display:none}
+  .sumttl{font-weight:700; color:var(--primary)}
+  .badge{margin-left:auto; font-size:12px; color:var(--muted)}
+  .tasks{display:grid; gap:10px; margin:8px 0 4px}
+  .task{display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:start;
+    border:1px dashed var(--line); background:var(--bg); border-radius:12px; padding:12px;}
+  .box{display:inline-grid; place-items:center; width:24px; height:24px; border-radius:8px; border:2px solid var(--line); background:#fff0; cursor:pointer}
+  input[type="checkbox"]{appearance:none; width:18px; height:18px;}
+  input[type="checkbox"]:checked + .box{background:var(--accent); border-color:var(--accent)}
+  input[type="checkbox"]:checked + .box::after{content:"✓"; color:#fff; font-weight:800; font-size:14px}
+  .label{font-weight:600}
+  .note{grid-column:1/-1; margin:6px 0 0}
+  .note textarea{width:100%; min-height:70px; padding:8px 10px; border:1px solid var(--line); border-radius:10px; background:var(--bg); color:var(--fg);}
+  .section-progress{display:flex; align-items:center; gap:8px; margin:6px 2px 2px}
+  .mini{flex:1; height:8px; background:var(--note); border:1px solid var(--line); border-radius:999px; overflow:hidden}
+  .mini>span{display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--accent),#22c55e)}
+  .warn{background:var(--warn); border:1px solid var(--warn-line); padding:10px 12px; border-radius:12px; color:var(--muted); font-size:14px}
+  footer{margin-top:16px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+  .small{font-size:12px; color:var(--muted)}
+  @media print{ .toolbar, footer{display:none} body{background:#fff} .card{break-inside:avoid} }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Чек-лист: как избежать блокировки счёта</h1>
+    <p class="sub">Отмечайте пункты, фиксируйте заметки и сохраняйте прогресс локально. Можно распечатать в PDF.</p>
+
+    <div class="topbar">
+      <div style="flex:1; min-width:220px">
+        <div class="progress" aria-label="Общий прогресс"><span id="totalBar"></span></div>
+        <div class="hint"><span id="totalCount">0</span> из <span id="totalAll">0</span> выполнено</div>
+      </div>
+      <div class="toolbar">
+        <button id="btnPrint" title="Печать или сохранить в PDF">Печать / PDF</button>
+        <button id="btnExport" title="Экспорт прогресса в файл">Экспорт</button>
+        <label class="btn" for="fileImport" title="Импорт сохранённого прогресса" style="cursor:pointer">Импорт
+          <input id="fileImport" type="file" accept="application/json" style="display:none">
+        </label>
+        <button id="btnReset" title="Сбросить все отметки">Сброс</button>
+      </div>
+    </div>
+
+    <div id="sections" class="sections"></div>
+
+    <footer>
+      <div class="warn">Совет: поддерживайте налоговую нагрузку по счёту ≥ 0,9% от дебетового оборота и храните документы по каждой операции.</div>
+      <div class="small">Автосохранение: <strong>включено</strong> · Данные хранятся в вашем браузере</div>
+    </footer>
+  </div>
+
+<script>
+/* ---------- ДАННЫЕ ЧЕК-ЛИСТА ---------- */
+const DATA = [
+  { id:"ops",  title:"Быстрая самопроверка операций", items:[
+    {id:"ops1", text:"Нет транзитов без смысла — деньги не уходят сразу после зачисления; назначение платежа понятное."},
+    {id:"ops2", text:"Наличные снимаются редко и по документам — по крупным снятиям есть авансовые отчёты и чеки."},
+    {id:"ops3", text:"Налоговая нагрузка по счёту за месяц ≥ 0,9% от дебетового оборота."},
+    {id:"ops4", text:"Назначение платежей соответствует видам деятельности (ОКВЭД) и договорам."},
+    {id:"ops5", text:"Нет аномалий — резких скачков оборота и десятков однотипных переводов без объяснений."}
+  ]},
+  { id:"docs", title:"Документы по сделкам", items:[
+    {id:"docs1", text:"По каждой оплате готов комплект: договор, счёт/спецификация, акт/накладная, переписка при необходимости."},
+    {id:"docs2", text:"По нестандартным платежам подготовлена краткая пояснительная записка (1–3 предложения)."},
+    {id:"docs3", text:"Реквизиты контрагента проверены: ИНН/ОГРН и адрес совпадают с выпиской ЕГРЮЛ/ЕГРИП."}
+  ]},
+  { id:"ctr",  title:"Проверка контрагентов", items:[
+    {id:"ctr1", text:"Проверен в ФНС «Прозрачный бизнес» и ЕГРЮЛ/ЕГРИП: статус действующий, адрес не массовый."},
+    {id:"ctr2", text:"Нет признаков «однодневки»: свежая регистрация без штата, множественные связи руководителя, отсутствие контактов."},
+    {id:"ctr3", text:"Есть деловая цель сделки и адекватная рыночная цена."}
+  ]},
+  { id:"fin",  title:"Финансовая дисциплина", items:[
+    {id:"fin1", text:"Налоги, НДФЛ и страховые взносы уплачиваются вовремя; зарплаты выплачиваются регулярно."},
+    {id:"fin2", text:"ФОТ соразмерен обороту — нет «нулевых» налогов при значительных поступлениях."},
+    {id:"fin3", text:"Минимум наличных расчётов; по выплатам физлицам есть договоры и акты."}
+  ]},
+  { id:"risk", title:"Зоны повышенного риска", items:[
+    {id:"risk1", text:"Нет операций с криптовалютой и зарубежных переводов без полного пакета подтверждений."},
+    {id:"risk2", text:"Отсутствует искусственное «дробление» бизнеса ради налоговой экономии."},
+    {id:"risk3", text:"Данные в ЕГРЮЛ актуальны: адрес, ОКВЭД, руководитель и бенефициары."}
+  ]},
+  { id:"comm", title:"Коммуникация с банком", items:[
+    {id:"comm1", text:"Назначен ответственный за ответы банку и комплаенс."},
+    {id:"comm2", text:"Готовность отвечать на запросы банка в течение 5–7 рабочих дней с полным пакетом документов."},
+    {id:"comm3", text:"Есть шаблоны писем и пояснительных записок по типовым операциям."}
+  ]}
+];
+
+const STORAGE_KEY = "safe_checklist_v1";
+
+/* ---------- УТИЛИТЫ ---------- */
+const $ = (s,r=document)=>r.querySelector(s);
+function loadState(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? {}; }catch(_){ return {}; } }
+function saveState(x){ localStorage.setItem(STORAGE_KEY, JSON.stringify(x)); }
+function pct(a,b){ return b ? Math.round(a/b*100) : 0; }
+
+/* ---------- РЕНДЕР ---------- */
+const state = loadState(); // { sectionId: { itemId: {checked, note} } }
+
+function render(){
+  const wrap = $("#sections"); wrap.innerHTML = "";
+  let totalAll = 0, totalDone = 0;
+
+  for(const sec of DATA){
+    const secState = state[sec.id] ?? {};
+    const details = document.createElement("details");
+    details.className = "card"; details.open = true;
+
+    const summary = document.createElement("summary");
+    summary.innerHTML = `<span>📂</span><span class="sumttl">${sec.title}</span><span class="badge" id="${sec.id}-b"></span>`;
+    details.appendChild(summary);
+
+    const tasks = document.createElement("div"); tasks.className = "tasks";
+    let done = 0;
+
+    for(const it of sec.items){
+      totalAll++;
+      const s = (secState[it.id] ?? {checked:false, note:""});
+      if(s.checked){ done++; totalDone++; }
+
+      const label = document.createElement("label");
+      label.className = "task";
+      label.innerHTML = `
+        <input type="checkbox" ${s.checked?"checked":""} data-sec="${sec.id}" data-id="${it.id}">
+        <span class="box" aria-hidden="true"></span>
+        <div>
+          <div class="label">${it.text}</div>
+          <div class="note"><textarea placeholder="Заметка, ссылка на документы..." data-note="${sec.id}:${it.id}">${s.note??""}</textarea></div>
+        </div>`;
+      tasks.appendChild(label);
+    }
+
+    details.appendChild(tasks);
+
+    const secProg = document.createElement("div");
+    secProg.className = "section-progress";
+    secProg.innerHTML = `<div class="mini"><span style="width:${pct(done,sec.items.length)}%"></span></div><div class="hint">${done} из ${sec.items.length}</div>`;
+    details.appendChild(secProg);
+
+    wrap.appendChild(details);
+    $(`#${sec.id}-b`).textContent = `${done}/${sec.items.length}`;
+  }
+
+  $("#totalAll").textContent = totalAll;
+  $("#totalCount").textContent = totalDone;
+  $("#totalBar").style.width = pct(totalDone,totalAll) + "%";
+}
+render();
+
+/* ---------- СЛУШАТЕЛИ ---------- */
+document.addEventListener("change", e=>{
+  if(e.target.matches('input[type="checkbox"][data-id]')){
+    const sec = e.target.dataset.sec, id = e.target.dataset.id;
+    state[sec] ??= {}; state[sec][id] ??= {};
+    state[sec][id].checked = e.target.checked;
+    saveState(state); render();
+  }
+  if(e.target.matches('textarea[data-note]')){
+    const [sec,id] = e.target.dataset.note.split(":");
+    state[sec] ??= {}; state[sec][id] ??= {};
+    state[sec][id].note = e.target.value;
+    saveState(state);
+  }
+});
+
+$("#btnReset").addEventListener("click", ()=>{
+  if(confirm("Сбросить все отметки и заметки?")){
+    localStorage.removeItem(STORAGE_KEY);
+    for(const k in state) delete state[k];
+    render();
+  }
+});
+$("#btnPrint").addEventListener("click", ()=>window.print());
+$("#btnExport").addEventListener("click", ()=>{
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = Object.assign(document.createElement("a"), {href:url, download:"checklist-progress.json"});
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+});
+$("#fileImport").addEventListener("change", e=>{
+  const f = e.target.files?.[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{ try{
+      const imp = JSON.parse(String(r.result));
+      if(typeof imp === "object"){ localStorage.setItem(STORAGE_KEY, JSON.stringify(imp)); Object.assign(state, imp); render(); alert("Прогресс импортирован."); }
+      else throw 0;
+    }catch(_){ alert("Не удалось импортировать файл. Проверьте формат JSON."); }
+  };
+  r.readAsText(f); e.target.value = "";
+});
+</script>
+</body>
+</html>
