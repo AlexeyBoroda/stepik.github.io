@@ -4,14 +4,14 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Чек-листы и алгоритмы — Блокировки счетов (интерактивная версия)</title>
-<meta name="description" content="Интерактивные чек-листы, дорожная карта 0–72 часа, шаблоны писем и самопроверки по теме блокировок счетов. Локальное сохранение прогресса, экспорт, печать." />
+<meta name="description" content="Интерактивные чек-листы, дорожная карта 0–72 часа, шаблоны писем и самопроверки по теме блокировок счетов. Локальное сохранение прогресса, поиск, тёмная тема и экспорт в PDF.">
 <style>
   :root{
     --bg:#ffffff; --ink:#0f172a; --muted:#475569; --line:#e2e8f0; --card:#f8fafc;
     --accent:#0ea5e9; --ok:#16a34a; --warn:#ca8a04; --bad:#dc2626;
     --chip:#eef2ff; --chip-ink:#3730a3;
   }
-  /* Dark mode (optional, toggled) */
+  /* Dark mode */
   :root.dark{
     --bg:#0b1220; --ink:#e5e7eb; --muted:#9aa4b2; --line:#243043; --card:#121a2c;
     --accent:#38bdf8; --ok:#22c55e; --warn:#f59e0b; --bad:#f87171;
@@ -84,17 +84,16 @@
   <div class="toolbar">
     <div class="left-tools">
       <label class="search" title="Поиск по чек-листам">
-        <!-- search icon -->
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 21l-3.5-3.5M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 21l-3.5-3.5M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <input id="search" type="search" placeholder="Найти пункт..." />
       </label>
-      <button id="btn-clear" class="btn" title="Сбросить прогресс (все чекбоксы)">Сброс прогресса</button>
-      <button id="btn-export" class="btn" title="Экспорт отмеченных пунктов в Markdown">Экспорт ✓</button>
-      <button id="btn-print" class="btn" title="Версия для печати / PDF">Печать</button>
+      <button id="btn-clear" class="btn">Сброс прогресса</button>
+      <button id="btn-export" class="btn">Экспорт ✓ PDF</button>
+      <button id="btn-print" class="btn">Печать</button>
     </div>
     <div class="right-tools">
-      <button id="btn-compact" class="btn btn-ghost" aria-pressed="false" title="Переключить компактный режим">Компактно</button>
-      <button id="btn-theme" class="btn btn-ghost" aria-pressed="false" title="Светлая/тёмная тема">Тема</button>
+      <button id="btn-compact" class="btn btn-ghost" aria-pressed="false">Компактно</button>
+      <button id="btn-theme" class="btn btn-ghost" aria-pressed="false">Тема</button>
     </div>
   </div>
 
@@ -207,27 +206,24 @@
   </section>
 
   <div class="hr"></div>
-
-  <footer class="small">
-    © Финмон, 2025 · Интерактивные чек-листы. Данные сохраняются локально в вашем браузере.
-  </footer>
+  <footer class="small">© Финмон, 2025 · Интерактивные чек-листы. Данные сохраняются локально в вашем браузере.</footer>
 </main>
 
+<!-- jsPDF для экспорта в PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-3c1f8YH5P9A86J5v1Kc7i9J0o3+9sL0tQ0QGqf0k3rS5bY3mLQ0Z1u2k+z6C6nHnS9Qzqd0vM7+Qn3k4mYQ6Xg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
-/* ===== Helpers ===== */
+/* ===== Mini helpers ===== */
 const $$ = (sel, ctx=document)=>Array.from(ctx.querySelectorAll(sel));
 const $ = (sel, ctx=document)=>ctx.querySelector(sel);
 
+/* ===== Keys for localStorage ===== */
 const STORAGE_KEY = 'finmon_checklists_v1';
 const THEME_KEY = 'finmon_theme';
 const COMPACT_KEY = 'finmon_compact';
 
-function loadState(){
-  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }catch{ return {}; }
-}
-function saveState(state){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-}
+/* ===== Persistence utils ===== */
+function loadState(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }catch{ return {}; } }
+function saveState(state){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 function getTheme(){ return localStorage.getItem(THEME_KEY) || 'light'; }
 function setTheme(mode){
   if(mode==='dark'){ document.documentElement.classList.add('dark'); }
@@ -235,26 +231,19 @@ function setTheme(mode){
   localStorage.setItem(THEME_KEY, mode);
 }
 function getCompact(){ return localStorage.getItem(COMPACT_KEY) === '1'; }
-function setCompact(on){
-  document.body.classList.toggle('compact', !!on);
-  localStorage.setItem(COMPACT_KEY, on ? '1' : '0');
-}
+function setCompact(on){ document.body.classList.toggle('compact', !!on); localStorage.setItem(COMPACT_KEY, on ? '1' : '0'); }
 
-/* ===== Init checklists with persistence ===== */
+/* ===== Global state ===== */
 const state = loadState();
-let total = 0, done = 0;
 
+/* ===== Wire each checklist with saved state ===== */
 function wireChecklist(section){
   const listId = section.dataset.listId || Math.random().toString(36).slice(2);
   if(!state[listId]) state[listId] = {};
   const boxes = $$('input[type="checkbox"]', section);
   boxes.forEach((box, idx)=>{
     const id = box.id || (box.id = `${listId}_${idx}`);
-    // restore
     if(state[listId][id]) box.checked = true;
-    // count
-    total += 1; if(box.checked) done += 1;
-    // change
     box.addEventListener('change', ()=>{
       state[listId][id] = box.checked ? 1 : 0;
       saveState(state);
@@ -263,6 +252,7 @@ function wireChecklist(section){
   });
 }
 
+/* ===== Progress ===== */
 function computeProgress(){
   const all = $$('input[type="checkbox"]');
   const checked = all.filter(b=>b.checked);
@@ -289,7 +279,7 @@ function wireSearch(){
       sec.style.opacity = any ? '1' : '0.35';
     });
   });
-  // focus with "/"
+  // hotkey "/"
   window.addEventListener('keydown', (e)=>{
     if(e.key === '/' && document.activeElement.tagName !== 'INPUT'){
       e.preventDefault(); input.focus();
@@ -297,42 +287,76 @@ function wireSearch(){
   });
 }
 
-/* ===== Export checked as Markdown ===== */
-function exportChecked(){
-  const lines = ['# Отмеченные пункты', ''];
+/* ===== Export checked items to PDF via jsPDF ===== */
+function exportCheckedPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'pt', format:'a4' }); // points, A4
+  const pageW = doc.internal.pageSize.getWidth();
+  const margin = 40;
+  let y = margin;
+
+  function addTitle(txt){
+    doc.setFont('helvetica','bold'); doc.setFontSize(14);
+    doc.text(txt, margin, y); y += 18;
+  }
+  function addItem(txt){
+    doc.setFont('helvetica','normal'); doc.setFontSize(11);
+    const lines = doc.splitTextToSize('• ' + txt, pageW - margin*2);
+    lines.forEach(line=>{
+      if(y > doc.internal.pageSize.getHeight() - margin){ doc.addPage(); y = margin; }
+      doc.text(line, margin, y); y += 14;
+    });
+  }
+
+  // Header
+  doc.setFont('helvetica','bold'); doc.setFontSize(16);
+  doc.text('Отмеченные пункты (чек-листы Финмон)', margin, y);
+  y += 22;
+  doc.setFont('helvetica','normal'); doc.setFontSize(10);
+  const date = new Date().toLocaleString();
+  doc.text(`Сформировано: ${date}`, margin, y); y += 16;
+
+  // Sections
+  let anyItems = false;
   $$('#lists section').forEach(sec=>{
     const title = $('h2', sec)?.textContent?.trim() || 'Раздел';
-    const items = $$('input[type="checkbox"]:checked', sec).map(box=>{
-      return '- ' + box.closest('label')?.innerText.trim();
-    });
+    const items = $$('input[type="checkbox"]:checked', sec).map(b=>{
+      // ближайший label может содержать вложенные элементы — берем видимый текст
+      const lbl = b.closest('label');
+      return (lbl ? lbl.innerText : b.parentElement?.innerText || '').trim();
+    }).filter(Boolean);
     if(items.length){
-      lines.push('## ' + title, ...items, '');
+      if(y > doc.internal.pageSize.getHeight() - margin - 24){ doc.addPage(); y = margin; }
+      addTitle(title);
+      items.forEach(addItem);
+      anyItems = true;
+      y += 6;
     }
   });
-  const md = lines.join('\n');
-  const blob = new Blob([md], {type:'text/markdown;charset=utf-8'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'finmon_checklists.md';
-  a.click();
-  URL.revokeObjectURL(a.href);
+
+  if(!anyItems){
+    addTitle('Нет отмеченных пунктов');
+    doc.setFont('helvetica','normal'); doc.setFontSize(11);
+    doc.text('Отметьте галочками нужные пункты и повторите экспорт.', margin, y);
+  }
+
+  doc.save('finmon_checklists.pdf');
 }
 
-/* ===== Copy template letter ===== */
+/* ===== Copy template letter to clipboard ===== */
 function copyTemplate(){
   const txt = $('#template').innerText;
-  navigator.clipboard.writeText(txt).then(()=>{
-    notify('Шаблон скопирован в буфер обмена.');
-  }).catch(()=>{
-    // fallback
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(()=>notify('Шаблон скопирован в буфер обмена.'));
+  }else{
     const ta = document.createElement('textarea');
     ta.value = txt; document.body.appendChild(ta);
     ta.select(); document.execCommand('copy'); ta.remove();
     notify('Шаблон скопирован (fallback).');
-  });
+  }
 }
 
-/* ===== Notify (lightweight) ===== */
+/* ===== Lightweight toast ===== */
 let notifyTimer = null;
 function notify(msg){
   let n = $('#notifier');
@@ -351,7 +375,7 @@ function notify(msg){
   notifyTimer = setTimeout(()=>{ n.style.opacity='0'; }, 1600);
 }
 
-/* ===== Buttons / hotkeys ===== */
+/* ===== Buttons, theme, compact & hotkeys ===== */
 function wireButtons(){
   $('#btn-clear').addEventListener('click', ()=>{
     if(confirm('Сбросить прогресс по всем чек-листам?')){
@@ -360,7 +384,7 @@ function wireButtons(){
       computeProgress(); notify('Прогресс сброшен.');
     }
   });
-  $('#btn-export').addEventListener('click', exportChecked);
+  $('#btn-export').addEventListener('click', exportCheckedPDF);
   $('#btn-print').addEventListener('click', ()=>window.print());
   $('#btn-copy-template').addEventListener('click', copyTemplate);
 
@@ -381,19 +405,19 @@ function wireButtons(){
   themeBtn.addEventListener('click', toggleTheme);
   compactBtn.addEventListener('click', toggleCompact);
 
-  // hotkeys
+  // Hotkeys
   window.addEventListener('keydown',(e)=>{
     if(e.key.toLowerCase()==='d'){ toggleTheme(); }
     if(e.key.toLowerCase()==='c'){ toggleCompact(); }
   });
 }
 
-/* ===== Query params (optional): ?dark=1&compact=1 ===== */
+/* ===== Query params support: ?dark=1&compact=1 ===== */
 function applyQueryParams(){
   const q = new URLSearchParams(location.search);
   if(q.get('dark')==='1') setTheme('dark'); else setTheme(getTheme());
   if(q.get('compact')==='1') setCompact(true); else setCompact(getCompact());
-  // if opened in Stepik small iframe — you can pass ?compact=1 to tighten paddings
+  // Пример для Stepik: добавьте к iframe src ...?compact=1 для плотной верстки
 }
 
 /* ===== Boot ===== */
@@ -403,7 +427,7 @@ function boot(){
   wireSearch();
   wireButtons();
   computeProgress();
-  // focus handling to improve accessibility
+  // accessibility: toggle details by Enter/Space
   $$('summary').forEach(s=>s.addEventListener('keydown',e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); s.click(); } }));
 }
 document.addEventListener('DOMContentLoaded', boot);
