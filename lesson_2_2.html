@@ -8,9 +8,9 @@
 <style>
   :root{
     --bg:#ffffff;
-    --text:#0f1b3d;         /* тёмно-синий */
+    --text:#0f1b3d;
     --muted:#5b6b8c;
-    --accent:#d1122e;       /* красный акцент */
+    --accent:#d1122e;
     --ok:#0a7f2e;
     --warn:#b4690e;
     --bad:#a1111a;
@@ -48,7 +48,6 @@
   .step .meta p{margin:.15rem 0; color:var(--muted); font-size:14px}
   .actions{display:flex; flex-wrap:wrap; gap:8px}
   .btn{appearance:none; border:1px solid transparent; background:var(--accent); color:#fff; padding:10px 14px; border-radius:999px; font-weight:700; cursor:pointer; box-shadow:var(--shadow); transition:.2s}
-  .btn.secondary{background:#fff; color:var(--accent); border-color:var(--accent)}
   .btn.ghost{background:#fff; color:#0f1b3d; border-color:#e6e8ef}
   .btn:active{transform:translateY(1px)}
   label{display:block; margin:8px 0 4px; font-weight:600}
@@ -64,15 +63,12 @@
   .result.bad{border-color:rgba(161,17,26,.35); background:linear-gradient(0deg, rgba(161,17,26,.06), rgba(161,17,26,.06)); color:var(--bad)}
   .result.hint{border-color:#e7d8bd; background:linear-gradient(0deg, rgba(180,105,14,.06), rgba(180,105,14,.06)); color:var(--warn)}
   .small{font-size:13px; color:var(--muted)}
-  .hr{height:1px; background:var(--line); margin:14px 0}
   footer{color:var(--muted); font-size:14px; padding:26px 0 80px}
   .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; background:#0f172a0e; border:1px solid #dfe4ef; padding:0 6px; border-radius:6px}
-  /* Toast */
   .toast{position:fixed;right:16px;bottom:16px;z-index:50;display:none;max-width:440px}
   .toast .msg{background:#101828;color:#fff;padding:12px 14px;border-radius:12px;box-shadow:var(--shadow)}
   .toast.show{display:block;animation:fade .25s ease-out}
   @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-  /* Print */
   @media print{header,.actions{display:none!important}.card{box-shadow:none!important}}
 </style>
 </head>
@@ -82,29 +78,12 @@
     <div class="logo"><span class="dot"></span> <span>ФИНМОН · Интерактивный кейс</span></div>
     <div class="actions" style="margin-left:auto">
       <button class="btn" id="resetAll" title="Сбросить прогресс">Сброс</button>
-      <button class="btn secondary" id="printBtn" title="Сохранить как PDF">Скачать PDF</button>
-      <!-- скрытая ссылка на случай скачивания HTML-снимка (больше не используется в песочнице) -->
-      <a id="dlHtml" download="finmon_case.html" style="display:none"></a>
     </div>
   </div>
   <div class="progress"><div class="bar" id="progressBar"></div></div>
 </header>
 
 <main class="container">
-  <!-- Баннер для песочницы Stepik -->
-  <div id="sandboxNotice" style="display:none; margin:16px 0" class="card soft">
-    <strong>Печать внутри Stepik недоступна.</strong>
-    <div class="small" style="margin-top:6px">
-      Эта страница открыта в песочнице LMS без прав на всплывающие окна и загрузки.<br/>
-      Откройте материал вне Stepik и используйте печать браузера.
-    </div>
-    <div class="actions" style="margin-top:10px; gap:8px; flex-wrap:wrap">
-      <a id="openTop" class="btn secondary" href="#" target="_top" rel="noopener">Открыть в этом окне</a>
-      <a id="openBlank" class="btn" href="#" target="_blank" rel="noopener noreferrer">Открыть в новой вкладке</a>
-      <span class="pill" id="pageUrl" style="user-select:text"></span>
-    </div>
-  </div>
-
   <h1>На что смотрят банки — интерактивный кейс</h1>
   <p class="lead">Разбери кейс компании и по шагам определи ключевые сигналы для банка: транзиты, обналичивание, налоговая нагрузка, соответствие деятельности и аномалии в поведении по счёту. На каждом шаге — мгновенная обратная связь и подсказки.</p>
 
@@ -258,7 +237,7 @@
   <section class="card" id="step4">
     <div class="inline" style="justify-content:space-between; align-items:center">
       <h2 style="margin:0">Шаг 4. Соответствие ОКВЭД и операций</h2>
-      <span class="badge">Отметь НЕ соответствующие</span>
+    <span class="badge">Отметь НЕ соответствующие</span>
     </div>
     <p class="small">ОКВЭД компании: <strong>43.39 — иные работы по отделке зданий</strong>.</p>
     <table style="width:100%; border-collapse:separate; border:1px solid var(--line); border-radius:12px; overflow:hidden">
@@ -309,7 +288,7 @@
       <div>
         <span class="badge">Прогресс</span>
         <h3 id="progressTxt" style="margin:.4rem 0 0">0 / 6 шагов</h3>
-        <p class="small">Заверши все шаги и распечатай результат в PDF.</p>
+        <p class="small">Заверши все шаги. Прогресс можно сбросить кнопкой сверху.</p>
       </div>
       <div>
         <span class="badge">Сильные стороны</span>
@@ -384,7 +363,7 @@
     pb.style.width = pct+'%';
     document.getElementById('progressTxt').textContent = `${done} / ${total} шагов`;
     strengths.textContent = done >= 3 ? 'Ты уверенно распознаёшь риски и умеешь обосновывать позицию документами.' : 'Продвигайся по шагам — начни с распознавания сигналов и расчёта доли налогов.';
-    improve.textContent = done < 6 ? 'Закрой оставшиеся шаги и уточни план действий: документы, ОКВЭД, предупреждение банка, безналичные инструменты.' : 'Отлично! Сохрани страничку в PDF и используй как чек-лист в работе.';
+    improve.textContent = done < 6 ? 'Закрой оставшиеся шаги и уточни план действий: документы, ОКВЭД, предупреждение банка, безналичные инструменты.' : 'Супер! Все шаги закрыты.';
   }
 
   function setResult(el, ok, msg){
@@ -430,35 +409,7 @@
   // Toast
   const toast = (msg)=>{const t=document.getElementById('toast'), m=document.getElementById('toastMsg'); m.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200);};
 
-  // ===== ПЕЧАТЬ: безопасный режим для песочницы Stepik =====
-  function isInIframe(){ try { return window.self !== window.top; } catch(_) { return true; } }
-  function getCanonicalUrl(){ return location.href; }
-
-  // При загрузке: если мы во фрейме, меняем текст кнопки и готовим баннер
-  document.addEventListener('DOMContentLoaded', ()=>{
-    if (isInIframe()){
-      const btn = document.getElementById('printBtn');
-      btn.textContent = 'Открыть вне Stepik';
-    }
-  });
-
-  // Кнопка «Скачать PDF»: печатаем напрямую ТОЛЬКО вне iframe; во фрейме — показываем баннер со ссылками
-  document.getElementById('printBtn').addEventListener('click', (e)=>{
-    e.preventDefault();
-    if (!isInIframe()){
-      window.print();
-      return;
-    }
-    const box = document.getElementById('sandboxNotice');
-    const url = getCanonicalUrl();
-    document.getElementById('openTop').href = url;
-    document.getElementById('openBlank').href = url;
-    document.getElementById('pageUrl').textContent = url;
-    box.style.display = 'block';
-    if (typeof toast === 'function') toast('В Stepik печать заблокирована. Откройте страницу вне LMS и распечатайте.');
-  });
-
-  // Сброс
+  // Кнопка «Сброс» в шапке — сбрасывает всё сразу
   document.getElementById('resetAll').addEventListener('click',()=>{
     [1,2,3,4,5,6].forEach(clearStep);
     toast('Платформа очищена.');
@@ -478,7 +429,7 @@
     const miss = need.filter(x=>!picked.includes(x));
     const extra = picked.filter(x=>!need.includes(x));
     if(miss.length===0 && extra.length===0){
-      setResult(res, true, '✓ Отлично! Ты увидел все 5 ключевых сигналов: транзиты, обнал, низкая налоговая нагрузка, несоответствие деятельности и аномалии. Продолжай в том же духе — мышление как у риск-менеджера.');
+      setResult(res, true, '✓ Отлично! Ты увидел все 5 ключевых сигналов: транзиты, обнал, низкая налоговая нагрузка, несоответствие деятельности и аномалии.');
       markStep(1,true);
     }else{
       let tip = 'Подумай ещё: ';
@@ -511,7 +462,7 @@
     }
     const res = document.getElementById('res2');
     if(ok){
-      setResult(res, true, '✓ Точно! Каждый факт попал в свою категорию. Это навык, который экономит недели на коммуникации с банком.');
+      setResult(res, true, '✓ Точно! Каждый факт попал в свою категорию. Это экономит недели на коммуникации с банком.');
       markStep(2,true);
     }else{
       setResult(res, false, '✕ Есть ошибки в распределении: ' + missing.map(x=>'«'+prettyLabel(x)+'»').join(', ') +
@@ -622,7 +573,7 @@
     }
   }
 
-  // Скролл-бар прогресса страницы
+  // Прогресс-бар по прокрутке (косметика)
   document.addEventListener('scroll', ()=>{
     const h=document.documentElement;
     const scrolled=(h.scrollTop)/(h.scrollHeight-h.clientHeight);
@@ -639,11 +590,10 @@
   window.clearStep  = clearStep;
 
   // Рендер таблицы шага 4
-  (function initStep4(){ /* уже отрисовано */ })();
+  (function initStep4(){ /* таблица заполнена выше */ })();
 
   // Инициализация
   updateProgress();
-
 </script>
 </body>
 </html>
