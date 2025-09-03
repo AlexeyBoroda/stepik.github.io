@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Мини-кейс «Кто за что отвечает» — сопоставление</title>
+<style>
+  :root{
+    --bg:#fff; --ink:#111; --muted:#666; --accent:#e11d48; --ok:#16a34a; --warn:#b45309;
+    --card:#f7f7f8; --line:#e5e7eb;
+  }
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+  .app{max-width:980px;margin:0 auto;padding:20px 16px 48px}
+  h1{font-size:20px;margin:0 0 6px}
+  .lead{color:var(--muted);margin:0 0 16px}
+  .wrap{display:grid;grid-template-columns:1fr 280px;gap:16px}
+  @media (max-width:900px){.wrap{grid-template-columns:1fr}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .left .item{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0}
+  .left .item.sel{outline:2px solid var(--accent)}
+  .pill{margin-left:auto;font-size:12px;padding:4px 8px;border-radius:999px;border:1px dashed var(--line);color:var(--muted);background:#fafafa}
+  .right .org{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0;cursor:pointer}
+  .right .org:hover{outline:2px solid #ddd}
+  .org small{color:var(--muted)}
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+  button{cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 14px}
+  button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+  button.ghost{background:transparent}
+  .score{margin:8px 0 0}
+  .score b.ok{color:var(--ok)} .score b.bad{color:#dc2626}
+  .legend{font-size:13px;color:var(--muted);margin-top:8px}
+  .hint{font-size:14px;border-top:1px dashed var(--line);margin-top:10px;padding-top:10px;display:none}
+  .hint.show{display:block}
+  .badge{font-size:12px;border-radius:999px;padding:2px 8px;border:1px solid var(--line);background:#fff}
+  .stat{display:flex;gap:8px;flex-wrap:wrap}
+  .k{display:inline-flex;align-items:center;gap:8px}
+  .k i{width:14px;height:14px;border-radius:50%}
+  .k .ok{background:var(--ok)} .k .bad{background:#dc2626} .k .none{background:var(--muted)}
+  .note{font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>Мини-кейс «Кто за что отвечает»</h1>
+  <p class="lead">Сопоставьте <b>действия/ситуации</b> слева с <b>организациями</b> справа. Кликните пункт слева, затем — соответствующую организацию справа. Несколько пунктов могут относиться к одной организации.</p>
+
+  <div class="wrap">
+    <section class="panel left">
+      <div id="items"></div>
+    </section>
+
+    <aside class="panel right">
+      <div id="orgs"></div>
+      <div class="toolbar">
+        <button class="primary" id="checkBtn">Проверить</button>
+        <button id="resetBtn">Сбросить ответы</button>
+        <button class="ghost" id="shuffleBtn">Перемешать</button>
+        <button class="ghost" id="hintsBtn">Показать подсказки</button>
+      </div>
+      <div class="score" id="score"></div>
+      <div class="legend">
+        <div class="stat">
+          <span class="k"><i class="ok"></i>верно</span>
+          <span class="k"><i class="bad"></i>ошибка</span>
+          <span class="k"><i class="none"></i>нет ответа</span>
+        </div>
+      </div>
+      <div class="hint" id="hintsBox">
+        <div class="note"><b>Подсказки по ролям регуляторов</b></div>
+        <ul>
+          <li><b>ЦБ РФ:</b> надзор за банками, методрекомендации по «сомнительным операциям», приём жалоб на банки.</li>
+          <li><b>ФНС:</b> налоговая отчётность, «Прозрачный бизнес» и ГИР БО, проверки и взыскание долгов.</li>
+          <li><b>Росфинмониторинг:</b> анализ подозрительных операций, передача сведений, ПОД/ФТ на уровне государства.</li>
+          <li><b>Банк:</b> работает с клиентом напрямую — открывает счёт, запрашивает документы, может ограничить операции.</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+/** ДАННЫЕ */
+const ORGS = [
+  { id:"CBR", name:"Центральный банк РФ", alias:"ЦБ РФ" },
+  { id:"FNS", name:"Федеральная налоговая служба", alias:"ФНС" },
+  { id:"ROSFIN", name:"Росфинмониторинг", alias:"Росфинмониторинг" },
+  { id:"BANK", name:"Коммерческий банк", alias:"Банк" }
+];
+
+// элементы слева (можно редактировать/дополнять)
+const ITEMS = [
+  { id:1,  text:"Анализирует подозрительные операции и передает сведения по ПОД/ФТ",                          ans:"ROSFIN", explain:"Это ключевая функция Росфинмониторинга."},
+  { id:2,  text:"Выдает методические рекомендации для банков по «сомнительным операциям»",                   ans:"CBR",    explain:"Методология и письма — зона ЦБ РФ."},
+  { id:3,  text:"Контролирует налоговую нагрузку и принимает бухгалтерскую/налоговую отчетность",           ans:"FNS",    explain:"Налоговый контроль — ФНС."},
+  { id:4,  text:"Публикует «Прозрачный бизнес» и государственный ресурс бухотчетности (ГИР БО)",            ans:"FNS",    explain:"Оба сервиса — экосистема ФНС."},
+  { id:5,  text:"Ограничивает или приостанавливает операции клиента по счету",                              ans:"BANK",   explain:"Решение на уровне банка в рамках ПОД/ФТ и договора."},
+  { id:6,  text:"Запрашивает у клиента документы и пояснения по операциям",                                 ans:"BANK",   explain:"Банк общается с клиентом напрямую."},
+  { id:7,  text:"Осуществляет банковский надзор и контроль соблюдения 115-ФЗ банками",                      ans:"CBR",    explain:"Надзор за банками — функция ЦБ РФ."},
+  { id:8,  text:"Ведет финансовый мониторинг на уровне государства",                                        ans:"ROSFIN", explain:"Росфинмониторинг — национальная служба финмониторинга."},
+  { id:9,  text:"Взыскивает налоговую задолженность и проводит проверки",                                   ans:"FNS",    explain:"Инструменты взыскания — у ФНС."},
+  { id:10, text:"Рассматривает жалобы на банк по вопросам ПОД/ФТ и комплаенса",                             ans:"CBR",    explain:"Жалобы на действия банка — в ЦБ РФ."},
+  { id:11, text:"Отслеживает транзитные операции (методология и признаки) в банковской системе",            ans:"CBR",    explain:"Методология транзитов — письма/указания ЦБ РФ."},
+  { id:12, text:"Проводит выездные и камеральные налоговые проверки",                                       ans:"FNS",    explain:"Проверочные мероприятия — ФНС."}
+];
+
+/** СОСТОЯНИЕ */
+let state = {
+  selectedItemId: null,   // активный пункт слева
+  matches: {}             // { itemId: orgId }
+};
+
+/** УТИЛЫ */
+const $ = sel => document.querySelector(sel);
+function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(v=>v[1]); }
+function reset(){
+  state.selectedItemId = null;
+  state.matches = {};
+  renderItems();
+  renderOrgs();
+  $("#score").textContent = "";
+  $("#hintsBox").classList.remove("show");
+}
+function renderItems(list = currentItems){
+  const box = $("#items");
+  box.innerHTML = "";
+  list.forEach(it=>{
+    const div = document.createElement("div");
+    div.className = "item";
+    div.dataset.id = it.id;
+    div.innerHTML = `
+      <span>${it.text}</span>
+      <span class="pill" id="pill-${it.id}">${state.matches[it.id] ? orgName(state.matches[it.id]) : "не выбрано"}</span>
+    `;
+    if(state.selectedItemId === it.id) div.classList.add("sel");
+    div.onclick = ()=>{
+      state.selectedItemId = (state.selectedItemId === it.id) ? null : it.id;
+      renderItems();
+    };
+    box.appendChild(div);
+  });
+}
+function renderOrgs(){
+  const box = $("#orgs");
+  box.innerHTML = "";
+  ORGS.forEach(o=>{
+    const d = document.createElement("div");
+    d.className = "org";
+    d.innerHTML = `<div><b>${o.alias}</b><br/><small>${o.name}</small></div><span class="badge" id="count-${o.id}">0</span>`;
+    d.onclick = ()=>{
+      if(state.selectedItemId==null) return;
+      state.matches[state.selectedItemId] = o.id;
+      // auto-advance: снять выделение
+      state.selectedItemId = null;
+      renderItems();
+      updateCounts();
+    };
+    box.appendChild(d);
+  });
+  updateCounts();
+}
+function updateCounts(){
+  const counts = {};
+  ORGS.forEach(o=>counts[o.id]=0);
+  Object.values(state.matches).forEach(id=>{ if(counts[id]!=null) counts[id]++; });
+  ORGS.forEach(o=>{ const el = $("#count-"+o.id); if(el) el.textContent = counts[o.id]; });
+}
+function orgName(id){ const o = ORGS.find(x=>x.id===id); return o ? o.alias : "—"; }
+
+let currentItems = shuffle(ITEMS.slice());
+renderItems();
+renderOrgs();
+
+/** КНОПКИ */
+$("#resetBtn").onclick = reset;
+$("#shuffleBtn").onclick = ()=>{
+  currentItems = shuffle(ITEMS.slice());
+  reset();
+};
+$("#hintsBtn").onclick = ()=> $("#hintsBox").classList.toggle("show");
+
+$("#checkBtn").onclick = ()=>{
+  let right=0, wrong=0, none=0;
+  currentItems.forEach(it=>{
+    const chosen = state.matches[it.id];
+    const pill = $("#pill-"+it.id);
+    pill.style.border = "1px solid var(--line)";
+    pill.style.background = "#fafafa";
+    pill.style.color = "var(--muted)";
+    pill.title = "";
+
+    if(!chosen){ none++; pill.textContent = "нет ответа"; pill.style.color = "var(--muted)"; return; }
+
+    if(chosen === it.ans){
+      right++;
+      pill.textContent = orgName(chosen);
+      pill.style.background = "rgba(22,163,74,.08)";
+      pill.style.border = "1px solid rgba(22,163,74,.3)";
+      pill.style.color = "var(--ok)";
+      pill.title = "Верно. " + it.explain;
+    } else {
+      wrong++;
+      pill.textContent = orgName(chosen);
+      pill.style.background = "rgba(220,38,38,.08)";
+      pill.style.border = "1px solid rgba(220,38,38,.3)";
+      pill.style.color = "#dc2626";
+      pill.title = "Неверно. " + it.explain;
+    }
+  });
+  $("#score").innerHTML = `
+    Результат: <b class="ok">${right}</b> верно,
+    <b class="bad">${wrong}</b> ошибок,
+    <b>${none}</b> без ответа.
+  `;
+};
+</script>
+</body>
+</html>
