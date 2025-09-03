@@ -4,13 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Кейс-платформа: На что смотрят банки</title>
-<meta name="description" content="Интерактивный кейс с чек-листом и мгновенной обратной связью: учимся видеть банковские риски — транзиты, обналичивание, налоговую нагрузку, несоответствие ОКВЭД, аномалии.">
 <style>
   :root{
     --bg:#ffffff;
-    --text:#0f1b3d;           /* тёмно-синий шрифт */
+    --text:#0f1b3d;
     --muted:#5b6b8c;
-    --accent:#d1122e;         /* красный акцент */
+    --accent:#d1122e;
     --ok:#0a7f2e;
     --warn:#b4690e;
     --bad:#a1111a;
@@ -31,43 +30,14 @@
   main{max-width:1100px;margin:0 auto;padding:20px}
   h1{font-size:clamp(26px,3vw,36px);margin:10px 0 8px}
   .lead{color:var(--muted);max-width:900px}
-  .grid{display:grid;gap:16px}
-  @media(min-width:900px){.grid.cols-2{grid-template-columns:1fr 1fr}}
-  .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
-  .step{position:relative}
-  .step .kicker{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-  .step h2{margin:6px 0 8px;font-size:20px}
-  .hint{background:var(--card);border:1px dashed var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:10px 12px;color:var(--muted)}
-  .inline{display:inline-flex;align-items:center;gap:8px}
-  .badge{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-size:12px;color:var(--muted)}
-  .badge.ok{border-color:var(--ok);color:var(--ok)}
-  .badge.bad{border-color:var(--bad);color:var(--bad)}
-  .badge.warn{border-color:var(--warn);color:var(--warn)}
-  table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);overflow:hidden;border-radius:14px}
-  th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left}
-  th{background:#fafbff;color:#0f204a}
-  tr:last-child td{border-bottom:none}
-  .row{display:flex;gap:10px;flex-wrap:wrap}
-  input[type="text"],input[type="number"],textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;font:inherit;background:#fff}
-  textarea{min-height:110px;resize:vertical}
+  .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin:18px 0}
+  .kicker{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  h2{margin:6px 0 8px;font-size:20px}
   .result{margin-top:10px;font-weight:700}
   .result.ok{color:var(--ok)} .result.bad{color:var(--bad)} .result.warn{color:var(--warn)}
   .progress{height:8px;background:#eef1f9;border-radius:999px;overflow:hidden;margin:6px 0 16px}
   .progress>span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#fe6a6f)}
-  details{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff}
-  details[open]{box-shadow:var(--shadow)}
-  summary{cursor:pointer;font-weight:700}
-  .pill{display:inline-flex;gap:6px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 8px;font-size:12px}
-  .kpi{display:flex;gap:10px;align-items:center}
-  .kpi .bar{height:10px;background:#eef1f9;border-radius:999px;flex:1;overflow:hidden}
-  .kpi .bar span{display:block;height:100%;background:linear-gradient(90deg,#78d083,var(--ok));width:0}
   footer{color:var(--muted);font-size:13px;padding:30px 0 60px}
-  /* Toast */
-  .toast{position:fixed;right:16px;bottom:16px;z-index:50;display:none;max-width:440px}
-  .toast .msg{background:#101828;color:#fff;padding:12px 14px;border-radius:12px;box-shadow:var(--shadow)}
-  .toast.show{display:block;animation:fade .25s ease-out}
-  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-  /* Print */
   @media print{header,.actions{display:none!important}.card{box-shadow:none}}
 </style>
 </head>
@@ -77,7 +47,6 @@
     <div class="logo"><span class="dot"></span><span>ФИНМОН · Интерактивный кейс</span></div>
     <div class="actions">
       <button class="btn" id="resetAll">Сбросить</button>
-      <button class="btn" id="copyJSON">Скопировать результат</button>
       <button class="btn accent" id="printBtn">Скачать PDF</button>
     </div>
   </div>
@@ -85,430 +54,65 @@
 
 <main>
   <h1>На что смотрят банки — интерактивный кейс</h1>
-  <p class="lead">Задача: разобрать операции компании, пройти чек-лист проверки и получить мгновенную обратную связь по каждому шагу. По итогу — короткий отчёт и рекомендации.</p>
+  <p class="lead">Разберите кейс компании, пройдите чек-лист и получите мгновенную обратную связь.</p>
 
-  <!-- ЗАДАЧА -->
-  <section class="card">
-    <div class="kicker">Задача</div>
-    <p><strong>Компания:</strong> ООО «СтройМаркет» (ОКВЭД: ремонт зданий). <strong>Период:</strong> июнь–август 2025.</p>
-    <ul>
-      <li>На счёт поступают платежи от ООО «Альфа» (по 1 000 000 ₽), в тот же день деньги переводятся на ИП Иванова И.И. без актов.</li>
-      <li>Директор каждые 3–4 дня снимает наличные по 400 000 ₽, есть только авансовые отчёты без чеков.</li>
-      <li>Оборот за 3 мес — 30 млн ₽, налоги и страховые взносы — 100 000 ₽.</li>
-      <li>В ЕГРЮЛ — «ремонт», по счёту — платежи «за маркетинг» и «IT-услуги».</li>
-      <li>В августе обороты выросли с 3 до 15 млн ₽, число платежей увеличилось в 10 раз.</li>
-    </ul>
-    <div class="hint">Пройдите чек-лист ниже. Каждый шаг — небольшой инструмент анализа с мгновенной обратной связью и подсказками.</div>
-    <div class="progress" aria-label="Прогресс по шагам"><span id="globalProgress"></span></div>
-    <div class="inline"><span class="badge" id="doneBadge">Выполнено: 0/6</span><span class="badge warn">Цель: найти и обосновать риски + предложить меры</span></div>
-  </section>
-
-  <!-- ШАГ 1: Транзиты -->
-  <section class="card step" id="step1">
+  <!-- Пример шага -->
+  <section class="card" id="step1">
     <div class="kicker">Шаг 1</div>
     <h2>Транзитные операции</h2>
-    <p>Отметьте операции, которые выглядят как транзиты (пришло → сразу ушло, «копейка в копейку», нет первички).</p>
-    <table>
-      <thead><tr><th>Дата</th><th>Плательщик → Получатель</th><th>Сумма</th><th>Документы</th><th>Дельта времени</th><th>Подозрительно?</th></tr></thead>
-      <tbody id="t1"></tbody>
-    </table>
-    <div class="row">
-      <button class="btn" data-check="1">Проверить</button>
-      <button class="btn" data-reveal="1">Подсказка</button>
-      <span class="result" id="r1"></span>
+    <p>Выберите подозрительные операции.</p>
+    <label><input type="checkbox" id="ex1"> ООО «Альфа» → ООО «СтройМаркет» → ИП Иванов (1 000 000 ₽)</label><br>
+    <label><input type="checkbox" id="ex2"> ООО «Бета» → ООО «СтройМаркет» (320 000 ₽, договор+акт)</label>
+    <div>
+      <button class="btn" onclick="checkStep1()">Проверить</button>
+      <span class="result" id="res1"></span>
     </div>
-    <details style="margin-top:10px"><summary>Пояснение</summary>
-      <p>Транзиты без экономического смысла и первички — один из главных «красных флагов». Если транзит — элемент группы компаний, держите договоры, спецификации, акты и пояснение экономической цели.</p>
-    </details>
   </section>
 
-  <!-- ШАГ 2: Обналичивание -->
-  <section class="card step" id="step2">
-    <div class="kicker">Шаг 2</div>
-    <h2>Обналичивание</h2>
-    <p>Отметьте снятия наличных, которые вызовут вопросы банка (ориентир: ≥ 300 000 ₽, нет чеков).</p>
-    <table>
-      <thead><tr><th>Дата</th><th>Сумма</th><th>Чеки</th><th>Комментарий</th><th>Подозрительно?</th></tr></thead>
-      <tbody id="t2"></tbody>
-    </table>
-    <div class="row">
-      <button class="btn" data-check="2">Проверить</button>
-      <button class="btn" data-reveal="2">Подсказка</button>
-      <span class="result" id="r2"></span>
-    </div>
-    <details style="margin-top:10px"><summary>Пояснение</summary>
-      <p>Регулярные крупные снятия без подтверждающих документов — классический триггер. Используйте бизнес-карты и прикладывайте авансовые отчёты + чеки.</p>
-    </details>
-  </section>
-
-  <!-- ШАГ 3: Налоговая нагрузка -->
-  <section class="card step" id="step3">
-    <div class="kicker">Шаг 3</div>
-    <h2>Налоговая нагрузка</h2>
-    <p>Рассчитайте долю налогов к обороту. Ориентир банков — не ниже <strong>0,9%</strong>.</p>
-    <div class="grid cols-2">
-      <div>
-        <label>Оборот, ₽</label>
-        <input type="number" id="turnover" value="30000000" min="0" step="1000" />
-      </div>
-      <div>
-        <label>Налоги+взносы, ₽</label>
-        <input type="number" id="taxes" value="100000" min="0" step="1000" />
-      </div>
-    </div>
-    <div class="kpi" style="margin-top:10px">
-      <div class="pill">Нагрузка: <strong><span id="taxShare">—</span></strong></div>
-      <div class="bar"><span id="taxBar"></span></div>
-      <span class="badge" id="taxBadge">Оценка: —</span>
-    </div>
-    <div class="row" style="margin-top:8px">
-      <button class="btn" data-check="3">Оценить</button>
-      <button class="btn" data-reveal="3">Подсказка</button>
-      <span class="result" id="r3"></span>
-    </div>
-    <details style="margin-top:10px"><summary>Пояснение</summary>
-      <p>При больших оборотах минимальные налоги выглядят подозрительно. Ведите таблицу показателей (оборот → налоги/НДФЛ/ФОТ/взносы) по месяцам.</p>
-    </details>
-  </section>
-
-  <!-- ШАГ 4: Несоответствие деятельности -->
-  <section class="card step" id="step4">
-    <div class="kicker">Шаг 4</div>
-    <h2>Соответствие ОКВЭД и операций</h2>
-    <p>ОКВЭД компании: <strong>43.39 — иные работы по отделке зданий</strong>. Выберите операции, которые <u>не соответствуют</u> ОКВЭД.</p>
-    <table>
-      <thead><tr><th>Дата</th><th>Назначение платежа</th><th>Сумма</th><th>Соответствует?</th></tr></thead>
-      <tbody id="t4"></tbody>
-    </table>
-    <div class="row">
-      <button class="btn" data-check="4">Проверить</button>
-      <button class="btn" data-reveal="4">Подсказка</button>
-      <span class="result" id="r4"></span>
-    </div>
-    <details style="margin-top:10px"><summary>Пояснение</summary>
-      <p>Если деятельность не совпадает с фактическими платежами, банк спросит документы. Обновляйте ОКВЭД и храните договоры на «нестандартные» услуги.</p>
-    </details>
-  </section>
-
-  <!-- ШАГ 5: Аномалии и скачки -->
-  <section class="card step" id="step5">
-    <div class="kicker">Шаг 5</div>
-    <h2>Аномалии по оборотам</h2>
-    <p>Отметьте месяцы с <u>аномальным</u> поведением (резкий рост оборота/количества платежей).</p>
-    <div id="bars" class="card" style="background:#fff">
-      <!-- простая «бар-диаграмма» без библиотек -->
-    </div>
-    <div class="row" style="margin-top:8px">
-      <button class="btn" data-check="5">Проверить</button>
-      <button class="btn" data-reveal="5">Подсказка</button>
-      <span class="result" id="r5"></span>
-    </div>
-    <details style="margin-top:10px"><summary>Пояснение</summary>
-      <p>Резкие скачки — нормальны при сезонности/контрактах, но банк ждёт пояснений. Предупреждайте заранее и готовьте подтверждения.</p>
-    </details>
-  </section>
-
-  <!-- ШАГ 6: Пояснение банку -->
-  <section class="card step" id="step6">
-    <div class="kicker">Шаг 6</div>
-    <h2>Составьте короткое пояснение банку</h2>
-    <p>Напишите 4–6 предложений: экономический смысл операций и список приложений. <em>Подсказка по ключевым словам работает в реальном времени.</em></p>
-    <textarea id="letter" placeholder="Опишите сделку, контрагентов, документы (договор, акт, инвойс), логистику/сроки и соответствие назначений платежей договору."></textarea>
-    <div class="row" style="align-items:center; margin-top:8px">
-      <div class="pill" id="kwStatus">Ключевые слова: 0/5</div>
-      <button class="btn" data-template>Вставить шаблон</button>
-      <button class="btn" data-check="6">Проверить</button>
-      <span class="result" id="r6"></span>
-    </div>
-    <details style="margin-top:10px"><summary>Рекомендованный шаблон</summary>
-<pre style="white-space:pre-wrap;margin:0">
-Тема: Пояснение по платежу №___ от __.__.____
-Сделка: поставка/услуги по договору №___ от __.__.____ с ООО/ИП ___.
-Предмет/объём/цены: ___.
-Документы: договор, спецификация, счёт/инвойс, акт/накладная (прилагаем).
-Исполнение/логистика: схема поставки/оказания, ключевые сроки.
-Назначение платежа соответствует условиям договора.
-Готовы предоставить доп. материалы.
-</pre>
-    </details>
-  </section>
-
-  <!-- ИТОГ -->
+  <!-- Итог -->
   <section class="card" id="final">
     <div class="kicker">Итог</div>
     <h2>Краткий отчёт</h2>
-    <p id="summary">Пройдите все шаги, чтобы сформировать отчёт и рекомендации.</p>
-    <ul id="recs"></ul>
+    <p id="summary">Пройдите шаги, чтобы получить вывод и рекомендации.</p>
   </section>
 
-  <footer>
-    Материал для учебных целей. Подходы и пороги — ориентиры: сверяйтесь с актуальными требованиями вашего банка.
-  </footer>
+  <footer>Материал для учебных целей. Проверяйте актуальные требования вашего банка и законодательства.</footer>
 </main>
 
-<div class="toast" id="toast"><div class="msg" id="toastMsg">—</div></div>
-
 <script>
-/* ======= ДАННЫЕ КЕЙСА ======= */
-const data = {
-  step1: [
-    {date:'12.07', flow:'ООО «Альфа» → ООО «СтройМаркет»', sum:1000000, docs:'нет', delta:'+2 часа', suspicious:true},
-    {date:'12.07', flow:'ООО «СтройМаркет» → ИП Иванов',     sum:1000000, docs:'нет', delta:'в тот же день', suspicious:true},
-    {date:'15.07', flow:'ООО «Бета» → ООО «СтройМаркет»',    sum:320000,  docs:'договор+акт', delta:'—', suspicious:false},
-    {date:'21.07', flow:'ООО «СтройМаркет» → ООО «Гамма»',   sum:180000,  docs:'счёт', delta:'—', suspicious:false},
-  ],
-  step2: [
-    {date:'05.07', sum:400000, receipts:false, note:'авансовый отчёт без чеков', suspicious:true},
-    {date:'09.07', sum:120000, receipts:true,  note:'хоз. расходы с чеками', suspicious:false},
-    {date:'13.07', sum:350000, receipts:false, note:'без чеков', suspicious:true},
-    {date:'18.07', sum:280000, receipts:true,  note:'частично подтверждено', suspicious:false},
-  ],
-  step4: [
-    {date:'08.07', purpose:'Оплата услуг по отделке помещений', sum:480000, mismatch:false},
-    {date:'12.07', purpose:'Маркетинг и лидогенерация', sum:350000, mismatch:true},
-    {date:'16.07', purpose:'IT-подписка на облачные сервисы', sum:110000, mismatch:true},
-    {date:'22.07', purpose:'Поставка отделочных материалов', sum:260000, mismatch:false},
-  ],
-  step5: { // простая имитация рядов
-    months:[
-      {m:'Май', v:3, count:12},
-      {m:'Июн', v:3, count:14},
-      {m:'Июл', v:3, count:16},
-      {m:'Авг', v:15, count:160} // аномалия
-    ],
-    anomalies:['Авг']
-  },
-  keywords:['договор','акт','инвойс','логист','назначен'] // логист*, назначен*
-};
+const state = { s1:false };
 
-/* ======= РЕНДЕР ТАБЛИЦ ======= */
-const t1 = document.getElementById('t1');
-data.step1.forEach((r,i)=>{
-  const tr=document.createElement('tr');
-  tr.innerHTML=`<td>${r.date}</td><td>${r.flow}</td><td>${r.sum.toLocaleString('ru-RU')} ₽</td><td>${r.docs}</td><td>${r.delta}</td>
-  <td><label class="inline"><input type="checkbox" data-s1="${i}"> Подозрительно</label></td>`;
-  t1.appendChild(tr);
-});
-const t2 = document.getElementById('t2');
-data.step2.forEach((r,i)=>{
-  const tr=document.createElement('tr');
-  tr.innerHTML=`<td>${r.date}</td><td>${r.sum.toLocaleString('ru-RU')} ₽</td><td>${r.receipts?'есть':'нет'}</td><td>${r.note}</td>
-  <td><label class="inline"><input type="checkbox" data-s2="${i}"> Подозрительно</label></td>`;
-  t2.appendChild(tr);
-});
-const t4 = document.getElementById('t4');
-data.step4.forEach((r,i)=>{
-  const tr=document.createElement('tr');
-  tr.innerHTML=`<td>${r.date}</td><td>${r.purpose}</td><td>${r.sum.toLocaleString('ru-RU')} ₽</td>
-  <td><label class="inline"><input type="checkbox" data-s4="${i}"> НЕ соответствует</label></td>`;
-  t4.appendChild(tr);
-});
-
-/* ======= ШАГ 5: БАРЫ ======= */
-const bars = document.getElementById('bars');
-bars.style.display='grid';bars.style.gridTemplateColumns='repeat(4,1fr)';bars.style.gap='12px';
-data.step5.months.forEach((m,i)=>{
-  const wrap=document.createElement('div');wrap.className='card';wrap.style.border='1px solid var(--line)';wrap.style.boxShadow='none';
-  wrap.innerHTML = `
-    <div class="inline" style="justify-content:space-between;margin-bottom:8px">
-      <strong>${m.m}</strong>
-      <label class="inline"><input type="checkbox" data-s5="${i}"> Аномалия</label>
-    </div>
-    <div style="display:flex;gap:8px;align-items:flex-end;height:120px">
-      <div title="Оборот (млн ₽)" style="background:#e9f7ef;width:34px;height:${m.v*6}px;border-radius:8px"></div>
-      <div title="Кол-во платежей" style="background:#eef1f9;width:34px;height:${Math.min(100, m.count/2)}px;border-radius:8px"></div>
-    </div>
-    <div style="font-size:12px;color:var(--muted);margin-top:6px">Оборот: ${m.v} млн · Платежей: ${m.count}</div>
-  `;
-  bars.appendChild(wrap);
-});
-
-/* ======= СОСТОЯНИЕ / ПРОГРЕСС ======= */
-const state = { s1:false, s2:false, s3:false, s4:false, s5:false, s6:false };
-const doneBadge=document.getElementById('doneBadge');
-const globalProgress=document.getElementById('globalProgress');
 function updateProgress(){
   const done = Object.values(state).filter(Boolean).length;
-  doneBadge.textContent = `Выполнено: ${done}/6`;
-  globalProgress.style.width = (done/6*100)+'%';
-  buildSummary();
+  document.getElementById('summary').textContent =
+    done===1 ? "Отлично! Вы нашли транзитную операцию. Продолжайте анализ дальше." :
+    "Пройдите шаги, чтобы получить вывод и рекомендации.";
 }
 
-/* ======= ТОСТ ======= */
-const toast = (msg)=>{const t=document.getElementById('toast'), m=document.getElementById('toastMsg'); m.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200);};
-
-/* ======= ПРОВЕРКИ ======= */
 function checkStep1(){
-  const checks=[...document.querySelectorAll('[data-s1]')].map(cb=>cb.checked);
-  const truth=data.step1.map(x=>x.suspicious);
-  const ok = checks.length===truth.length && checks.every((v,i)=>v===truth[i]);
-  const r=document.getElementById('r1');
-  if(ok){ r.textContent='✓ Верно: вы правильно распознали транзиты.'; r.className='result ok';
-    state.s1=true; toast('Отлично! Вы видите транзиты глазами банка.');}
-  else { r.textContent='✕ Есть неточности. Подумайте про «копейка в копейку» и отсутствие первички.'; r.className='result bad';
-    state.s1=false; toast('Ничего, попробуйте ещё раз — ищите «пришло → сразу ушло».');}
-  updateProgress();
-}
-function reveal1(){
-  [...document.querySelectorAll('[data-s1]')].forEach((cb,i)=>cb.checked=data.step1[i].suspicious);
-  toast('Подсказка применена к шагу 1.');
-}
-
-function checkStep2(){
-  const checks=[...document.querySelectorAll('[data-s2]')].map(cb=>cb.checked);
-  const truth=data.step2.map(x=>x.suspicious);
-  const ok = checks.length===truth.length && checks.every((v,i)=>v===truth[i]);
-  const r=document.getElementById('r2');
-  if(ok){ r.textContent='✓ Верно: выделены рискованные снятия.'; r.className='result ok';
-    state.s2=true; toast('Супер! Крупные снятия без чеков — триггер.');}
-  else { r.textContent='✕ Проверьте порог 300k и наличие чеков.'; r.className='result bad';
-    state.s2=false; toast('Хорошая попытка! Сфокусируйтесь на суммах ≥300k и отсутствии чеков.');}
-  updateProgress();
-}
-function reveal2(){ [...document.querySelectorAll('[data-s2]')].forEach((cb,i)=>cb.checked=data.step2[i].suspicious); toast('Подсказка применена к шагу 2.'); }
-
-function checkStep3(){
-  const turnover=+document.getElementById('turnover').value||0;
-  const taxes=+document.getElementById('taxes').value||0;
-  const share = turnover>0 ? taxes/turnover*100 : 0;
-  document.getElementById('taxShare').textContent = share.toFixed(2)+'%';
-  const bar=document.getElementById('taxBar');
-  bar.style.width = Math.min(100, share)*1.2+'%';
-  const badge=document.getElementById('taxBadge');
-  const r=document.getElementById('r3');
-  if(share>=0.9){ badge.textContent='Оценка: в ориентире'; badge.className='badge ok';
-    r.textContent='✓ Нагрузка не выглядит заниженной по ориентиру 0,9%.'; r.className='result ok'; state.s3=true; toast('Отлично! Порог 0,9% выполнен.'); }
-  else{ badge.textContent='Оценка: занижено'; badge.className='badge bad';
-    r.textContent='✕ Нагрузка ниже ориентира 0,9% — банк может спросить пояснения.'; r.className='result bad'; state.s3=false; toast('Не критично — это сигнал к подготовке пояснений и документов.');}
-  updateProgress();
-}
-function reveal3(){ document.getElementById('taxes').value = Math.ceil((0.9/100) * (+document.getElementById('turnover').value||0)); checkStep3(); }
-
-function checkStep4(){
-  const checks=[...document.querySelectorAll('[data-s4]')].map(cb=>cb.checked);
-  const truth=data.step4.map(x=>x.mismatch);
-  const ok = checks.length===truth.length && checks.every((v,i)=>v===truth[i]);
-  const r=document.getElementById('r4');
-  if(ok){ r.textContent='✓ Верно: выделены операции вне ОКВЭД.'; r.className='result ok';
-    state.s4=true; toast('Отличная точность — маркетинг/IT требуют обоснования/ОКВЭД.');}
-  else{ r.textContent='✕ Проверьте, что отделка/материалы — ок, а маркетинг/IT — вне профиля.'; r.className='result bad';
-    state.s4=false; toast('Хороший прогресс! Ещё раз сравните назначения с ОКВЭД.');}
-  updateProgress();
-}
-function reveal4(){ [...document.querySelectorAll('[data-s4]')].forEach((cb,i)=>cb.checked=data.step4[i].mismatch); toast('Подсказка применена к шагу 4.'); }
-
-function checkStep5(){
-  const checks=[...document.querySelectorAll('[data-s5]')].reduce((arr,cb,i)=>{ if(cb.checked) arr.push(data.step5.months[i].m); return arr;},[]);
-  const truth=data.step5.anomalies;
-  const ok = checks.length===truth.length && checks.every(x=>truth.includes(x));
-  const r=document.getElementById('r5');
-  if(ok){ r.textContent='✓ Корректно: отмечена(ы) аномалия(и).'; r.className='result ok';
-    state.s5=true; toast('Верно! Резкий рост в августе — повод для пояснения.');}
-  else{ r.textContent='✕ Проверьте месяцы с резким ростом оборота/кол-ва платежей.'; r.className='result bad';
-    state.s5=false; toast('Подсказка: ищите месяцы с кратным ростом относительно тренда.');}
-  updateProgress();
-}
-function reveal5(){ [...document.querySelectorAll('[data-s5]')].forEach((cb,i)=>cb.checked=data.step5.anomalies.includes(data.step5.months[i].m)); toast('Подсказка применена к шагу 5.'); }
-
-function checkStep6(){
-  const val=document.getElementById('letter').value.toLowerCase();
-  const hits = data.keywords.filter(k=>val.includes(k)).length;
-  document.getElementById('kwStatus').textContent = `Ключевые слова: ${hits}/${data.keywords.length}`;
-  const r=document.getElementById('r6');
-  if(hits>=5){ r.textContent='✓ Отлично! Пояснение содержит ключевые элементы и выглядит убедительно.'; r.className='result ok';
-    state.s6=true; toast('Супер! Вы говорите на «языке банка».');}
-  else{ r.textContent='✕ Добавьте конкретику: договор, акт, инвойс, логистику/сроки, назначение платежа.'; r.className='result bad';
-    state.s6=false; toast('Хороший черновик. Добавьте недостающие элементы.');}
-  updateProgress();
-}
-
-/* ======= КНОПКИ ======= */
-document.querySelectorAll('[data-check]').forEach(b=>{
-  b.addEventListener('click',()=>{
-    const n=b.getAttribute('data-check');
-    ({1:checkStep1,2:checkStep2,3:checkStep3,4:checkStep4,5:checkStep5,6:checkStep6})[n]();
-  });
-});
-document.querySelectorAll('[data-reveal]').forEach(b=>{
-  b.addEventListener('click',()=>{
-    const n=b.getAttribute('data-reveal');
-    ({1:reveal1,2:reveal2,3:reveal3,4:reveal4,5:reveal5})[n]();
-  });
-});
-document.querySelector('[button][data-template]'); // silence
-
-document.querySelector('[data-template]')?.addEventListener('click',()=>{
-  const tpl = `Тема: Пояснение по платежу №___ от __.__.____
-Сделка: услуги по договору №___ от __.__.____ с ООО «Альфа».
-Документы: договор, спецификация, счёт/инвойс, акт выполненных работ (прилагаем).
-Логистика/сроки: выполнение работ __.__–___.___. Назначение платежа соответствует договору.
-Готовы предоставить дополнительные материалы.`;
-  const ta=document.getElementById('letter');
-  ta.value = tpl;
-  ta.dispatchEvent(new Event('input'));
-  toast('Шаблон вставлен.');
-});
-
-/* live keywords */
-document.getElementById('letter').addEventListener('input', ()=>{
-  const val=document.getElementById('letter').value.toLowerCase();
-  const hits = data.keywords.filter(k=>val.includes(k)).length;
-  document.getElementById('kwStatus').textContent = `Ключевые слова: ${hits}/${data.keywords.length}`;
-});
-
-/* ======= ИТОГ И РЕКОМЕНДАЦИИ ======= */
-function buildSummary(){
-  const s = document.getElementById('summary');
-  const list = document.getElementById('recs');
-  list.innerHTML='';
-  const done = Object.values(state).filter(Boolean).length;
-  if(done<6){
-    s.textContent = `Прогресс: ${done}/6 шагов. Завершите все проверки, чтобы собрать рекомендации.`;
-    return;
+  const c1=document.getElementById('ex1').checked;
+  const c2=document.getElementById('ex2').checked;
+  const r=document.getElementById('res1');
+  if(c1 && !c2){
+    r.textContent="✓ Верно: транзитная операция найдена.";
+    r.className="result ok";
+    state.s1=true;
+  } else {
+    r.textContent="✕ Ошибка: отметьте транзит (1 млн без документов).";
+    r.className="result bad";
+    state.s1=false;
   }
-  s.innerHTML = `<span class="badge ok">Готово</span> Все шаги пройдены. Ниже — авто-резюме и меры снижения рисков.`;
-  const items = [
-    'Устранить транзиты без первички: оформить договоры/акты, добавить пояснения экономического смысла.',
-    'Минимизировать крупные снятия наличных; использовать бизнес-карты, подтверждать чеки.',
-    'Свести налоговую нагрузку к ориентиру ≥0,9% от оборота или подготовить обоснование отклонений.',
-    'Обновить ОКВЭД или заключить отдельные договоры на маркетинг/IT с чётким предметом.',
-    'Подготовить пояснение по аномалии августа (рост оборота/платежей) и предупредить банк на будущее.',
-    'Поддерживать «папку обоснования» по ключевым контрагентам: договор, спецификация, счёт/инвойс, акт/накладная.'
-  ];
-  items.forEach(t=>{ const li=document.createElement('li'); li.textContent=t; list.appendChild(li);});
+  updateProgress();
 }
 
-/* ======= УТИЛИТЫ ======= */
 document.getElementById('printBtn').addEventListener('click',()=>window.print());
 document.getElementById('resetAll').addEventListener('click',()=>{
-  // чекбоксы
-  ['s1','s2','s4','s5'].forEach(k=>{
-    document.querySelectorAll(`[data-${k}]`).forEach(cb=>cb.checked=false);
-  });
-  // результаты
-  ['r1','r2','r3','r4','r5','r6'].forEach(id=>{const el=document.getElementById(id); el.textContent=''; el.className='result';});
-  // поля
-  document.getElementById('turnover').value=30000000;
-  document.getElementById('taxes').value=100000;
-  document.getElementById('taxShare').textContent='—';
-  document.getElementById('taxBar').style.width='0';
-  document.getElementById('taxBadge').textContent='Оценка: —'; document.getElementById('taxBadge').className='badge';
-  document.getElementById('letter').value=''; document.getElementById('kwStatus').textContent='Ключевые слова: 0/5';
-  Object.keys(state).forEach(k=>state[k]=false);
-  updateProgress(); toast('Платформа очищена.');
+  document.getElementById('ex1').checked=false;
+  document.getElementById('ex2').checked=false;
+  document.getElementById('res1').textContent='';
+  state.s1=false;
+  updateProgress();
 });
-document.getElementById('copyJSON').addEventListener('click', async ()=>{
-  const payload = {
-    steps: state,
-    taxes: {turnover:+document.getElementById('turnover').value||0, taxes:+document.getElementById('taxes').value||0},
-    letter: document.getElementById('letter').value
-  };
-  try{ await navigator.clipboard.writeText(JSON.stringify(payload,null,2)); toast('Результат скопирован в буфер обмена.'); }
-  catch(e){ toast('Скопируйте вручную: клипборд недоступен.'); }
-});
-
-/* init */
-updateProgress();
 </script>
 </body>
 </html>
