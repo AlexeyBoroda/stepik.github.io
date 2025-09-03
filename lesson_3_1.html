@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Чеклист заданий — Документирование операций</title>
+<meta name="description" content="Чеклист дистанционных заданий по документированию операций: самопроверка, прогресс, сохранение в браузере." />
+<style>
+  :root{
+    --bg:#ffffff;--fg:#0f172a;--muted:#475569;--line:#e2e8f0;--soft:#f8fafc;
+    --brand:#0ea5e9;--brand-ink:#0b7db1;--ok:#10b981;--warn:#f59e0b;--bad:#ef4444;
+    --r:16px;--shadow:0 10px 30px rgba(2,6,23,.08)
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif}
+  a{color:var(--brand);text-decoration:none} a:hover{text-decoration:underline}
+  .wrap{max-width:1100px;margin:auto;padding:22px}
+  header.hero{border:1px solid var(--line);background:linear-gradient(180deg,#fff,#f4fbff);border-radius:20px;box-shadow:var(--shadow);padding:22px}
+  header.hero h1{margin:0 0 6px;font-size:clamp(22px,3.2vw,34px)}
+  header.hero p{margin:6px 0 0;color:#334155}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .chip{padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:13px;color:#0f172a}
+
+  .progress{height:12px;border:1px solid var(--line);border-radius:999px;background:#eef2f7;overflow:hidden}
+  .bar{height:100%;background:linear-gradient(90deg,#0ea5e9,#38bdf8);width:0%}
+  .grid{display:grid;gap:16px}
+  @media(min-width:960px){ .grid.cols-2{grid-template-columns:1fr 1fr} }
+  section.task{
+    background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);
+    padding:18px; margin:14px 0
+  }
+  section.task.done{outline:2px solid #10b981; outline-offset:2px}
+  section.task h2{margin:0 0 8px;font-size:20px}
+  .muted{color:var(--muted)}
+  .btn{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 12px;cursor:pointer}
+  .btn:hover{box-shadow:0 6px 16px rgba(2,6,23,.08);transform:translateY(-1px)}
+  .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  .pill{display:inline-block;padding:2px 8px;border:1px solid var(--line);border-radius:999px;font-size:12px;background:#fff}
+  .ok{color:var(--ok)} .bad{color:var(--bad)} .warn{color:var(--warn)}
+  .box{border:1px dashed var(--line);border-radius:12px;background:#fcfeff;padding:10px}
+  .col{display:flex;flex-direction:column;gap:8px}
+  textarea,input[type="text"]{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px}
+  .table{width:100%;border-collapse:collapse}
+  .table th,.table td{border:1px solid var(--line);padding:8px;vertical-align:top;background:#fff}
+  .table th{background:#f8fafc;text-align:left}
+  .hint{display:none;margin-top:8px}
+  .hint.show{display:block}
+  .tag{font-size:12px;color:#334155;background:#f1f5f9;border:1px solid var(--line);padding:2px 8px;border-radius:999px}
+  .dnd-wrap{display:grid;gap:12px}
+  @media(min-width:900px){ .dnd-wrap{grid-template-columns:320px 1fr} }
+  .dnd-list,.dnd-bin{border:1px dashed var(--line);border-radius:12px;min-height:46px;padding:8px;background:#fafcff}
+  .dnd-card{padding:8px;border:1px solid var(--line);border-radius:10px;background:#fff;margin:6px 0;cursor:grab}
+  .flex{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .right{color:#0b7db1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <h1>Чеклист дистанционных заданий — «Документирование операций»</h1>
+    <p>Выполняйте задания прямо на странице, отмечайте выполнение и проверяйте себя. Прогресс сохраняется в вашем браузере (<span class="pill">localStorage</span>).</p>
+    <div class="chips">
+      <span class="chip">Самопроверка</span>
+      <span class="chip">Без внешних зависимостей</span>
+      <span class="chip">Готово для iFrame</span>
+    </div>
+    <div style="margin-top:12px">
+      <div class="progress" aria-label="Прогресс выполнения"><div id="progressBar" class="bar"></div></div>
+      <div class="muted" style="margin-top:6px">Прогресс: <b id="progressText">0%</b></div>
+    </div>
+  </header>
+
+  <!-- Задание 1 -->
+  <section class="task" id="t1">
+    <h2>1) Найди ошибки в документах</h2>
+    <p class="muted">Отметьте пункты, которые являются ошибками в пакете документов.</p>
+    <div class="box">
+      <label><input type="checkbox" class="t1opt" data-correct="true"> Счёт: <b>220 000 ₽</b>, Акт: <b>200 000 ₽</b></label><br>
+      <label><input type="checkbox" class="t1opt" data-correct="false"> Подписант — директор с действующей доверенностью</label><br>
+      <label><input type="checkbox" class="t1opt" data-correct="true"> УПД от <b>10.08</b>, платёжка от <b>05.08</b></label><br>
+      <label><input type="checkbox" class="t1opt" data-correct="false"> Квитанции ЭДО «доставлен/подписан» приложены</label>
+    </div>
+    <div class="flex" style="margin-top:8px">
+      <button class="btn primary" onclick="checkT1()">Проверить</button>
+      <button class="btn" onclick="markDone('t1')">Отметить выполненным</button>
+      <span id="t1msg"></span>
+    </div>
+  </section>
+
+  <!-- Задание 2 -->
+  <section class="task" id="t2">
+    <h2>2) Собери пакет документов по кейсам</h2>
+    <p class="muted">Перетащите карточки слева в соответствующие корзины справа. Затем нажмите «Проверить».</p>
+    <div class="dnd-wrap">
+      <div>
+        <div class="tag">Документы</div>
+        <div id="dndList" class="dnd-list">
+          <div class="dnd-card" draggable="true" data-id="contract">Договор + ТЗ</div>
+          <div class="dnd-card" draggable="true" data-id="upd">Акт/УПД</div>
+          <div class="dnd-card" draggable="true" data-id="ttn">ТТН</div>
+          <div class="dnd-card" draggable="true" data-id="reports">Отчёты платформ / выгрузки</div>
+          <div class="dnd-card" draggable="true" data-id="kvit">Квитанции ЭДО</div>
+          <div class="dnd-card" draggable="true" data-id="loan">График погашения займа</div>
+          <div class="dnd-card" draggable="true" data-id="proof">Фото/логи/скриншоты факта</div>
+          <div class="dnd-card" draggable="true" data-id="invoice">Инвойс/счёт</div>
+        </div>
+      </div>
+      <div>
+        <div class="grid cols-2">
+          <div>
+            <div class="tag">Поставка товара</div>
+            <div id="binGoods" class="dnd-bin"></div>
+          </div>
+          <div>
+            <div class="tag">Маркетинговые услуги</div>
+            <div id="binMkt" class="dnd-bin"></div>
+          </div>
+          <div>
+            <div class="tag">Займ внутри группы</div>
+            <div id="binLoan" class="dnd-bin"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flex" style="margin-top:8px">
+      <button class="btn primary" onclick="checkT2()">Проверить</button>
+      <button class="btn" onclick="markDone('t2')">Отметить выполненным</button>
+      <span id="t2msg"></span>
+    </div>
+  </section>
+
+  <!-- Задание 3 -->
+  <section class="task" id="t3">
+    <h2>3) Экономический смысл сделки (мини-эссе)</h2>
+    <p class="muted">Напишите 3–5 предложений пояснения для банка по кейсу: «SMM-услуги на 200 000 ₽ в августе».</p>
+    <div class="col">
+      <textarea id="t3text" rows="5" placeholder="Кратко опишите деловую цель, ожидаемый эффект, связь с доходом/экономией, KPI/контроль, ссылки на артефакты."></textarea>
+      <div class="flex">
+        <button class="btn primary" onclick="saveEssay('t3text')">Сохранить черновик</button>
+        <button class="btn" onclick="toggleHint('t3hint')">Показать пример</button>
+        <button class="btn" onclick="markDone('t3')">Отметить выполненным</button>
+      </div>
+      <div id="t3hint" class="hint box">
+        Пример: «Услуги SMM направлены на генерацию 200 лидов на лендинг X. Экономический эффект — увеличение MQL и выручки в Q3. Контроль по KPI: лиды/CTR/CPA; артефакты — выгрузки из VK с ID кампаний, скриншоты кабинетa, акт/УПД и квитанции ЭДО.»
+      </div>
+    </div>
+  </section>
+
+  <!-- Задание 4 -->
+  <section class="task" id="t4">
+    <h2>4) Собери таймлайн сделки</h2>
+    <p class="muted">Перетащите пункты, чтобы выстроить правильную последовательность. Затем нажмите «Проверить».</p>
+    <div id="orderList" class="dnd-list">
+      <div class="dnd-card" draggable="true" data-step="kyc">KYC контрагента</div>
+      <div class="dnd-card" draggable="true" data-step="contract">Договор + ТЗ</div>
+      <div class="dnd-card" draggable="true" data-step="exec">Акт/УПД (факт исполнения)</div>
+      <div class="dnd-card" draggable="true" data-step="pay">Платёжка</div>
+      <div class="dnd-card" draggable="true" data-step="archive">Архив + квитанции ЭДО</div>
+      <div class="dnd-card" draggable="true" data-step="req">Заявка/обоснование</div>
+    </div>
+    <div class="flex" style="margin-top:8px">
+      <button class="btn primary" onclick="checkT4()">Проверить</button>
+      <button class="btn" onclick="markDone('t4')">Отметить выполненным</button>
+      <span id="t4msg"></span>
+    </div>
+  </section>
+
+  <!-- Задание 5 -->
+  <section class="task" id="t5">
+    <h2>5) KYC-чек</h2>
+    <p class="muted">Отметьте признаки риска и сделайте вывод.</p>
+    <table class="table">
+      <thead><tr><th>Признак</th><th>Есть</th></tr></thead>
+      <tbody>
+        <tr><td>Директор в 20 компаниях одновременно</td><td><input type="checkbox" class="kyc" data-correct="true"></td></tr>
+        <tr><td>Нет сайта/офиса, только телефон</td><td><input type="checkbox" class="kyc" data-correct="true"></td></tr>
+        <tr><td>Компания 5 лет на рынке, реальный склад</td><td><input type="checkbox" class="kyc" data-correct="false"></td></tr>
+        <tr><td>Выписка ЕГРЮЛ с частыми сменами адреса</td><td><input type="checkbox" class="kyc" data-correct="true"></td></tr>
+      </tbody>
+    </table>
+    <div class="flex" style="margin-top:8px">
+      <label class="flex">Итог: 
+        <select id="kycVerdict" style="margin-left:8px;border:1px solid var(--line);border-radius:10px;padding:6px">
+          <option value="">— выберите —</option>
+          <option value="risk">Рискованно</option>
+          <option value="ok">Можно сотрудничать</option>
+        </select>
+      </label>
+    </div>
+    <div class="flex" style="margin-top:8px">
+      <button class="btn primary" onclick="checkT5()">Проверить</button>
+      <button class="btn" onclick="markDone('t5')">Отметить выполненным</button>
+      <span id="t5msg"></span>
+    </div>
+  </section>
+
+  <!-- Задание 6 (бывш. №7) -->
+  <section class="task" id="t6">
+    <h2>6) Симуляция ответа банку</h2>
+    <p class="muted">Выберите стратегию и обоснуйте.</p>
+    <div class="box">
+      <label><input type="radio" name="bank" value="ignore"> Проигнорировать письмо (подождать)</label><br>
+      <label><input type="radio" name="bank" value="package"> Подготовить договор, акт/УПД, артефакты и пояснительную записку</label><br>
+      <label><input type="radio" name="bank" value="complain"> Сразу жалоба регулятору</label>
+    </div>
+    <div class="col" style="margin-top:8px">
+      <textarea id="t6text" rows="4" placeholder="Короткое обоснование выбранной стратегии..."></textarea>
+      <div class="flex">
+        <button class="btn primary" onclick="checkT6()">Проверить</button>
+        <button class="btn" onclick="markDone('t6')">Отметить выполненным</button>
+        <span id="t6msg"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Задание 7 (бывш. №8) -->
+  <section class="task" id="t7">
+    <h2>7) Регламент SLA: заполните таблицу</h2>
+    <p class="muted">Заполните не менее 3 строк: этап → срок → контрольный документ.</p>
+    <table class="table" id="slaTable">
+      <thead><tr><th>Этап</th><th>SLA</th><th>Контроль</th></tr></thead>
+      <tbody>
+        <tr><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
+        <tr><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
+        <tr><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
+        <tr><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
+      </tbody>
+    </table>
+    <div class="flex" style="margin-top:8px">
+      <button class="btn" onclick="toggleHint('slaHint')">Показать пример</button>
+      <button class="btn primary" onclick="markDone('t7')">Отметить выполненным</button>
+    </div>
+    <div id="slaHint" class="hint box">
+      Пример строк: «KYC → 1–2 р.д. → чек-лист KYC», «Договор → 3–5 р.д. → лист замечаний», «Закрывающие → ≤3 р.д. → автосверка сумм/дат/НДС».
+    </div>
+  </section>
+
+  <footer class="muted" style="margin:18px 0 8px">Данные сохраняются только в вашем браузере. Страницу можно встраивать на платформу через iFrame.</footer>
+</div>
+
+<script>
+/* ---------- Хранилище прогресса ---------- */
+const KEY = "docops-checklist-progress-v1";
+const state = JSON.parse(localStorage.getItem(KEY) || "{}");
+const tasks = ["t1","t2","t3","t4","t5","t6","t7"];
+
+function saveState(){ localStorage.setItem(KEY, JSON.stringify(state)); updateProgress(); }
+function markDone(id){
+  state[id] = true;
+  document.getElementById(id).classList.add('done');
+  saveState();
+}
+function updateProgress(){
+  let done = tasks.filter(t=>state[t]).length;
+  const pct = Math.round(done/tasks.length*100);
+  const bar = document.getElementById('progressBar');
+  const txt = document.getElementById('progressText');
+  if(bar){ bar.style.width = pct + "%"; }
+  if(txt){ txt.textContent = pct + "%"; }
+  tasks.forEach(id => {
+    if(state[id]) document.getElementById(id)?.classList.add('done');
+  });
+}
+updateProgress();
+
+/* ---------- Задание 1 ---------- */
+function checkT1(){
+  const opts = document.querySelectorAll('.t1opt');
+  let ok = true;
+  opts.forEach(i=>{
+    const should = i.dataset.correct==="true";
+    if(should && !i.checked) ok=false;
+    if(!should && i.checked) ok=false;
+  });
+  const msg = document.getElementById('t1msg');
+  msg.innerHTML = ok ? "✅ Верно: отмечены все и только ошибки." : "❌ Проверьте: ошибки — расхождение сумм и предоплата раньше факта.";
+  if(ok) markDone('t1');
+}
+
+/* ---------- DND helpers ---------- */
+let dragEl = null;
+function handleDragStart(e){ dragEl = e.target; e.dataTransfer.effectAllowed = 'move'; }
+function handleDragOver(e){ e.preventDefault(); }
+function handleDrop(e){
+  e.preventDefault();
+  const target = e.currentTarget;
+  if(dragEl && (dragEl.classList.contains('dnd-card'))){
+    target.appendChild(dragEl);
+    dragEl = null;
+  }
+}
+document.querySelectorAll('.dnd-card').forEach(el=>el.addEventListener('dragstart',handleDragStart));
+['dndList','binGoods','binMkt','binLoan','orderList'].forEach(id=>{
+  const el = document.getElementById(id);
+  el.addEventListener('dragover',handleDragOver);
+  el.addEventListener('drop',handleDrop);
+});
+
+/* ---------- Задание 2 ---------- */
+function checkT2(){
+  const needGoods = ['contract','upd','ttn','kvit','invoice','proof'];
+  const needMkt   = ['contract','upd','reports','kvit','proof'];
+  const needLoan  = ['contract','loan','invoice','kvit'];
+  function idsIn(binId){
+    return Array.from(document.querySelectorAll('#'+binId+' .dnd-card')).map(x=>x.dataset.id);
+  }
+  const g = idsIn('binGoods'); const m = idsIn('binMkt'); const l = idsIn('binLoan');
+  const ok = needGoods.every(x=>g.includes(x)) && needMkt.every(x=>m.includes(x)) && needLoan.every(x=>l.includes(x));
+  const msg = document.getElementById('t2msg');
+  msg.innerHTML = ok ? "✅ Отлично: пакеты собраны корректно." : "❌ Ещё не всё на местах. Подсказка: маркетинг требует отчёты платформ, поставка — ТТН/фото, займ — график погашения.";
+  if(ok) markDone('t2');
+}
+
+/* ---------- Задание 3 ---------- */
+function saveEssay(id){
+  const val = document.getElementById(id).value.trim();
+  localStorage.setItem(id, val);
+  alert("Черновик сохранён локально.");
+}
+function toggleHint(id){
+  const el = document.getElementById(id);
+  el.classList.toggle('show');
+}
+
+/* ---------- Задание 4 ---------- */
+function checkT4(){
+  const want = ['req','kyc','contract','exec','pay','archive'];
+  const got  = Array.from(document.querySelectorAll('#orderList .dnd-card')).map(x=>x.dataset.step);
+  const ok = JSON.stringify(got)===JSON.stringify(want);
+  const msg = document.getElementById('t4msg');
+  msg.innerHTML = ok ? "✅ Правильная последовательность!" : "❌ Подсказка: сначала заявка, затем KYC, далее договор, факт, оплата, архив.";
+  if(ok) markDone('t4');
+}
+
+/* ---------- Задание 5 ---------- */
+function checkT5(){
+  const checks = document.querySelectorAll('.kyc');
+  let ok = true;
+  checks.forEach(c=>{
+    const should = c.dataset.correct==="true";
+    if(should && !c.checked) ok=false;
+    if(!should && c.checked) ok=false;
+  });
+  const verdict = document.getElementById('kycVerdict').value;
+  ok = ok && verdict==='risk';
+  const msg = document.getElementById('t5msg');
+  msg.innerHTML = ok ? "✅ Верно: признаки риска выбраны, итог — «Рискованно»." : "❌ Проверьте признаки и итоговый вывод.";
+  if(ok) markDone('t5');
+}
+
+/* ---------- Задание 6 ---------- */
+function checkT6(){
+  const val = (document.querySelector('input[name="bank"]:checked')||{}).value;
+  const txt = document.getElementById('t6text').value.trim();
+  const ok = (val==='package') && txt.length>20;
+  const msg = document.getElementById('t6msg');
+  msg.innerHTML = ok ? "✅ Корректно: пакет документов + обоснование." : "❌ Выберите стратегию «подготовить пакет» и добавьте краткое обоснование.";
+  if(ok) markDone('t6');
+}
+
+/* ---------- SLA hint toggle already above ---------- */
+</script>
+</body>
+</html>
