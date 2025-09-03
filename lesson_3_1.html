@@ -90,49 +90,44 @@
   <!-- Задание 2 -->
   <section class="task" id="t2">
     <h2>2) Собери пакет документов по кейсам</h2>
-    <p class="muted">Перетащите карточки слева в соответствующие корзины справа. Затем нажмите «Проверить».</p>
+    <p class="muted">Разложите <b>каждую уникальную карточку</b> по соответствующей корзине. Дубликатов нет — у каждой карточки ровно один правильный кейс.</p>
     <div class="dnd-wrap">
       <div>
-        <div class="tag">Документы</div>
+        <div class="tag">Карточки</div>
         <div id="dndList" class="dnd-list">
-          <!-- контракт ×3 -->
-          <div class="dnd-card" draggable="true" data-type="contract">Договор + ТЗ</div>
-          <div class="dnd-card" draggable="true" data-type="contract">Договор + ТЗ</div>
-          <div class="dnd-card" draggable="true" data-type="contract">Договор + ТЗ</div>
-          <!-- акт/УПД ×2 -->
-          <div class="dnd-card" draggable="true" data-type="upd">Акт/УПД</div>
-          <div class="dnd-card" draggable="true" data-type="upd">Акт/УПД</div>
-          <!-- ТТН ×1 -->
-          <div class="dnd-card" draggable="true" data-type="ttn">ТТН</div>
-          <!-- отчёты ×1 -->
-          <div class="dnd-card" draggable="true" data-type="reports">Отчёты платформ / выгрузки</div>
-          <!-- квитанции ЭДО ×3 -->
-          <div class="dnd-card" draggable="true" data-type="kvit">Квитанции ЭДО</div>
-          <div class="dnd-card" draggable="true" data-type="kvit">Квитанции ЭДО</div>
-          <div class="dnd-card" draggable="true" data-type="kvit">Квитанции ЭДО</div>
-          <!-- график займа ×1 -->
-          <div class="dnd-card" draggable="true" data-type="loan">График погашения займа</div>
-          <!-- фото/логи ×2 -->
-          <div class="dnd-card" draggable="true" data-type="proof">Фото/логи/скриншоты факта</div>
-          <div class="dnd-card" draggable="true" data-type="proof">Фото/логи/скриншоты факта</div>
-          <!-- инвойс/счёт ×2 -->
-          <div class="dnd-card" draggable="true" data-type="invoice">Инвойс/счёт</div>
-          <div class="dnd-card" draggable="true" data-type="invoice">Инвойс/счёт</div>
+          <!-- Поставка -->
+          <div class="dnd-card" draggable="true" data-target="goods">Договор поставки</div>
+          <div class="dnd-card" draggable="true" data-target="goods">Акт/УПД (поставка)</div>
+          <div class="dnd-card" draggable="true" data-target="goods">ТТН</div>
+          <div class="dnd-card" draggable="true" data-target="goods">Счёт/инвойс (товар)</div>
+          <div class="dnd-card" draggable="true" data-target="goods">Фото отгрузки/приёмки</div>
+          <div class="dnd-card" draggable="true" data-target="goods">Квитанции ЭДО (товар)</div>
+          <!-- Маркетинг -->
+          <div class="dnd-card" draggable="true" data-target="mkt">Договор на маркетинговые услуги</div>
+          <div class="dnd-card" draggable="true" data-target="mkt">Акт/УПД (маркетинг)</div>
+          <div class="dnd-card" draggable="true" data-target="mkt">Отчёты платформ / выгрузки</div>
+          <div class="dnd-card" draggable="true" data-target="mkt">Логи/скриншоты кампаний</div>
+          <div class="dnd-card" draggable="true" data-target="mkt">Квитанции ЭДО (маркетинг)</div>
+          <!-- Займ -->
+          <div class="dnd-card" draggable="true" data-target="loan">Договор займа</div>
+          <div class="dnd-card" draggable="true" data-target="loan">График погашения займа</div>
+          <div class="dnd-card" draggable="true" data-target="loan">Платёжное поручение (займ)</div>
+          <div class="dnd-card" draggable="true" data-target="loan">Обоснование деловой цели (займ)</div>
         </div>
       </div>
       <div>
         <div class="grid cols-2">
           <div>
             <div class="tag">Поставка товара</div>
-            <div id="binGoods" class="dnd-bin"></div>
+            <div id="binGoods" class="dnd-bin" data-bin="goods"></div>
           </div>
           <div>
             <div class="tag">Маркетинговые услуги</div>
-            <div id="binMkt" class="dnd-bin"></div>
+            <div id="binMkt" class="dnd-bin" data-bin="mkt"></div>
           </div>
           <div>
             <div class="tag">Займ внутри группы</div>
-            <div id="binLoan" class="dnd-bin"></div>
+            <div id="binLoan" class="dnd-bin" data-bin="loan"></div>
           </div>
         </div>
       </div>
@@ -255,7 +250,7 @@
 
 <script>
 /* ---------- Хранилище прогресса ---------- */
-const KEY = "docops-checklist-progress-v2";
+const KEY = "docops-checklist-progress-v3";
 const state = JSON.parse(localStorage.getItem(KEY) || "{}");
 const tasks = ["t1","t2","t3","t4","t5","t6","t7"];
 
@@ -292,22 +287,16 @@ function checkT1(){
   if(ok) markDone('t1');
 }
 
-/* ---------- DND для Задания 2 (корзины) ---------- */
+/* ---------- DND для Задания 2 (уникальные карточки) ---------- */
 let dragEl = null;
-function handleDragStart(e){
-  dragEl = e.target;
-  e.dataTransfer.effectAllowed = 'move';
-}
+function handleDragStart(e){ dragEl = e.target; e.dataTransfer.effectAllowed = 'move'; }
 function handleDragOver(e){ e.preventDefault(); }
 function handleDrop(e){
   e.preventDefault();
   const target = e.currentTarget;
-  if(dragEl && dragEl.classList.contains('dnd-card')){
-    target.appendChild(dragEl);
-    dragEl = null;
-  }
+  if(dragEl && dragEl.classList.contains('dnd-card')) target.appendChild(dragEl);
+  dragEl = null;
 }
-// назначаем drag&drop только для задания №2
 document.querySelectorAll('#dndList .dnd-card').forEach(el => el.addEventListener('dragstart', handleDragStart));
 ['dndList','binGoods','binMkt','binLoan'].forEach(id => {
   const el = document.getElementById(id);
@@ -315,24 +304,31 @@ document.querySelectorAll('#dndList .dnd-card').forEach(el => el.addEventListene
   el.addEventListener('drop', handleDrop);
 });
 
-/* Проверка Задания 2 */
 function checkT2(){
-  // требуемые наборы (одна штука каждого типа)
-  const needGoods = ['contract','upd','ttn','kvit','invoice','proof'];
-  const needMkt   = ['contract','upd','reports','kvit','proof'];
-  const needLoan  = ['contract','loan','invoice','kvit'];
-
-  function typesIn(binId){
-    return Array.from(document.querySelectorAll('#'+binId+' .dnd-card')).map(x=>x.dataset.type);
-  }
-  function hasAll(binId, required){
-    const types = typesIn(binId);
-    return required.every(t => types.includes(t));
-  }
-  const ok = hasAll('binGoods', needGoods) && hasAll('binMkt', needMkt) && hasAll('binLoan', needLoan);
+  const bins = [
+    {id:'binGoods', code:'goods', name:'Поставка товара'},
+    {id:'binMkt',   code:'mkt',   name:'Маркетинговые услуги'},
+    {id:'binLoan',  code:'loan',  name:'Займ внутри группы'}
+  ];
+  const leftover = document.querySelectorAll('#dndList .dnd-card').length;
+  let wrong = [];
+  bins.forEach(b=>{
+    document.querySelectorAll('#'+b.id+' .dnd-card').forEach(card=>{
+      const should = card.dataset.target;
+      if(should !== b.code) wrong.push(card.textContent.trim()+" → "+b.name);
+    });
+  });
   const msg = document.getElementById('t2msg');
-  msg.innerHTML = ok ? "✅ Отлично: пакеты собраны корректно." : "❌ Ещё не всё на местах. Подсказка: маркетинг требует отчёты платформ; поставка — ТТН и фото/логи; займ — график погашения.";
-  if(ok) markDone('t2');
+  if(leftover>0){
+    msg.innerHTML = "❌ Разложите все карточки по корзинам. Осталось: "+leftover;
+    return;
+  }
+  if(wrong.length>0){
+    msg.innerHTML = "❌ Неверные размещения:<br><span class='bad'>• "+wrong.join("<br>• ")+"</span>";
+    return;
+  }
+  msg.innerHTML = "✅ Отлично: все карточки разложены корректно.";
+  markDone('t2');
 }
 
 /* ---------- Задание 3 ---------- */
@@ -346,7 +342,7 @@ function toggleHint(id){
   el.classList.toggle('show');
 }
 
-/* ---------- Задание 4: правильное упорядочивание в списке ---------- */
+/* ---------- Задание 4: упорядочивание списка ---------- */
 const orderList = document.getElementById('orderList');
 orderList.querySelectorAll('.dnd-card').forEach(el=>{
   el.addEventListener('dragstart', ()=> el.classList.add('dragging'));
@@ -357,11 +353,8 @@ orderList.addEventListener('dragover', (e)=>{
   const after = getDragAfterElement(orderList, e.clientY);
   const dragging = orderList.querySelector('.dragging');
   if(!dragging) return;
-  if(after == null){
-    orderList.appendChild(dragging);
-  } else {
-    orderList.insertBefore(dragging, after);
-  }
+  if(after == null){ orderList.appendChild(dragging); }
+  else { orderList.insertBefore(dragging, after); }
 });
 function getDragAfterElement(container, y){
   const items = [...container.querySelectorAll('.dnd-card:not(.dragging)')];
@@ -369,9 +362,7 @@ function getDragAfterElement(container, y){
   for(const child of items){
     const box = child.getBoundingClientRect();
     const offset = y - (box.top + box.height/2);
-    if(offset < 0 && offset > closest.offset){
-      closest = {offset, element: child};
-    }
+    if(offset < 0 && offset > closest.offset){ closest = {offset, element: child}; }
   }
   return closest.element;
 }
@@ -380,7 +371,7 @@ function checkT4(){
   const got  = Array.from(document.querySelectorAll('#orderList .dnd-card')).map(x=>x.dataset.step);
   const ok = JSON.stringify(got)===JSON.stringify(want);
   const msg = document.getElementById('t4msg');
-  msg.innerHTML = ok ? "✅ Правильная последовательность!" : "❌ Подсказка: сначала заявка, затем KYC, далее договор, факт, оплата, архив.";
+  msg.innerHTML = ok ? "✅ Правильная последовательность!" : "❌ Подсказка: заявка → KYC → договор → факт → платёжка → архив.";
   if(ok) markDone('t4');
 }
 
