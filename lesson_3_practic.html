@@ -209,8 +209,8 @@
   <footer class="small">© Финмон, 2025 · Интерактивные чек-листы. Данные сохраняются локально в вашем браузере.</footer>
 </main>
 
-<!-- jsPDF для экспорта в PDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-3c1f8YH5P9A86J5v1Kc7i9J0o3+9sL0tQ0QGqf0k3rS5bY3mLQ0Z1u2k+z6C6nHnS9Qzqd0vM7+Qn3k4mYQ6Xg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<!-- jsPDF (через jsDelivr) для экспорта в PDF -->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script>
 /* ===== Mini helpers ===== */
 const $$ = (sel, ctx=document)=>Array.from(ctx.querySelectorAll(sel));
@@ -289,44 +289,47 @@ function wireSearch(){
 
 /* ===== Export checked items to PDF via jsPDF ===== */
 function exportCheckedPDF(){
+  if(!window.jspdf || !window.jspdf.jsPDF){
+    alert('Не удалось загрузить модуль PDF. Используйте печать (Ctrl/Cmd+P) и сохраните как PDF.');
+    window.print();
+    return;
+  }
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit:'pt', format:'a4' }); // points, A4
+  const doc = new jsPDF({ unit:'pt', format:'a4' });
   const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
   const margin = 40;
   let y = margin;
 
-  function addTitle(txt){
+  const addTitle = (txt)=>{
     doc.setFont('helvetica','bold'); doc.setFontSize(14);
     doc.text(txt, margin, y); y += 18;
-  }
-  function addItem(txt){
+  };
+  const addItem = (txt)=>{
     doc.setFont('helvetica','normal'); doc.setFontSize(11);
     const lines = doc.splitTextToSize('• ' + txt, pageW - margin*2);
     lines.forEach(line=>{
-      if(y > doc.internal.pageSize.getHeight() - margin){ doc.addPage(); y = margin; }
+      if(y > pageH - margin){ doc.addPage(); y = margin; }
       doc.text(line, margin, y); y += 14;
     });
-  }
+  };
 
   // Header
   doc.setFont('helvetica','bold'); doc.setFontSize(16);
-  doc.text('Отмеченные пункты (чек-листы Финмон)', margin, y);
-  y += 22;
+  doc.text('Отмеченные пункты (чек-листы Финмон)', margin, y); y += 22;
   doc.setFont('helvetica','normal'); doc.setFontSize(10);
-  const date = new Date().toLocaleString();
-  doc.text(`Сформировано: ${date}`, margin, y); y += 16;
+  doc.text('Сформировано: ' + new Date().toLocaleString(), margin, y); y += 16;
 
   // Sections
   let anyItems = false;
   $$('#lists section').forEach(sec=>{
     const title = $('h2', sec)?.textContent?.trim() || 'Раздел';
     const items = $$('input[type="checkbox"]:checked', sec).map(b=>{
-      // ближайший label может содержать вложенные элементы — берем видимый текст
       const lbl = b.closest('label');
       return (lbl ? lbl.innerText : b.parentElement?.innerText || '').trim();
     }).filter(Boolean);
     if(items.length){
-      if(y > doc.internal.pageSize.getHeight() - margin - 24){ doc.addPage(); y = margin; }
+      if(y > pageH - margin - 24){ doc.addPage(); y = margin; }
       addTitle(title);
       items.forEach(addItem);
       anyItems = true;
@@ -417,7 +420,7 @@ function applyQueryParams(){
   const q = new URLSearchParams(location.search);
   if(q.get('dark')==='1') setTheme('dark'); else setTheme(getTheme());
   if(q.get('compact')==='1') setCompact(true); else setCompact(getCompact());
-  // Пример для Stepik: добавьте к iframe src ...?compact=1 для плотной верстки
+  // Для Stepik можно добавить к src iframe параметр ?compact=1
 }
 
 /* ===== Boot ===== */
