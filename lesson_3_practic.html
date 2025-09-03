@@ -4,14 +4,13 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Чек-листы и алгоритмы — Блокировки счетов (интерактивная версия)</title>
-<meta name="description" content="Интерактивные чек-листы, дорожная карта 0–72 часа, шаблоны писем и самопроверки по теме блокировок счетов. Локальное сохранение прогресса, поиск, тёмная тема и экспорт в PDF.">
+<meta name="description" content="Интерактивные чек-листы, дорожная карта 0–72 часа, шаблоны писем и самопроверки. Локальное сохранение, поиск, тёмная тема и экспорт полной страницы в PDF.">
 <style>
   :root{
     --bg:#ffffff; --ink:#0f172a; --muted:#475569; --line:#e2e8f0; --card:#f8fafc;
     --accent:#0ea5e9; --ok:#16a34a; --warn:#ca8a04; --bad:#dc2626;
     --chip:#eef2ff; --chip-ink:#3730a3;
   }
-  /* Dark mode */
   :root.dark{
     --bg:#0b1220; --ink:#e5e7eb; --muted:#9aa4b2; --line:#243043; --card:#121a2c;
     --accent:#38bdf8; --ok:#22c55e; --warn:#f59e0b; --bad:#f87171;
@@ -31,12 +30,9 @@
   .card{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px}
   .toolbar{display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin:10px 0 18px}
   .left-tools,.right-tools{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
-  button, .btn {
-    background:#fff; border:1px solid var(--line); color:var(--ink); border-radius:10px; padding:8px 12px; cursor:pointer;
-  }
+  button, .btn { background:#fff; border:1px solid var(--line); color:var(--ink); border-radius:10px; padding:8px 12px; cursor:pointer; }
   .btn-ghost{background:transparent}
   .btn-accent{background:var(--accent); border-color:transparent; color:#001928}
-  .chip{display:inline-block; padding:2px 8px; border-radius:999px; background:var(--chip); color:var(--chip-ink); font-size:12px}
   .progress{height:10px; background:linear-gradient(90deg,var(--accent) var(--p,0%),transparent 0); border-radius:999px; border:1px solid var(--line); position:relative}
   .progress::after{content:attr(data-label); position:absolute; right:8px; top:-20px; font-size:12px; color:var(--muted)}
   .checklist{list-style:none; padding-left:0; margin:0}
@@ -58,14 +54,9 @@
   .badge{display:inline-block; font-size:12px; padding:2px 10px; border-radius:999px; border:1px solid var(--line); background:#fff; color:var(--muted)}
   .notice{border-left:4px solid var(--accent); background:#f0f9ff; border-radius:8px; padding:10px 12px}
   .kbdline{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
-  /* Compact mode */
   .compact .card{padding:12px}
   .compact .checklist li{margin:6px 0; padding:6px}
-  @media print{
-    .toolbar{display:none}
-    .wrap{padding:0}
-    a[href]::after{content:" (" attr(href) ")"; font-size:12px; color:var(--muted)}
-  }
+  @media print{ .toolbar{display:none} .wrap{padding:0} }
 </style>
 </head>
 <body>
@@ -80,15 +71,15 @@
     </div>
   </header>
 
-  <!-- Toolbar -->
-  <div class="toolbar">
+  <!-- Toolbar (исключаем из PDF) -->
+  <div class="toolbar" data-noexport>
     <div class="left-tools">
       <label class="search" title="Поиск по чек-листам">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 21l-3.5-3.5M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <input id="search" type="search" placeholder="Найти пункт..." />
       </label>
       <button id="btn-clear" class="btn">Сброс прогресса</button>
-      <button id="btn-export" class="btn">Экспорт ✓ PDF</button>
+      <button id="btn-export" class="btn">Экспорт PDF (вся страница)</button>
       <button id="btn-print" class="btn">Печать</button>
     </div>
     <div class="right-tools">
@@ -97,7 +88,7 @@
     </div>
   </div>
 
-  <!-- Progress -->
+  <!-- Прогресс -->
   <div class="card" aria-live="polite">
     <div class="grid cols-3">
       <div>
@@ -111,7 +102,7 @@
 
   <div class="hr"></div>
 
-  <!-- Checklists -->
+  <!-- Чек-листы -->
   <div class="grid cols-2" id="lists">
     <section class="card" data-list-id="compliance">
       <h2>1) «Папка комплаенса» (минимум)</h2>
@@ -138,7 +129,7 @@
     <section class="card" data-list-id="letter">
       <h2>3) Шаблон письма в банк</h2>
       <div class="notice small">Нажмите «Скопировать» — шаблон попадёт в буфер обмена.</div>
-      <div class="kbdline">
+      <div class="kbdline" data-noexport>
         <button id="btn-copy-template" class="btn-accent">Скопировать</button>
         <span class="small muted">и вставьте в письмо/тикет банка</span>
       </div>
@@ -166,7 +157,7 @@
     </section>
   </div>
 
-  <!-- 0–72h Roadmap -->
+  <!-- Дорожная карта -->
   <section class="card" id="roadmap">
     <h2>5) Дорожная карта «0–72 часа» при блокировке</h2>
     <div class="stepper">
@@ -209,229 +200,161 @@
   <footer class="small">© Финмон, 2025 · Интерактивные чек-листы. Данные сохраняются локально в вашем браузере.</footer>
 </main>
 
-<!-- jsPDF (через jsDelivr) для экспорта в PDF -->
+<!-- jsPDF + html2canvas для PDF с кириллицей -->
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
-/* ===== Mini helpers ===== */
+/* ===== helpers ===== */
 const $$ = (sel, ctx=document)=>Array.from(ctx.querySelectorAll(sel));
 const $ = (sel, ctx=document)=>ctx.querySelector(sel);
 
-/* ===== Keys for localStorage ===== */
-const STORAGE_KEY = 'finmon_checklists_v1';
-const THEME_KEY = 'finmon_theme';
-const COMPACT_KEY = 'finmon_compact';
+/* ===== storage keys ===== */
+const STORAGE_KEY='finmon_checklists_v1', THEME_KEY='finmon_theme', COMPACT_KEY='finmon_compact';
+function loadState(){ try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}')}catch{return{}} }
+function saveState(s){ localStorage.setItem(STORAGE_KEY, JSON.stringify(s)) }
+function getTheme(){ return localStorage.getItem(THEME_KEY)||'light' }
+function setTheme(m){ document.documentElement.classList.toggle('dark', m==='dark'); localStorage.setItem(THEME_KEY,m) }
+function getCompact(){ return localStorage.getItem(COMPACT_KEY)==='1' }
+function setCompact(on){ document.body.classList.toggle('compact',!!on); localStorage.setItem(COMPACT_KEY,on?'1':'0') }
 
-/* ===== Persistence utils ===== */
-function loadState(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }catch{ return {}; } }
-function saveState(state){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-function getTheme(){ return localStorage.getItem(THEME_KEY) || 'light'; }
-function setTheme(mode){
-  if(mode==='dark'){ document.documentElement.classList.add('dark'); }
-  else{ document.documentElement.classList.remove('dark'); }
-  localStorage.setItem(THEME_KEY, mode);
-}
-function getCompact(){ return localStorage.getItem(COMPACT_KEY) === '1'; }
-function setCompact(on){ document.body.classList.toggle('compact', !!on); localStorage.setItem(COMPACT_KEY, on ? '1' : '0'); }
-
-/* ===== Global state ===== */
-const state = loadState();
-
-/* ===== Wire each checklist with saved state ===== */
+/* ===== state & wiring ===== */
+const state=loadState();
 function wireChecklist(section){
-  const listId = section.dataset.listId || Math.random().toString(36).slice(2);
-  if(!state[listId]) state[listId] = {};
-  const boxes = $$('input[type="checkbox"]', section);
-  boxes.forEach((box, idx)=>{
-    const id = box.id || (box.id = `${listId}_${idx}`);
-    if(state[listId][id]) box.checked = true;
-    box.addEventListener('change', ()=>{
-      state[listId][id] = box.checked ? 1 : 0;
-      saveState(state);
-      computeProgress();
-    });
+  const listId=section.dataset.listId||Math.random().toString(36).slice(2);
+  if(!state[listId]) state[listId]={};
+  $$('input[type="checkbox"]',section).forEach((box,idx)=>{
+    const id=box.id|| (box.id=`${listId}_${idx}`);
+    if(state[listId][id]) box.checked=true;
+    box.addEventListener('change',()=>{ state[listId][id]=box.checked?1:0; saveState(state); computeProgress(); });
   });
 }
-
-/* ===== Progress ===== */
 function computeProgress(){
-  const all = $$('input[type="checkbox"]');
-  const checked = all.filter(b=>b.checked);
-  const p = all.length ? Math.round(checked.length / all.length * 100) : 0;
-  const bar = $('#progress');
-  bar.style.setProperty('--p', p+'%');
-  bar.setAttribute('data-label', p + '%');
-  $('#stats').textContent = `${checked.length} из ${all.length} пунктов`;
+  const all=$$('input[type="checkbox"]'), checked=all.filter(b=>b.checked);
+  const p=all.length?Math.round(checked.length/all.length*100):0;
+  $('#progress').style.setProperty('--p',p+'%');
+  $('#progress').setAttribute('data-label',p+'%');
+  $('#stats').textContent=`${checked.length} из ${all.length} пунктов`;
 }
-
-/* ===== Search filter ===== */
 function wireSearch(){
-  const input = $('#search');
-  input.addEventListener('input', ()=>{
-    const q = input.value.trim().toLowerCase();
+  const input=$('#search');
+  input?.addEventListener('input',()=>{
+    const q=input.value.trim().toLowerCase();
     $$('#lists section').forEach(sec=>{
-      let any = false;
-      $$('.checklist li, details, p', sec).forEach(el=>{
-        const text = el.textContent.toLowerCase();
-        const match = !q || text.includes(q);
-        el.style.display = match ? '' : 'none';
-        if(match) any = true;
+      let any=false;
+      $$('.checklist li, details, p',sec).forEach(el=>{
+        const match=!q||el.textContent.toLowerCase().includes(q);
+        el.style.display=match?'':'none'; if(match) any=true;
       });
-      sec.style.opacity = any ? '1' : '0.35';
+      sec.style.opacity=any?'1':'0.35';
     });
   });
-  // hotkey "/"
-  window.addEventListener('keydown', (e)=>{
-    if(e.key === '/' && document.activeElement.tagName !== 'INPUT'){
-      e.preventDefault(); input.focus();
-    }
-  });
+  window.addEventListener('keydown',(e)=>{ if(e.key==='/' && document.activeElement.tagName!=='INPUT'){ e.preventDefault(); input?.focus(); }});
 }
 
-/* ===== Export checked items to PDF via jsPDF ===== */
-function exportCheckedPDF(){
-  if(!window.jspdf || !window.jspdf.jsPDF){
-    alert('Не удалось загрузить модуль PDF. Используйте печать (Ctrl/Cmd+P) и сохраните как PDF.');
+/* ===== PDF: экспорт всей страницы (html2canvas -> jsPDF) ===== */
+async function exportFullPagePDF(){
+  try{
+    if(!(window.jspdf && window.html2canvas)) throw new Error('libs');
+    const { jsPDF } = window.jspdf;
+
+    // Клонируем содержимое, чтобы скрыть элементы с [data-noexport]
+    const src = document.querySelector('main.wrap');
+    const clone = src.cloneNode(true);
+    clone.querySelectorAll('[data-noexport]').forEach(el=>el.remove());
+
+    // Временный контейнер вне экрана
+    const temp = document.createElement('div');
+    temp.style.position='fixed'; temp.style.left='-99999px'; temp.style.top='0';
+    temp.style.width=src.offsetWidth+'px';
+    temp.appendChild(clone);
+    document.body.appendChild(temp);
+
+    // Рендерим в canvas с увеличенным масштабом (качество текста/кириллица)
+    const canvas = await html2canvas(clone, { scale: 2, backgroundColor: getComputedStyle(document.body).backgroundColor });
+    document.body.removeChild(temp);
+
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF({ unit:'pt', format:'a4', compress:true });
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+
+    // Массштаб изображения под ширину страницы
+    const ratio = canvas.width / canvas.height;
+    const imgW = pageW;
+    const imgH = imgW / ratio;
+
+    // Если изображение выше страницы — режем на страницы
+    let y = 0;
+    while(y < imgH){
+      pdf.addImage(imgData, 'PNG', 0, -y, imgW, imgH);
+      y += pageH;
+      if(y < imgH) pdf.addPage();
+    }
+    pdf.save('finmon_full_page.pdf');
+  }catch(e){
+    alert('Не удалось сформировать PDF. Откройте печать (Ctrl/Cmd+P) и сохраните как PDF.');
     window.print();
-    return;
   }
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit:'pt', format:'a4' });
-  const pageW = doc.internal.pageSize.getWidth();
-  const pageH = doc.internal.pageSize.getHeight();
-  const margin = 40;
-  let y = margin;
-
-  const addTitle = (txt)=>{
-    doc.setFont('helvetica','bold'); doc.setFontSize(14);
-    doc.text(txt, margin, y); y += 18;
-  };
-  const addItem = (txt)=>{
-    doc.setFont('helvetica','normal'); doc.setFontSize(11);
-    const lines = doc.splitTextToSize('• ' + txt, pageW - margin*2);
-    lines.forEach(line=>{
-      if(y > pageH - margin){ doc.addPage(); y = margin; }
-      doc.text(line, margin, y); y += 14;
-    });
-  };
-
-  // Header
-  doc.setFont('helvetica','bold'); doc.setFontSize(16);
-  doc.text('Отмеченные пункты (чек-листы Финмон)', margin, y); y += 22;
-  doc.setFont('helvetica','normal'); doc.setFontSize(10);
-  doc.text('Сформировано: ' + new Date().toLocaleString(), margin, y); y += 16;
-
-  // Sections
-  let anyItems = false;
-  $$('#lists section').forEach(sec=>{
-    const title = $('h2', sec)?.textContent?.trim() || 'Раздел';
-    const items = $$('input[type="checkbox"]:checked', sec).map(b=>{
-      const lbl = b.closest('label');
-      return (lbl ? lbl.innerText : b.parentElement?.innerText || '').trim();
-    }).filter(Boolean);
-    if(items.length){
-      if(y > pageH - margin - 24){ doc.addPage(); y = margin; }
-      addTitle(title);
-      items.forEach(addItem);
-      anyItems = true;
-      y += 6;
-    }
-  });
-
-  if(!anyItems){
-    addTitle('Нет отмеченных пунктов');
-    doc.setFont('helvetica','normal'); doc.setFontSize(11);
-    doc.text('Отметьте галочками нужные пункты и повторите экспорт.', margin, y);
-  }
-
-  doc.save('finmon_checklists.pdf');
 }
 
-/* ===== Copy template letter to clipboard ===== */
+/* ===== copy template ===== */
 function copyTemplate(){
-  const txt = $('#template').innerText;
-  if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(txt).then(()=>notify('Шаблон скопирован в буфер обмена.'));
-  }else{
-    const ta = document.createElement('textarea');
-    ta.value = txt; document.body.appendChild(ta);
-    ta.select(); document.execCommand('copy'); ta.remove();
-    notify('Шаблон скопирован (fallback).');
+  const txt=$('#template').innerText;
+  if(navigator.clipboard?.writeText){ navigator.clipboard.writeText(txt).then(()=>notify('Шаблон скопирован.')); }
+  else{
+    const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); ta.remove(); notify('Шаблон скопирован (fallback).');
   }
 }
 
-/* ===== Lightweight toast ===== */
-let notifyTimer = null;
+/* ===== toast ===== */
+let notifyTimer=null;
 function notify(msg){
-  let n = $('#notifier');
-  if(!n){
-    n = document.createElement('div');
-    n.id = 'notifier';
-    n.style.position='fixed'; n.style.bottom='16px'; n.style.left='50%';
-    n.style.transform='translateX(-50%)';
-    n.style.background='var(--accent)'; n.style.color='#001928';
-    n.style.padding='10px 14px'; n.style.borderRadius='12px';
-    n.style.boxShadow='0 6px 20px rgba(0,0,0,.2)'; n.style.zIndex='9999';
-    document.body.appendChild(n);
-  }
-  n.textContent = msg; n.style.opacity='1';
-  clearTimeout(notifyTimer);
-  notifyTimer = setTimeout(()=>{ n.style.opacity='0'; }, 1600);
+  let n=$('#notifier');
+  if(!n){ n=document.createElement('div'); n.id='notifier'; Object.assign(n.style,{
+    position:'fixed', bottom:'16px', left:'50%', transform:'translateX(-50%)',
+    background:'var(--accent)', color:'#001928', padding:'10px 14px', borderRadius:'12px',
+    boxShadow:'0 6px 20px rgba(0,0,0,.2)', zIndex:'9999'
+  }); document.body.appendChild(n); }
+  n.textContent=msg; n.style.opacity='1'; clearTimeout(notifyTimer);
+  notifyTimer=setTimeout(()=>{ n.style.opacity='0'; },1600);
 }
 
-/* ===== Buttons, theme, compact & hotkeys ===== */
+/* ===== UI wiring ===== */
 function wireButtons(){
-  $('#btn-clear').addEventListener('click', ()=>{
+  $('#btn-clear').addEventListener('click',()=>{
     if(confirm('Сбросить прогресс по всем чек-листам?')){
       localStorage.removeItem(STORAGE_KEY);
       $$('input[type="checkbox"]').forEach(b=>b.checked=false);
       computeProgress(); notify('Прогресс сброшен.');
     }
   });
-  $('#btn-export').addEventListener('click', exportCheckedPDF);
+  $('#btn-export').addEventListener('click', exportFullPagePDF);
   $('#btn-print').addEventListener('click', ()=>window.print());
-  $('#btn-copy-template').addEventListener('click', copyTemplate);
+  $('#btn-copy-template')?.addEventListener('click', copyTemplate);
 
-  // Theme & compact
-  const themeBtn = $('#btn-theme');
-  const compactBtn = $('#btn-compact');
-
-  function toggleTheme(){
-    const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
-    setTheme(next);
-    themeBtn.setAttribute('aria-pressed', next==='dark');
-  }
-  function toggleCompact(){
-    const on = !document.body.classList.contains('compact');
-    setCompact(on);
-    compactBtn.setAttribute('aria-pressed', on);
-  }
+  const themeBtn=$('#btn-theme'); const compactBtn=$('#btn-compact');
+  function toggleTheme(){ const next=document.documentElement.classList.contains('dark')?'light':'dark'; setTheme(next); themeBtn.setAttribute('aria-pressed', next==='dark'); }
+  function toggleCompact(){ const on=!document.body.classList.contains('compact'); setCompact(on); compactBtn.setAttribute('aria-pressed', on); }
   themeBtn.addEventListener('click', toggleTheme);
   compactBtn.addEventListener('click', toggleCompact);
 
-  // Hotkeys
-  window.addEventListener('keydown',(e)=>{
-    if(e.key.toLowerCase()==='d'){ toggleTheme(); }
-    if(e.key.toLowerCase()==='c'){ toggleCompact(); }
-  });
+  window.addEventListener('keydown',(e)=>{ if(e.key.toLowerCase()==='d') toggleTheme(); if(e.key.toLowerCase()==='c') toggleCompact(); });
 }
 
-/* ===== Query params support: ?dark=1&compact=1 ===== */
+/* ===== query params ===== */
 function applyQueryParams(){
-  const q = new URLSearchParams(location.search);
+  const q=new URLSearchParams(location.search);
   if(q.get('dark')==='1') setTheme('dark'); else setTheme(getTheme());
   if(q.get('compact')==='1') setCompact(true); else setCompact(getCompact());
-  // Для Stepik можно добавить к src iframe параметр ?compact=1
 }
 
-/* ===== Boot ===== */
+/* ===== boot ===== */
 function boot(){
   applyQueryParams();
   $$('#lists section').forEach(wireChecklist);
-  wireSearch();
-  wireButtons();
-  computeProgress();
-  // accessibility: toggle details by Enter/Space
-  $$('summary').forEach(s=>s.addEventListener('keydown',e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); s.click(); } }));
+  wireSearch(); wireButtons(); computeProgress();
+  $$('summary').forEach(s=>s.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); s.click(); } }));
 }
 document.addEventListener('DOMContentLoaded', boot);
 </script>
