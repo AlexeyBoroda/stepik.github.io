@@ -83,6 +83,8 @@
     <div class="actions" style="margin-left:auto">
       <button class="btn" id="resetAll" title="Сбросить прогресс">Сброс</button>
       <button class="btn secondary" id="printBtn" title="Сохранить как PDF">Скачать PDF</button>
+      <!-- скрытая ссылка на случай скачивания HTML-снимка -->
+      <a id="dlHtml" download="finmon_case.html" style="display:none"></a>
     </div>
   </div>
   <div class="progress"><div class="bar" id="progressBar"></div></div>
@@ -414,8 +416,46 @@
   // Toast
   const toast = (msg)=>{const t=document.getElementById('toast'), m=document.getElementById('toastMsg'); m.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200);};
 
-  // Печать/Сброс
-  document.getElementById('printBtn').addEventListener('click',()=>window.print());
+  // ===== Печать с учётом Stepik (iframe sandbox) =====
+  function getFullHTMLSnapshot() {
+    const doctype = '<!DOCTYPE html>';
+    const html = document.documentElement.cloneNode(true);
+    // убрать элементы управления
+    html.querySelectorAll('#resetAll, #printBtn, .toast').forEach(el=>el?.parentNode?.removeChild(el));
+    const style = document.createElement('style');
+    style.textContent='@media print{header,.actions{display:none!important}.card{box-shadow:none!important}body{background:#fff}}';
+    html.querySelector('head')?.appendChild(style);
+    return doctype + '\n' + html.outerHTML;
+  }
+  function openPrintableWindowOrDownload() {
+    const blob = new Blob([getFullHTMLSnapshot()], { type:'text/html' });
+    const url = URL.createObjectURL(blob);
+    const w = window.open(url, '_blank', 'noopener');
+    if (w) {
+      const timer = setInterval(()=>{
+        try{
+          if(w.document && w.document.readyState==='complete'){
+            clearInterval(timer); w.focus(); w.print();
+          }
+        }catch(_){}
+      },300);
+      setTimeout(()=>URL.revokeObjectURL(url), 20000);
+    } else {
+      const a = document.getElementById('dlHtml');
+      a.href = url; a.click();
+      setTimeout(()=>URL.revokeObjectURL(url), 20000);
+    }
+  }
+  // Если не в iframe — печатаем напрямую; если в iframe (Stepik) — fallback
+  document.getElementById('printBtn').addEventListener('click', ()=>{
+    if (window.top === window.self) {
+      window.print();
+    } else {
+      openPrintableWindowOrDownload();
+    }
+  });
+
+  // Сброс
   document.getElementById('resetAll').addEventListener('click',()=>{
     [1,2,3,4,5,6].forEach(clearStep);
     toast('Платформа очищена.');
@@ -498,7 +538,7 @@
       ? `✓ Доля налогов = ${share.toFixed(2)}% (≥ 0,9%). Хороший ориентир: риск по этому критерию ниже.`
       : `⚠ Доля налогов = ${share.toFixed(2)}% (< 0,9%). Это красный флаг для банка — нужен план корректировок и пояснений.`;
     setResult(res, ok ? 'hint' : false, msg + '<br><span class="small">Мотивация: ты управляешь тем, что измеряешь. Продолжай!</span>');
-    markStep(3,true); // засчитываем шаг как выполненный (расчёт сделан)
+    markStep(3,true);
   }
 
   // ===== Шаг 4 =====
@@ -578,28 +618,14 @@
     }
   }
 
-  // Итоговые подсказки
-  function buildSummary(){
-    const s = document.getElementById('summary');
-    const list = document.getElementById('recs');
-    if(list) list.innerHTML='';
-  }
-
-  // Скролл-бар
+  // Скролл-бар прогресса страницы (красиво двигается при прокрутке)
   document.addEventListener('scroll', ()=>{
     const h=document.documentElement;
     const scrolled=(h.scrollTop)/(h.scrollHeight-h.clientHeight);
     pb.style.width=Math.max(0,Math.min(1,scrolled))*100+'%';
   }, {passive:true});
 
-  // Рендер таблиц шагов 1–2
-  (function renderTables(){
-    // шаг 1 (упрощён: проверка идёт по чек-листу общих сигналов)
-    // шаг 2 уже отрисован селектами
-    // шаг 4/5 — выше
-  })();
-
-  // Публичные функции на window (кнопки в разметке)
+  // Публичные функции для кнопок
   window.checkStep1 = checkStep1;
   window.checkStep2 = checkStep2;
   window.calcStep3  = calcStep3;
@@ -608,6 +634,12 @@
   window.checkStep6 = checkStep6;
   window.clearStep  = clearStep;
 
+  // Рендер таблицы шага 4 из данных
+  (function initStep4(){
+    // (таблица уже отрисована выше)
+  })();
+
+  // Инициализация
   updateProgress();
 </script>
 </body>
