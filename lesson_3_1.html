@@ -95,14 +95,29 @@
       <div>
         <div class="tag">Документы</div>
         <div id="dndList" class="dnd-list">
-          <div class="dnd-card" draggable="true" data-id="contract">Договор + ТЗ</div>
-          <div class="dnd-card" draggable="true" data-id="upd">Акт/УПД</div>
-          <div class="dnd-card" draggable="true" data-id="ttn">ТТН</div>
-          <div class="dnd-card" draggable="true" data-id="reports">Отчёты платформ / выгрузки</div>
-          <div class="dnd-card" draggable="true" data-id="kvit">Квитанции ЭДО</div>
-          <div class="dnd-card" draggable="true" data-id="loan">График погашения займа</div>
-          <div class="dnd-card" draggable="true" data-id="proof">Фото/логи/скриншоты факта</div>
-          <div class="dnd-card" draggable="true" data-id="invoice">Инвойс/счёт</div>
+          <!-- контракт ×3 -->
+          <div class="dnd-card" draggable="true" data-type="contract">Договор + ТЗ</div>
+          <div class="dnd-card" draggable="true" data-type="contract">Договор + ТЗ</div>
+          <div class="dnd-card" draggable="true" data-type="contract">Договор + ТЗ</div>
+          <!-- акт/УПД ×2 -->
+          <div class="dnd-card" draggable="true" data-type="upd">Акт/УПД</div>
+          <div class="dnd-card" draggable="true" data-type="upd">Акт/УПД</div>
+          <!-- ТТН ×1 -->
+          <div class="dnd-card" draggable="true" data-type="ttn">ТТН</div>
+          <!-- отчёты ×1 -->
+          <div class="dnd-card" draggable="true" data-type="reports">Отчёты платформ / выгрузки</div>
+          <!-- квитанции ЭДО ×3 -->
+          <div class="dnd-card" draggable="true" data-type="kvit">Квитанции ЭДО</div>
+          <div class="dnd-card" draggable="true" data-type="kvit">Квитанции ЭДО</div>
+          <div class="dnd-card" draggable="true" data-type="kvit">Квитанции ЭДО</div>
+          <!-- график займа ×1 -->
+          <div class="dnd-card" draggable="true" data-type="loan">График погашения займа</div>
+          <!-- фото/логи ×2 -->
+          <div class="dnd-card" draggable="true" data-type="proof">Фото/логи/скриншоты факта</div>
+          <div class="dnd-card" draggable="true" data-type="proof">Фото/логи/скриншоты факта</div>
+          <!-- инвойс/счёт ×2 -->
+          <div class="dnd-card" draggable="true" data-type="invoice">Инвойс/счёт</div>
+          <div class="dnd-card" draggable="true" data-type="invoice">Инвойс/счёт</div>
         </div>
       </div>
       <div>
@@ -141,7 +156,7 @@
         <button class="btn" onclick="markDone('t3')">Отметить выполненным</button>
       </div>
       <div id="t3hint" class="hint box">
-        Пример: «Услуги SMM направлены на генерацию 200 лидов на лендинг X. Экономический эффект — увеличение MQL и выручки в Q3. Контроль по KPI: лиды/CTR/CPA; артефакты — выгрузки из VK с ID кампаний, скриншоты кабинетa, акт/УПД и квитанции ЭДО.»
+        Пример: «Услуги SMM направлены на генерацию 200 лидов на лендинг X. Экономический эффект — рост MQL и выручки в Q3. Контроль по KPI: лиды/CTR/CPA; артефакты — выгрузки из VK с ID кампаний, скриншоты кабинета, акт/УПД и квитанции ЭДО.»
       </div>
     </div>
   </section>
@@ -194,7 +209,7 @@
     </div>
   </section>
 
-  <!-- Задание 6 (бывш. №7) -->
+  <!-- Задание 6 -->
   <section class="task" id="t6">
     <h2>6) Симуляция ответа банку</h2>
     <p class="muted">Выберите стратегию и обоснуйте.</p>
@@ -213,7 +228,7 @@
     </div>
   </section>
 
-  <!-- Задание 7 (бывш. №8) -->
+  <!-- Задание 7 -->
   <section class="task" id="t7">
     <h2>7) Регламент SLA: заполните таблицу</h2>
     <p class="muted">Заполните не менее 3 строк: этап → срок → контрольный документ.</p>
@@ -240,7 +255,7 @@
 
 <script>
 /* ---------- Хранилище прогресса ---------- */
-const KEY = "docops-checklist-progress-v1";
+const KEY = "docops-checklist-progress-v2";
 const state = JSON.parse(localStorage.getItem(KEY) || "{}");
 const tasks = ["t1","t2","t3","t4","t5","t6","t7"];
 
@@ -273,41 +288,50 @@ function checkT1(){
     if(!should && i.checked) ok=false;
   });
   const msg = document.getElementById('t1msg');
-  msg.innerHTML = ok ? "✅ Верно: отмечены все и только ошибки." : "❌ Проверьте: ошибки — расхождение сумм и предоплата раньше факта.";
+  msg.innerHTML = ok ? "✅ Верно: отмечены все и только ошибки." : "❌ Проверьте: расхождение сумм и оплата раньше факта.";
   if(ok) markDone('t1');
 }
 
-/* ---------- DND helpers ---------- */
+/* ---------- DND для Задания 2 (корзины) ---------- */
 let dragEl = null;
-function handleDragStart(e){ dragEl = e.target; e.dataTransfer.effectAllowed = 'move'; }
+function handleDragStart(e){
+  dragEl = e.target;
+  e.dataTransfer.effectAllowed = 'move';
+}
 function handleDragOver(e){ e.preventDefault(); }
 function handleDrop(e){
   e.preventDefault();
   const target = e.currentTarget;
-  if(dragEl && (dragEl.classList.contains('dnd-card'))){
+  if(dragEl && dragEl.classList.contains('dnd-card')){
     target.appendChild(dragEl);
     dragEl = null;
   }
 }
-document.querySelectorAll('.dnd-card').forEach(el=>el.addEventListener('dragstart',handleDragStart));
-['dndList','binGoods','binMkt','binLoan','orderList'].forEach(id=>{
+// назначаем drag&drop только для задания №2
+document.querySelectorAll('#dndList .dnd-card').forEach(el => el.addEventListener('dragstart', handleDragStart));
+['dndList','binGoods','binMkt','binLoan'].forEach(id => {
   const el = document.getElementById(id);
-  el.addEventListener('dragover',handleDragOver);
-  el.addEventListener('drop',handleDrop);
+  el.addEventListener('dragover', handleDragOver);
+  el.addEventListener('drop', handleDrop);
 });
 
-/* ---------- Задание 2 ---------- */
+/* Проверка Задания 2 */
 function checkT2(){
+  // требуемые наборы (одна штука каждого типа)
   const needGoods = ['contract','upd','ttn','kvit','invoice','proof'];
   const needMkt   = ['contract','upd','reports','kvit','proof'];
   const needLoan  = ['contract','loan','invoice','kvit'];
-  function idsIn(binId){
-    return Array.from(document.querySelectorAll('#'+binId+' .dnd-card')).map(x=>x.dataset.id);
+
+  function typesIn(binId){
+    return Array.from(document.querySelectorAll('#'+binId+' .dnd-card')).map(x=>x.dataset.type);
   }
-  const g = idsIn('binGoods'); const m = idsIn('binMkt'); const l = idsIn('binLoan');
-  const ok = needGoods.every(x=>g.includes(x)) && needMkt.every(x=>m.includes(x)) && needLoan.every(x=>l.includes(x));
+  function hasAll(binId, required){
+    const types = typesIn(binId);
+    return required.every(t => types.includes(t));
+  }
+  const ok = hasAll('binGoods', needGoods) && hasAll('binMkt', needMkt) && hasAll('binLoan', needLoan);
   const msg = document.getElementById('t2msg');
-  msg.innerHTML = ok ? "✅ Отлично: пакеты собраны корректно." : "❌ Ещё не всё на местах. Подсказка: маркетинг требует отчёты платформ, поставка — ТТН/фото, займ — график погашения.";
+  msg.innerHTML = ok ? "✅ Отлично: пакеты собраны корректно." : "❌ Ещё не всё на местах. Подсказка: маркетинг требует отчёты платформ; поставка — ТТН и фото/логи; займ — график погашения.";
   if(ok) markDone('t2');
 }
 
@@ -322,7 +346,35 @@ function toggleHint(id){
   el.classList.toggle('show');
 }
 
-/* ---------- Задание 4 ---------- */
+/* ---------- Задание 4: правильное упорядочивание в списке ---------- */
+const orderList = document.getElementById('orderList');
+orderList.querySelectorAll('.dnd-card').forEach(el=>{
+  el.addEventListener('dragstart', ()=> el.classList.add('dragging'));
+  el.addEventListener('dragend',   ()=> el.classList.remove('dragging'));
+});
+orderList.addEventListener('dragover', (e)=>{
+  e.preventDefault();
+  const after = getDragAfterElement(orderList, e.clientY);
+  const dragging = orderList.querySelector('.dragging');
+  if(!dragging) return;
+  if(after == null){
+    orderList.appendChild(dragging);
+  } else {
+    orderList.insertBefore(dragging, after);
+  }
+});
+function getDragAfterElement(container, y){
+  const items = [...container.querySelectorAll('.dnd-card:not(.dragging)')];
+  let closest = {offset: Number.NEGATIVE_INFINITY, element: null};
+  for(const child of items){
+    const box = child.getBoundingClientRect();
+    const offset = y - (box.top + box.height/2);
+    if(offset < 0 && offset > closest.offset){
+      closest = {offset, element: child};
+    }
+  }
+  return closest.element;
+}
 function checkT4(){
   const want = ['req','kyc','contract','exec','pay','archive'];
   const got  = Array.from(document.querySelectorAll('#orderList .dnd-card')).map(x=>x.dataset.step);
@@ -357,8 +409,6 @@ function checkT6(){
   msg.innerHTML = ok ? "✅ Корректно: пакет документов + обоснование." : "❌ Выберите стратегию «подготовить пакет» и добавьте краткое обоснование.";
   if(ok) markDone('t6');
 }
-
-/* ---------- SLA hint toggle already above ---------- */
 </script>
 </body>
 </html>
