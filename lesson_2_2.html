@@ -83,7 +83,7 @@
     <div class="actions" style="margin-left:auto">
       <button class="btn" id="resetAll" title="Сбросить прогресс">Сброс</button>
       <button class="btn secondary" id="printBtn" title="Сохранить как PDF">Скачать PDF</button>
-      <!-- скрытая ссылка на случай скачивания HTML-снимка -->
+      <!-- скрытая ссылка на случай скачивания HTML-снимка (больше не используется в песочнице) -->
       <a id="dlHtml" download="finmon_case.html" style="display:none"></a>
     </div>
   </div>
@@ -91,6 +91,20 @@
 </header>
 
 <main class="container">
+  <!-- Баннер для песочницы Stepik -->
+  <div id="sandboxNotice" style="display:none; margin:16px 0" class="card soft">
+    <strong>Печать внутри Stepik недоступна.</strong>
+    <div class="small" style="margin-top:6px">
+      Эта страница открыта в песочнице LMS без прав на всплывающие окна и загрузки.<br/>
+      Откройте материал вне Stepik и используйте печать браузера.
+    </div>
+    <div class="actions" style="margin-top:10px; gap:8px; flex-wrap:wrap">
+      <a id="openTop" class="btn secondary" href="#" target="_top" rel="noopener">Открыть в этом окне</a>
+      <a id="openBlank" class="btn" href="#" target="_blank" rel="noopener noreferrer">Открыть в новой вкладке</a>
+      <span class="pill" id="pageUrl" style="user-select:text"></span>
+    </div>
+  </div>
+
   <h1>На что смотрят банки — интерактивный кейс</h1>
   <p class="lead">Разбери кейс компании и по шагам определи ключевые сигналы для банка: транзиты, обналичивание, налоговая нагрузка, соответствие деятельности и аномалии в поведении по счёту. На каждом шаге — мгновенная обратная связь и подсказки.</p>
 
@@ -416,43 +430,32 @@
   // Toast
   const toast = (msg)=>{const t=document.getElementById('toast'), m=document.getElementById('toastMsg'); m.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200);};
 
-  // ===== Печать с учётом Stepik (iframe sandbox) =====
-  function getFullHTMLSnapshot() {
-    const doctype = '<!DOCTYPE html>';
-    const html = document.documentElement.cloneNode(true);
-    // убрать элементы управления
-    html.querySelectorAll('#resetAll, #printBtn, .toast').forEach(el=>el?.parentNode?.removeChild(el));
-    const style = document.createElement('style');
-    style.textContent='@media print{header,.actions{display:none!important}.card{box-shadow:none!important}body{background:#fff}}';
-    html.querySelector('head')?.appendChild(style);
-    return doctype + '\n' + html.outerHTML;
-  }
-  function openPrintableWindowOrDownload() {
-    const blob = new Blob([getFullHTMLSnapshot()], { type:'text/html' });
-    const url = URL.createObjectURL(blob);
-    const w = window.open(url, '_blank', 'noopener');
-    if (w) {
-      const timer = setInterval(()=>{
-        try{
-          if(w.document && w.document.readyState==='complete'){
-            clearInterval(timer); w.focus(); w.print();
-          }
-        }catch(_){}
-      },300);
-      setTimeout(()=>URL.revokeObjectURL(url), 20000);
-    } else {
-      const a = document.getElementById('dlHtml');
-      a.href = url; a.click();
-      setTimeout(()=>URL.revokeObjectURL(url), 20000);
+  // ===== ПЕЧАТЬ: безопасный режим для песочницы Stepik =====
+  function isInIframe(){ try { return window.self !== window.top; } catch(_) { return true; } }
+  function getCanonicalUrl(){ return location.href; }
+
+  // При загрузке: если мы во фрейме, меняем текст кнопки и готовим баннер
+  document.addEventListener('DOMContentLoaded', ()=>{
+    if (isInIframe()){
+      const btn = document.getElementById('printBtn');
+      btn.textContent = 'Открыть вне Stepik';
     }
-  }
-  // Если не в iframe — печатаем напрямую; если в iframe (Stepik) — fallback
-  document.getElementById('printBtn').addEventListener('click', ()=>{
-    if (window.top === window.self) {
+  });
+
+  // Кнопка «Скачать PDF»: печатаем напрямую ТОЛЬКО вне iframe; во фрейме — показываем баннер со ссылками
+  document.getElementById('printBtn').addEventListener('click', (e)=>{
+    e.preventDefault();
+    if (!isInIframe()){
       window.print();
-    } else {
-      openPrintableWindowOrDownload();
+      return;
     }
+    const box = document.getElementById('sandboxNotice');
+    const url = getCanonicalUrl();
+    document.getElementById('openTop').href = url;
+    document.getElementById('openBlank').href = url;
+    document.getElementById('pageUrl').textContent = url;
+    box.style.display = 'block';
+    if (typeof toast === 'function') toast('В Stepik печать заблокирована. Откройте страницу вне LMS и распечатайте.');
   });
 
   // Сброс
@@ -537,13 +540,14 @@
     const msg = ok
       ? `✓ Доля налогов = ${share.toFixed(2)}% (≥ 0,9%). Хороший ориентир: риск по этому критерию ниже.`
       : `⚠ Доля налогов = ${share.toFixed(2)}% (< 0,9%). Это красный флаг для банка — нужен план корректировок и пояснений.`;
-    setResult(res, ok ? 'hint' : false, msg + '<br><span class="small">Мотивация: ты управляешь тем, что измеряешь. Продолжай!</span>');
+    setResult(res, ok ? 'hint' : false, msg + '<span class="small"><br>Мотивация: ты управляешь тем, что измеряешь. Продолжай!</span>');
     markStep(3,true);
   }
 
   // ===== Шаг 4 =====
   const t4 = document.getElementById('t4');
-  data.step4.forEach((r,i)=>{
+  const step4Data = data.step4;
+  step4Data.forEach((r,i)=>{
     const tr=document.createElement('tr');
     tr.innerHTML=`<td>${r.date}</td><td>${r.purpose}</td><td>${r.sum.toLocaleString('ru-RU')} ₽</td>
     <td><label class="inline"><input type="checkbox" data-s4="${i}"> НЕ соответствует</label></td>`;
@@ -551,7 +555,7 @@
   });
   function checkStep4(){
     const checks=[...document.querySelectorAll('[data-s4]')].map(cb=>cb.checked);
-    const truth=data.step4.map(x=>x.mismatch);
+    const truth=step4Data.map(x=>x.mismatch);
     const ok = checks.length===truth.length && checks.every((v,i)=>v===truth[i]);
     const r=document.getElementById('res4');
     if(ok){ r.textContent='✓ Верно: выделены операции вне ОКВЭД.'; r.className='result ok';
@@ -618,7 +622,7 @@
     }
   }
 
-  // Скролл-бар прогресса страницы (красиво двигается при прокрутке)
+  // Скролл-бар прогресса страницы
   document.addEventListener('scroll', ()=>{
     const h=document.documentElement;
     const scrolled=(h.scrollTop)/(h.scrollHeight-h.clientHeight);
@@ -634,13 +638,12 @@
   window.checkStep6 = checkStep6;
   window.clearStep  = clearStep;
 
-  // Рендер таблицы шага 4 из данных
-  (function initStep4(){
-    // (таблица уже отрисована выше)
-  })();
+  // Рендер таблицы шага 4
+  (function initStep4(){ /* уже отрисовано */ })();
 
   // Инициализация
   updateProgress();
+
 </script>
 </body>
 </html>
