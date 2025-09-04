@@ -1,364 +1,572 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Практикум: Обновление данных</title>
-<meta name="description" content="Онлайн-задания по теме «Обновление данных» для курса «Прозрачность бизнеса». Полностью на русском, работает в iframe." />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Практикум для предпринимателей: Обновление данных</title>
+<meta name="description" content="Практические онлайн-задания без программирования: что делать в типовых ситуациях по обновлению данных."/>
 <style>
   :root{
     --bg:#fff;--fg:#0f172a;--muted:#475569;--line:#e2e8f0;--soft:#f8fafc;
-    --brand:#0ea5e9;--ok:#10b981;--bad:#ef4444;--warn:#f59e0b;--shadow:0 10px 28px rgba(2,6,23,.08);
-    --r:16px
+    --brand:#0ea5e9;--ok:#10b981;--bad:#ef4444;--warn:#f59e0b;
+    --r:16px;--shadow:0 10px 28px rgba(2,6,23,.08)
   }
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif}
   .wrap{max-width:1100px;margin:22px auto;padding:0 16px}
   h1{font-size:clamp(22px,3.4vw,34px);margin:0 0 8px}
   .muted{color:var(--muted)}
-  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
-  .tab{border:1px solid var(--line);border-radius:999px;padding:8px 12px;background:#fff;cursor:pointer}
-  .tab.active{background:linear-gradient(90deg,#0ea5e9,#38bdf8);border-color:#0ea5e9;color:#fff}
-  section[data-tab]{border:1px solid var(--line);border-radius:var(--r);background:#fff;box-shadow:var(--shadow);padding:16px;margin:0 0 16px}
+  .card{border:1px solid var(--line);border-radius:var(--r);background:#fff;box-shadow:var(--shadow);padding:16px;margin:14px 0}
   .grid{display:grid;gap:12px}
-  @media(min-width:920px){.cols-2{grid-template-columns:1fr 1fr}.cols-3{grid-template-columns:1fr 1fr 1fr}}
-  label{display:block;margin:8px 0 4px}
-  input[type="text"],input[type="date"],textarea,select{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff}
-  textarea{min-height:100px}
+  @media(min-width:900px){.cols-2{grid-template-columns:1fr 1fr}.cols-3{grid-template-columns:1fr 1fr 1fr}}
+  label{display:block;margin:6px 0 4px}
+  input[type="text"],input[type="date"],textarea,select{
+    width:100%;border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff
+  }
+  textarea{min-height:90px}
   .btn{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:12px;background:#fff;padding:8px 12px;cursor:pointer}
   .btn.primary{background:#0ea5e9;color:#fff;border-color:#0ea5e9}
   .btn.ok{background:#10b981;color:#fff;border-color:#10b981}
-  .btn.warn{background:#f59e0b;color:#fff;border-color:#f59e0b}
+  .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 8px;font-size:12px;background:#f1f5f9}
   .status{padding:10px;border-radius:12px;margin-top:10px;display:none}
   .status.ok{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
   .status.bad{background:#fef2f2;color:#7f1d1d;border:1px solid #fecaca}
   .status.warn{background:#fff7ed;color:#7c2d12;border:1px solid #fed7aa}
+  .qblock{border:1px dashed var(--line);border-radius:12px;padding:10px;background:#fafcff;margin:8px 0}
+  .small{font-size:13px;color:#64748b}
+  details{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:10px}
+  summary{cursor:pointer}
+  .progress{height:10px;border:1px solid var(--line);border-radius:999px;background:#eef2f7;overflow:hidden}
+  .bar{height:100%;background:linear-gradient(90deg,#0ea5e9,#38bdf8);width:0%}
   .table{width:100%;border-collapse:collapse}
   .table th,.table td{border:1px solid var(--line);padding:8px;background:#fff;vertical-align:top}
   .table th{background:#f8fafc;text-align:left}
-  .note{font-size:13px;color:#334155}
-  .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 8px;font-size:12px;background:#f1f5f9;margin-left:6px}
-  .code{background:#0b1020;color:#e6edf3;border-radius:12px;padding:12px;overflow:auto}
-  details{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:10px}
-  summary{cursor:pointer}
+  .row-hint{font-size:12px;color:#64748b;margin-left:6px}
+  .badmark{outline:2px solid var(--bad);outline-offset:2px;border-radius:8px}
+  .goodmark{outline:2px solid var(--ok);outline-offset:2px;border-radius:8px}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Практикум: Обновление данных</h1>
-  <p class="muted">Три задания. Всё на русском, без «скачиваний» — работает в айфрейме. Если непонятно — раскрывайте «Подсказку» или «Справку» в каждом блоке.</p>
+  <h1>Практикум: что делать в типовых ситуациях (без программирования)</h1>
+  <p class="muted">Темы: смена реквизитов, ошибка в документе, нужно ли допсоглашение, готовность к оплате, план действий для своей компании, ответ банку, карта ролей.</p>
 
-  <div class="tabs" id="tabs">
-    <button class="tab active" data-target="A">Задание А: Заявка на изменение</button>
-    <button class="tab" data-target="B">Задание Б: Версии без перекрытий</button>
-    <button class="tab" data-target="C">Задание В: Смена реквизитов (безопасно)</button>
-  </div>
-
-  <!-- A -->
-  <section data-tab="A">
-    <h2 style="margin:0 0 6px">Задание А — Оформите «Заявку на изменение данных» (ЗИ)</h2>
-    <p class="note">Цель: корректно описать <u>что</u> меняем, <u>почему</u> и <u>с какой даты</u>, приложив основания. Итог можно <b>скопировать</b> и вставить в вашу систему.</p>
+  <div class="card">
     <div class="grid cols-2">
       <div>
-        <label>Инициатор</label>
-        <input id="a_initiator" type="text" placeholder="Иванова А.А., закупки" />
-        <label>Объект изменения</label>
-        <select id="a_entity">
-          <option>Контрагент</option>
-          <option>Договор</option>
-          <option>Первичный документ</option>
-          <option>Справочник/цены</option>
-          <option>Платёж</option>
-        </select>
-        <label>ID объекта</label>
-        <input id="a_entity_id" type="text" placeholder="OOO-ИНН / CTR-45/25 / DOC-25-0001" />
-        <label>Что меняем и почему</label>
-        <textarea id="a_change" placeholder="Коротко и по делу: «Исправляем сумму в акте за август, ошибка в позиции №3…»"></textarea>
+        <b>Ваш общий прогресс</b>
+        <div class="progress" style="margin-top:6px"><div id="progressBar" class="bar"></div></div>
+        <div class="small">Выполнено: <b id="progressText">0%</b> <span class="pill">сохраняется в браузере</span></div>
       </div>
       <div>
-        <label>Дата вступления (с какой даты действует)</label>
-        <input id="a_valid_from" type="date" />
-        <label>Ссылки на основания (через запятую)</label>
-        <input id="a_evidence" type="text" placeholder="/files/письмо.pdf, /files/подтверждение_банка.pdf" />
-        <label>Проверки риска (включите, когда выполнено)</label>
-        <label><input type="checkbox" id="a_cb_cb"> Подтверждение по известному контакту (не из письма)</label>
-        <label><input type="checkbox" id="a_cb_sign"> Проверены полномочия/подпись</label>
-        <label><input type="checkbox" id="a_cb_docs"> Документ-основание настоящий (бланк/выписка)</label>
-        <div style="margin-top:10px">
-          <button class="btn primary" onclick="A_check()">Проверить заявку</button>
-          <button class="btn" onclick="A_copy()">Скопировать итог</button>
-        </div>
-        <div id="a_status" class="status warn">Подсказка: дата должна быть сегодня или позже; нужна хотя бы одна ссылка на основание; все три проверки должны быть отмечены.</div>
-      </div>
-    </div>
-    <details style="margin-top:10px"><summary><b>Справка</b></summary>
-      <ul class="note">
-        <li><b>ЗИ</b> — короткая карточка изменения. Нужна, чтобы каждый апдейт был доказуем и воспроизводим.</li>
-        <li>Основания — письма на бланке, выписки банка, допсоглашения, квитанции ЭДО, выгрузки из систем.</li>
-        <li>Подтверждение по известному контакту — звонок/письмо на те контакты, которые уже были в договоре/карточке.</li>
-      </ul>
-    </details>
-    <pre id="a_preview" class="code" style="margin-top:10px"></pre>
-  </section>
-
-  <!-- B -->
-  <section data-tab="B" style="display:none">
-    <h2 style="margin:0 0 6px">Задание Б — Обновите цену без «перекрытий» периодов</h2>
-    <p class="note">Дано: позиция <b>SMM-BASE</b>, цена 200 000 ₽, действует с «2025-08-01» по настоящее время. Введите новую цену и дату вступления — система проверит, что вы закрыли старую запись и открыли новую корректно.</p>
-    <div class="grid cols-3">
-      <div>
-        <h3 style="margin:8px 0">1) Текущие версии</h3>
-        <table class="table" id="b_table">
-          <thead><tr><th>SKU</th><th>Цена</th><th>С даты</th><th>По дату</th><th>Текущая?</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-      <div>
-        <h3 style="margin:8px 0">2) Ваше изменение</h3>
-        <label>Новая цена</label>
-        <input id="b_price" type="text" placeholder="Напр. 220000" />
-        <label>Дата вступления</label>
-        <input id="b_from" type="date" />
-        <div style="margin-top:10px">
-          <button class="btn primary" onclick="B_apply()">Применить</button>
-          <button class="btn" onclick="B_reset()">Сбросить</button>
-        </div>
-        <p class="note">Правило: предыдущая запись закрывается <u>днём ранее</u> выбранной даты; флаг «текущая» должен быть ровно у одной записи.</p>
-      </div>
-      <div>
-        <h3 style="margin:8px 0">3) Проверка</h3>
-        <div id="b_status" class="status warn">Введите цену и дату, затем нажмите «Применить».</div>
-        <details style="margin-top:10px"><summary><b>Подсказка</b></summary>
-          <p class="note">Если дата новой версии — 2025-10-01, то предыдущая запись должна закончиться 2025-09-30.</p>
-        </details>
-        <h3 style="margin:8px 0">SQL (подсказка)</h3>
-        <pre id="b_sql" class="code"></pre>
-      </div>
-    </div>
-  </section>
-
-  <!-- C -->
-  <section data-tab="C" style="display:none">
-    <h2 style="margin:0 0 6px">Задание В — Смена банковских реквизитов (безопасно)</h2>
-    <p class="note">Ситуация: контрагент прислал новые реквизиты. Ваша задача — подтвердить изменение и только после этого включить платежи.</p>
-    <div class="grid cols-2">
-      <div>
-        <label><input type="checkbox" id="c_letter"> Письмо на бланке проверено</label>
-        <label><input type="checkbox" id="c_bank"> Подтверждение из банка/выписка есть</label>
-        <label><input type="checkbox" id="c_call"> Перезвон по известному контакту выполнен</label>
-        <label><input type="checkbox" id="c_power"> Полномочия/подписант проверены</label>
-        <label><input type="checkbox" id="c_log"> Запись в журнале сделана</label>
-        <label>Черновик записи (что меняем)</label>
-        <textarea id="c_text" placeholder="Получатель, ИНН/КПП, Банк, БИК, Р/с, дата вступления..."></textarea>
-        <div style="margin-top:10px">
-          <button class="btn warn" onclick="C_stop()">Поставить «стоп» платежей</button>
-          <button class="btn primary" onclick="C_check()">Проверить и включить платежи</button>
-        </div>
-        <div id="c_status" class="status warn">Платежи включатся только если выполнены все пункты и заполнён черновик.</div>
-      </div>
-      <div>
-        <details><summary><b>Справка</b></summary>
-          <ul class="note">
-            <li>Никогда не меняйте реквизиты «по письму» без независимого подтверждения.</li>
-            <li>«Стоп» платежей обязателен до завершения проверки.</li>
-            <li>Контакты для проверки берём из договора/карточки, а не из письма.</li>
+        <details><summary><b>Как работать со страницей</b></summary>
+          <ul class="small">
+            <li>В каждом задании отметьте шаги/варианты и нажмите «Проверить» — увидите понятный разбор.</li>
+            <li>Пояснение в свободной форме — 2–3 предложения; это тренировка «что я напишу банку/коллеге».</li>
+            <li>Никаких технических терминов и кода — только действия и решения.</li>
           </ul>
         </details>
-        <h3 style="margin:8px 0">Итог (журнал)</h3>
-        <pre id="c_logbox" class="code"></pre>
-        <p class="note">Статус платёжных операций: <b id="c_gate">АКТИВЕН</b> <span class="pill" id="c_gate_hint">нажмите «Стоп», чтобы приостановить</span></p>
       </div>
     </div>
+  </div>
+
+  <!-- Задание 1 -->
+  <section class="card" id="t1">
+    <h2 style="margin:0 0 6px">1) Смена банковских реквизитов — какие шаги обязательны?</h2>
+    <p class="small">Ситуация: партнёр прислал письмо с новыми реквизитами. Отметьте только те шаги, которые действительно обязательны, и нажмите «Проверить».</p>
+    <div class="qblock">
+      <label><input type="checkbox" class="t1" data-correct="true"> Проверить письмо на бланке и приложенные документы (подтверждение банка)</label>
+      <label><input type="checkbox" class="t1" data-correct="true"> Перезвонить по известному ранее телефону/почте и подтвердить изменение</label>
+      <label><input type="checkbox" class="t1" data-correct="true"> Временно поставить «стоп» платежей до завершения проверки</label>
+      <label><input type="checkbox" class="t1" data-correct="true"> Сделать запись в журнале: кто менял, с какой даты действует</label>
+      <label><input type="checkbox" class="t1" data-correct="false"> Сразу оплатить по новым реквизитам — чтобы не задерживать поставщика</label>
+      <label><input type="checkbox" class="t1" data-correct="false"> Довериться письму и не тратить время на звонки</label>
+    </div>
+    <div>
+      <button class="btn primary" onclick="checkT1()">Проверить</button>
+      <button class="btn" onclick="markDone('t1')">Отметить выполненным</button>
+      <div id="t1msg" class="status warn">Подсказка: без независимой проверки и «стопа» платежей — высокий риск.</div>
+    </div>
+    <details style="margin-top:8px"><summary><b>Короткое объяснение</b></summary>
+      <p class="small">Главная цель — исключить подмену реквизитов. Нужны: документальные основания + подтверждение по известным контактам + временный «стоп» до завершения проверки.</p>
+    </details>
   </section>
+
+  <!-- Задание 2 -->
+  <section class="card" id="t2">
+    <h2 style="margin:0 0 6px">2) Ошибка в документе: что делать по порядку?</h2>
+    <p class="small">Ситуация: в акте/УПД неверная сумма. Поставьте каждому шагу номер от 1 до 5 (где 1 — первым).</p>
+    <div class="qblock">
+      <div>А) Согласовать налоговые последствия с бухгалтерией <input type="text" class="t2ord" data-step="2" placeholder="№"></div>
+      <div>Б) Оформить исправление документа (УКД) или перевыставить <input type="text" class="t2ord" data-step="1" placeholder="№"></div>
+      <div>В) Переподписать в ЭДО с корректными полномочиями <input type="text" class="t2ord" data-step="3" placeholder="№"></div>
+      <div>Г) Обновить учёт/НДС-книги <input type="text" class="t2ord" data-step="4" placeholder="№"></div>
+      <div>Д) Приложить квитанции ЭДО и закрыть инцидент <input type="text" class="t2ord" data-step="5" placeholder="№"></div>
+    </div>
+    <div>
+      <button class="btn primary" onclick="checkT2()">Проверить</button>
+      <button class="btn" onclick="markDone('t2')">Отметить выполненным</button>
+      <div id="t2msg" class="status warn">Подсказка: сначала — исправление, затем согласование и подписи, после — учёт и архив.</div>
+    </div>
+  </section>
+
+  <!-- Задание 3 -->
+  <section class="card" id="t3">
+    <h2 style="margin:0 0 6px">3) Нужен ли допсоглашение, или достаточно письма?</h2>
+    <p class="small">Выберите по каждому мини-сценарию, что правильно.</p>
+    <div class="qblock">
+      <div>
+        <b>Сценарий 1:</b> меняем цену и срок поставки. <br>
+        <label><input type="radio" name="s1" value="add"> Нужен допсоглашение (корректируем условия)</label>
+        <label><input type="radio" name="s1" value="letter"> Достаточно письма-уведомления</label>
+      </div>
+      <hr style="border:none;border-top:1px dashed var(--line)">
+      <div>
+        <b>Сценарий 2:</b> уточнение реквизитов получателя платежа (без изменения условий). <br>
+        <label><input type="radio" name="s2" value="add"> Нужен допсоглашение</label>
+        <label><input type="radio" name="s2" value="letter"> Достаточно письма на бланке + проверка</label>
+      </div>
+      <hr style="border:none;border-top:1px dashed var(--line)">
+      <div>
+        <b>Сценарий 3:</b> меняем предмет работ/спецификацию. <br>
+        <label><input type="radio" name="s3" value="add"> Нужен допсоглашение</label>
+        <label><input type="radio" name="s3" value="letter"> Достаточно письма</label>
+      </div>
+      <hr style="border:none;border-top:1px dashed var(--line)">
+      <div>
+        <b>Сценарий 4:</b> переносим дату отгрузки на неделю (без штрафов, по общему согласию). <br>
+        <label><input type="radio" name="s4" value="add"> Нужен допсоглашение</label>
+        <label><input type="radio" name="s4" value="letter"> Можно письмом, если договор это допускает</label>
+      </div>
+    </div>
+    <div>
+      <button class="btn primary" onclick="checkT3()">Проверить</button>
+      <button class="btn" onclick="markDone('t3')">Отметить выполненным</button>
+      <div id="t3msg" class="status warn">Подсказка: изменение условий договора (цены, сроки, предмет) — обычно через допсоглашение.</div>
+    </div>
+  </section>
+
+  <!-- Задание 4 -->
+  <section class="card" id="t4">
+    <h2 style="margin:0 0 6px">4) Готов ли пакет к оплате?</h2>
+    <p class="small">Поставьте галочки — система подскажет, можно ли запускать оплату.</p>
+    <div class="qblock">
+      <label><input type="checkbox" class="t4" data-weight="2"> Договор и приложения закрывают именно этот объём работ/поставки</label>
+      <label><input type="checkbox" class="t4" data-weight="2"> Документ факта (акт/накладная/УПД) оформлен и подписан</label>
+      <label><input type="checkbox" class="t4" data-weight="2"> Суммы и даты совпадают между счётом, актом/УПД и платёжкой</label>
+      <label><input type="checkbox" class="t4" data-weight="2"> Квитанции ЭДО «доставлен/подписан» есть в деле</label>
+      <label><input type="checkbox" class="t4" data-weight="2"> Для услуг есть «следы работы» (отчёты, ссылки, файлы)</label>
+    </div>
+    <div>
+      <button class="btn primary" onclick="checkT4()">Проверить</button>
+      <button class="btn" onclick="markDone('t4')">Отметить выполненным</button>
+      <div id="t4msg" class="status warn">Цель — набрать минимум 8 баллов из 10 (completeness ≈ 80%).</div>
+    </div>
+  </section>
+
+  <!-- Задание 5 -->
+  <section class="card" id="t5">
+    <h2 style="margin:0 0 6px">5) Мой план действий в компании (сгенерировать текст)</h2>
+    <p class="small">Заполните коротко — и получите <b>готовый план</b>, который можно скопировать и обсудить с командой.</p>
+    <div class="grid cols-2">
+      <div>
+        <label>Ответственные роли (кто за что)</label>
+        <input id="p_roles" type="text" placeholder="Кто ставит «стоп», кто проверяет, кто подписывает...">
+        <label>Сроки (когда что делаем)</label>
+        <input id="p_sla" type="text" placeholder="Проверка реквизитов — 1 р.д.; исправление акта — до 3 р.д.; ...">
+        <label>Где хранить доказательства</label>
+        <input id="p_store" type="text" placeholder="Папка в ЭДО/CRM, реестр, ответственное лицо...">
+      </div>
+      <div>
+        <label>Кому и о чём сообщаем</label>
+        <input id="p_notify" type="text" placeholder="Казначей, бухгалтерия, продажи/закупки, банк...">
+        <label>Что контролируем еженедельно</label>
+        <input id="p_metrics" type="text" placeholder="Охват, время до закрывающих, дефекты...">
+        <div style="margin-top:10px">
+          <button class="btn primary" onclick="genPlan()">Сформировать план</button>
+          <button class="btn" onclick="copyPlan()">Скопировать текст</button>
+        </div>
+      </div>
+    </div>
+    <details style="margin-top:8px"><summary><b>Подсказка</b></summary>
+      <p class="small">Думайте так: «кто делает», «что именно делает», «в какой срок», «где это хранится», «как я вижу прогресс».</p>
+    </details>
+    <pre id="plan_out" class="qblock" style="white-space:pre-wrap"></pre>
+  </section>
+
+  <!-- Задание 6 -->
+  <section class="card" id="t6">
+    <h2 style="margin:0 0 6px">6) Ответ банку: соберите письмо</h2>
+    <p class="small">Сформируйте вежливый и содержательный ответ. Отметьте, что приложите, и добавьте краткое пояснение «зачем была операция».</p>
+    <div class="grid cols-2">
+      <div>
+        <label>Тип операции</label>
+        <select id="op_type" onchange="T6_togglePayDocs()">
+          <option value="goods">Поставка товара</option>
+          <option value="mkt">Маркетинговые услуги</option>
+          <option value="loan">Займ внутри группы</option>
+        </select>
+        <label>Сумма и период/дата</label>
+        <input id="op_sum" type="text" placeholder="Напр.: 220 000 ₽ за август 2025">
+        <label>Коротко: деловая цель (зачем)</label>
+        <textarea id="op_goal" placeholder="2–3 предложения: для чего, какой эффект, как контролировали результат"></textarea>
+      </div>
+      <div>
+        <label>Что приложите к письму</label>
+        <label><input type="checkbox" class="t6doc" value="Договор/ТЗ"> Договор/ТЗ</label>
+        <label><input type="checkbox" class="t6doc" value="Акт/накладная/УПД"> Акт/накладная/УПД</label>
+        <label><input type="checkbox" class="t6doc" value="Квитанции ЭДО"> Квитанции ЭДО</label>
+        <label><input type="checkbox" class="t6doc" value="Артефакты факта (отчёты/фото/ТТН)"> Артефакты факта (отчёты/фото/ТТН)</label>
+        <label id="payDocsWrap" style="display:none"><input type="checkbox" class="t6doc" value="Платёжные документы (поручение/выписка)"> Платёжные документы (поручение/выписка)</label>
+        <div style="margin-top:10px">
+          <button class="btn primary" onclick="genLetter()">Сформировать письмо</button>
+          <button class="btn" onclick="copyLetter()">Скопировать письмо</button>
+          <button class="btn ok" onclick="checkT6()">Проверить</button>
+        </div>
+        <div id="t6msg" class="status warn">Совет: обязательно приложите «договор+факт» и «квитанции ЭДО». Для маркетинга — отчёты/скриншоты; для товара — ТТН/накладные; для займа — платёжные документы.</div>
+      </div>
+    </div>
+    <h3 style="margin:8px 0">Черновик письма</h3>
+    <pre id="letter_out" class="qblock" style="white-space:pre-wrap"></pre>
+  </section>
+
+  <!-- Задание 7 -->
+  <section class="card" id="t7">
+    <h2 style="margin:0 0 6px">7) Карта ролей: кто за что отвечает</h2>
+    <p class="small">Для каждого пункта выберите, кто отвечает. Нажмите «Проверить» — увидите рекомендации.</p>
+    <div class="qblock">
+      <div>
+        <label>1) Ставить «стоп» платежей
+          <select id="r_stop">
+            <option value="">— выберите —</option>
+            <option>Инициатор</option><option>Юрист</option><option>KYC/Безопасность</option>
+            <option>Бухгалтерия/Налоги</option><option>Казначей</option><option>Архив/ЭДО</option>
+          </select>
+          <span class="row-hint">(временно, пока идёт проверка)</span>
+        </label>
+      </div>
+      <div>
+        <label>2) Проверять контрагента и реквизиты (KYC)
+          <select id="r_kyc">
+            <option value="">— выберите —</option>
+            <option>Инициатор</option><option>Юрист</option><option>KYC/Безопасность</option>
+            <option>Бухгалтерия/Налоги</option><option>Казначей</option><option>Архив/ЭДО</option>
+          </select>
+        </label>
+      </div>
+      <div>
+        <label>3) Оформлять допсоглашения
+          <select id="r_addendum">
+            <option value="">— выберите —</option>
+            <option>Инициатор</option><option>Юрист</option><option>KYC/Безопасность</option>
+            <option>Бухгалтерия/Налоги</option><option>Казначей</option><option>Архив/ЭДО</option>
+          </select>
+        </label>
+      </div>
+      <div>
+        <label>4) Оформлять исправления к первичке (УКД)
+          <select id="r_ukd">
+            <option value="">— выберите —</option>
+            <option>Инициатор</option><option>Юрист</option><option>KYC/Безопасность</option>
+            <option>Бухгалтерия/Налоги</option><option>Казначей</option><option>Архив/ЭДО</option>
+          </select>
+        </label>
+      </div>
+      <div>
+        <label>5) Проверять первичку и НДС
+          <select id="r_primary">
+            <option value="">— выберите —</option>
+            <option>Инициатор</option><option>Юрист</option><option>KYC/Безопасность</option>
+            <option>Бухгалтерия/Налоги</option><option>Казначей</option><option>Архив/ЭДО</option>
+          </select>
+        </label>
+      </div>
+      <div>
+        <label>6) Запускать платёж при полном пакете
+          <select id="r_pay">
+            <option value="">— выберите —</option>
+            <option>Инициатор</option><option>Юрист</option><option>KYC/Безопасность</option>
+            <option>Бухгалтерия/Налоги</option><option>Казначей</option><option>Архив/ЭДО</option>
+          </select>
+        </label>
+      </div>
+      <div>
+        <label>7) Вести реестр/архив документов и квитанций
+          <select id="r_archive">
+            <option value="">— выберите —</option>
+            <option>Инициатор</option><option>Юрист</option><option>KYC/Безопасность</option>
+            <option>Бухгалтерия/Налоги</option><option>Казначей</option><option>Архив/ЭДО</option>
+          </select>
+        </label>
+      </div>
+      <div>
+        <label>8) Формулировать деловую цель и собирать «следы работы»
+          <select id="r_purpose">
+            <option value="">— выберите —</option>
+            <option>Инициатор</option><option>Юрист</option><option>KYC/Безопасность</option>
+            <option>Бухгалтерия/Налоги</option><option>Казначей</option><option>Архив/ЭДО</option>
+          </select>
+        </label>
+      </div>
+    </div>
+    <div>
+      <button class="btn primary" onclick="checkT7()">Проверить</button>
+      <button class="btn" onclick="markDone('t7')">Отметить выполненным</button>
+      <div id="t7msg" class="status warn">Подсказка: «стоп» и запуск платежей — у казначея; договоры — у юриста; первичка и УКД — у бухгалтерии; архив — у документооборота; KYC — у безопасности; деловая цель — у инициатора.</div>
+    </div>
+  </section>
+
+  <footer class="small muted">Данные сохраняются в вашем браузере. Можно встраивать на платформу через iFrame.</footer>
 </div>
 
 <script>
-/* ===== Общие мелочи ===== */
-function $(id){ return document.getElementById(id); }
-function todayISO(){ const d=new Date(); d.setHours(0,0,0,0); return d.toISOString().slice(0,10); }
-function copyToClipboard(text){
+/* ===== Прогресс ===== */
+const KEY='pb-upd-practice-v1';
+const state=JSON.parse(localStorage.getItem(KEY)||'{}');
+const tasks=['t1','t2','t3','t4','t5','t6','t7'];
+function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+function markDone(id){ state[id]=true; save(); updateProgress(); }
+function updateProgress(){
+  const done = tasks.filter(t=>state[t]).length;
+  const pct = Math.round(done/tasks.length*100);
+  const bar=document.getElementById('progressBar'); const txt=document.getElementById('progressText');
+  if(bar) bar.style.width=pct+'%'; if(txt) txt.textContent=pct+'%';
+  tasks.forEach(id=>{ if(state[id]) document.getElementById(id)?.classList.add('done'); });
+}
+updateProgress();
+
+/* ===== Задание 1 ===== */
+function checkT1(){
+  const checks=document.querySelectorAll('.t1');
+  let ok=true;
+  checks.forEach(c=>{
+    const should = c.dataset.correct==='true';
+    if(should && !c.checked) ok=false;
+    if(!should && c.checked) ok=false;
+  });
+  const m=document.getElementById('t1msg'); m.style.display='block';
+  if(ok){
+    m.className='status ok';
+    m.innerHTML='✅ Верно. Обязательные шаги: документальные основания, независимое подтверждение, временный «стоп» и запись в журнале. После этого — вносим изменения и снимаем «стоп».';
+    markDone('t1');
+  } else {
+    m.className='status bad';
+    m.innerHTML='❌ Проверьте себя: платить «сразу по письму» и «без звонка» — ошибки. Отметьте только шаги с проверкой и «стопом».';
+  }
+}
+
+/* ===== Задание 2 ===== */
+function checkT2(){
+  const inputs=document.querySelectorAll('.t2ord');
+  const want=['1','2','3','4','5'];
+  const got=[...inputs].map(i=>i.value.trim());
+  const m=document.getElementById('t2msg'); m.style.display='block';
+  if(JSON.stringify(got)===JSON.stringify(want)){
+    m.className='status ok';
+    m.innerHTML='✅ Отлично: сначала исправляем документ, затем согласование и подписи, после — учёт и архив.';
+    markDone('t2');
+  } else {
+    m.className='status bad';
+    m.innerHTML='❌ Есть перестановки. Подсказка: 1) оформить исправление; 2) согласовать налоги; 3) переподписать; 4) обновить учёт; 5) приложить квитанции и закрыть инцидент.';
+  }
+}
+
+/* ===== Задание 3 ===== */
+function checkT3(){
+  const m=document.getElementById('t3msg'); m.style.display='block';
+  const s1=document.querySelector('input[name="s1"]:checked')?.value;
+  const s2=document.querySelector('input[name="s2"]:checked')?.value;
+  const s3=document.querySelector('input[name="s3"]:checked')?.value;
+  const s4=document.querySelector('input[name="s4"]:checked')?.value;
+  const ok = (s1==='add')&&(s2==='letter')&&(s3==='add')&&(s4 && (s4==='letter'));
+  if(ok){
+    m.className='status ok';
+    m.innerHTML='✅ Верно: изменение цены/сроков и предмета — через допсоглашение; уточнение реквизитов — письмом с проверкой; перенос даты можно письмом, если договор это допускает.';
+    markDone('t3');
+  } else {
+    m.className='status bad';
+    m.innerHTML='❌ Проверьте: всё, что меняет условия договора (цены, сроки, предмет) — допсоглашение. Реквизиты/технические детали — письмо + проверка.';
+  }
+}
+
+/* ===== Задание 4 ===== */
+function checkT4(){
+  const checks=document.querySelectorAll('.t4');
+  let score=0; checks.forEach(c=>{ if(c.checked) score += Number(c.dataset.weight||0); });
+  const m=document.getElementById('t4msg'); m.style.display='block';
+  if(score>=8){
+    m.className='status ok';
+    m.innerHTML='✅ Пакет готов к оплате (комплект ≥ 80%). Можно запускать платёж.';
+    markDone('t4');
+  } else {
+    m.className='status bad';
+    m.innerHTML='❌ Недостаточно доказательств. Проверьте договор/акт, сверку сумм и дат, квитанции ЭДО и «следы работы». Цель — набрать минимум 8 из 10.';
+  }
+}
+
+/* ===== Задание 5 ===== */
+function genPlan(){
+  const roles=document.getElementById('p_roles').value.trim()||'—';
+  const sla=document.getElementById('p_sla').value.trim()||'—';
+  const store=document.getElementById('p_store').value.trim()||'—';
+  const notify=document.getElementById('p_notify').value.trim()||'—';
+  const metrics=document.getElementById('p_metrics').value.trim()||'—';
+  const txt =
+`План действий (черновик):
+
+1) Роли и ответственность: ${roles}.
+2) Сроки (как правило): ${sla}.
+3) Где храним доказательства: ${store}.
+4) Кого и как уведомляем: ${notify}.
+5) Еженедельный контроль: ${metrics}.
+6) Перед оплатой — чек «готовности»: договор/акт на этот объём, совпадение сумм и дат, квитанции ЭДО, «следы работы».
+7) При смене реквизитов — письмо на бланке + независимый звонок + «стоп» до проверки.
+8) Ошибку в документе исправляем: исправление/перевыставление → подписи → учёт → архив.
+9) Изменение условий договора — только через допсоглашение с датой «вступает с…».
+10) Итог: всё фиксируем в журнале изменений (кто, что, когда, с какой даты).`;
+  document.getElementById('plan_out').textContent = txt;
+  markDone('t5');
+}
+function copyPlan(){
+  const text=document.getElementById('plan_out').textContent||'';
+  if(!text.trim()){ alert('Сначала нажмите «Сформировать план».'); return; }
   if(navigator.clipboard && navigator.clipboard.writeText){
-    return navigator.clipboard.writeText(text).then(()=>true).catch(()=>false);
+    navigator.clipboard.writeText(text).then(()=>alert('Скопировано в буфер обмена.')).catch(()=>alert('Не удалось скопировать. Выделите текст и нажмите Ctrl+C.'));
   } else {
-    const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta);
-    ta.select(); try{ document.execCommand('copy'); document.body.removeChild(ta); return true; }catch(e){ document.body.removeChild(ta); return false; }
+    alert('Выделите текст мышкой и нажмите Ctrl+C.');
   }
 }
 
-/* ===== Вкладки ===== */
-document.querySelectorAll('.tab').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-    btn.classList.add('active');
-    const t = btn.dataset.target;
-    document.querySelectorAll('section[data-tab]').forEach(s=>{
-      s.style.display = (s.getAttribute('data-tab')===t) ? 'block' : 'none';
-    });
-  });
-});
+/* ===== Задание 6: Письмо банку ===== */
+function T6_togglePayDocs(){
+  const v=document.getElementById('op_type').value;
+  document.getElementById('payDocsWrap').style.display = (v==='loan') ? 'block' : 'none';
+}
+T6_togglePayDocs();
 
-/* ===== Задание А ===== */
-$('a_valid_from').value = todayISO();
-function A_check(){
-  const initiator = $('a_initiator').value.trim();
-  const entity = $('a_entity').value.trim();
-  const entity_id = $('a_entity_id').value.trim();
-  const change = $('a_change').value.trim();
-  const valid_from = $('a_valid_from').value;
-  const evidence = $('a_evidence').value.split(',').map(s=>s.trim()).filter(Boolean);
+function genLetter(){
+  const type=document.getElementById('op_type').value;
+  const sum=document.getElementById('op_sum').value.trim();
+  const goal=document.getElementById('op_goal').value.trim();
+  const docs=[...document.querySelectorAll('.t6doc')].filter(x=>x.checked).map(x=>x.value);
+  const typeName = type==='goods'?'поставка товара':(type==='mkt'?'маркетинговые услуги':'займ внутри группы');
 
-  const risk_ok = $('a_cb_cb').checked && $('a_cb_sign').checked && $('a_cb_docs').checked;
-  const msgs = [];
-  if(!initiator) msgs.push('Укажите инициатора.');
-  if(!entity_id) msgs.push('Укажите ID объекта (ИНН/номер договора/ID документа).');
-  if(!(valid_from && valid_from >= todayISO())) msgs.push('Дата вступления должна быть сегодня или позже.');
-  if(evidence.length<1) msgs.push('Добавьте хотя бы одну ссылку на основание.');
-  if(change.length<20) msgs.push('Опишите, что меняем и почему (минимум 20 символов).');
-  if(!risk_ok) msgs.push('Отметьте все три проверки риска.');
+  const lines=[];
+  lines.push('Тема: Пояснение по операции — '+typeName+(sum?(', '+sum):''));
+  lines.push('');
+  lines.push('Уважаемые коллеги,');
+  lines.push('Сообщаем пояснения по операции: '+typeName+(sum?(' ('+sum+')'):'')+'.');
+  if(goal){ lines.push('Деловая цель: '+goal); }
+  lines.push('К письму прилагаем:');
+  docs.forEach(d=>lines.push('— '+d));
+  lines.push('Просим учесть, что оплата/учёт производится при полном и непротиворечивом пакете документов, квитанции ЭДО прилагаются.');
+  lines.push('Готовы предоставить дополнительные пояснения при необходимости.');
+  lines.push('');
+  lines.push('С уважением,');
+  lines.push('__________________________');
 
-  const status = $('a_status'); status.style.display='block';
-  if(msgs.length){
-    status.className='status bad';
-    status.innerHTML = '❌ Требуются правки:<br>• ' + msgs.join('<br>• ');
+  document.getElementById('letter_out').textContent = lines.join('\n');
+}
+
+function copyLetter(){
+  const text=document.getElementById('letter_out').textContent||'';
+  if(!text.trim()){ alert('Сначала нажмите «Сформировать письмо».'); return; }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>alert('Скопировано в буфер обмена.')).catch(()=>alert('Не удалось скопировать. Выделите текст и нажмите Ctrl+C.'));
   } else {
-    status.className='status ok';
-    status.innerHTML = '✅ Заявка оформлена корректно. Можно копировать итог ниже.';
+    alert('Выделите текст мышкой и нажмите Ctrl+C.');
+  }
+}
+
+function checkT6(){
+  const msg=document.getElementById('t6msg'); msg.style.display='block';
+  const type=document.getElementById('op_type').value;
+  const goal=document.getElementById('op_goal').value.trim();
+  const docs=[...document.querySelectorAll('.t6doc')];
+  const has = name => docs.find(x=>x.checked && x.value.indexOf(name)>=0);
+
+  let ok=true, tips=[];
+  if(goal.length<20){ ok=false; tips.push('Добавьте 2–3 предложения о деловой цели.'); }
+
+  // базовые документы
+  if(!has('Договор/ТЗ')){ ok=false; tips.push('Добавьте «Договор/ТЗ».'); }
+  if(!has('Акт/накладная/УПД')){ ok=false; tips.push('Добавьте «Акт/накладная/УПД».'); }
+  if(!has('Квитанции ЭДО')){ ok=false; tips.push('Добавьте «Квитанции ЭДО».'); }
+
+  // по типам
+  if(type==='mkt' && !has('Артефакты факта')){ ok=false; tips.push('Для услуг приложите «Артефакты факта (отчёты/скрины)».'); }
+  if(type==='goods' && !has('Артефакты факта')){ ok=false; tips.push('Для товара приложите «ТТН/фото/накладные» (они в «Артефакты факта»).'); }
+  if(type==='loan'){
+    const payDocs=document.querySelector('#payDocsWrap input');
+    if(!(payDocs && payDocs.checked)){ ok=false; tips.push('Для займа добавьте «Платёжные документы».'); }
   }
 
-  const payload = {
-    id: 'ZI-'+todayISO().replaceAll('-','')+'-'+Math.random().toString(36).slice(2,6),
-    инициатор: initiator,
-    объект: entity,
-    id_объекта: entity_id,
-    что_и_почему_меняем: change,
-    действует_с: valid_from,
-    основания: evidence,
-    проверки: {подтверждение_по_контакту: $('a_cb_cb').checked, полномочия_подтверждены: $('a_cb_sign').checked, документ_настоящий: $('a_cb_docs').checked}
+  if(ok){
+    msg.className='status ok';
+    msg.innerHTML='✅ Отлично: письмо содержит цель и нужный комплект вложений. Можно отправлять.';
+    markDone('t6');
+  } else {
+    msg.className='status bad';
+    msg.innerHTML='❌ Требуются правки:<br>• '+tips.join('<br>• ');
+  }
+}
+
+/* ===== Задание 7: Карта ролей ===== */
+function checkT7(){
+  // эталон
+  const correct = {
+    r_stop:'Казначей',
+    r_kyc:'KYC/Безопасность',
+    r_addendum:'Юрист',
+    r_ukd:'Бухгалтерия/Налоги',
+    r_primary:'Бухгалтерия/Налоги',
+    r_pay:'Казначей',
+    r_archive:'Архив/ЭДО',
+    r_purpose:'Инициатор'
   };
-  $('a_preview').textContent = yaml(payload);
-}
-function A_copy(){
-  const text = $('a_preview').textContent || '';
-  if(!text.trim()){ alert('Сначала нажмите «Проверить заявку».'); return; }
-  copyToClipboard(text).then(ok=>{
-    alert(ok ? 'Скопировано в буфер обмена.' : 'Не удалось скопировать. Выделите текст вручную и нажмите Ctrl+C.');
+  const ids=Object.keys(correct);
+  let wrong=[], unset=[];
+  ids.forEach(id=>{
+    const sel=document.getElementById(id);
+    sel.classList.remove('badmark','goodmark');
+    const val=sel.value;
+    if(!val){ unset.push(idToText(id)); return; }
+    if(val!==correct[id]) wrong.push(idToText(id));
+    else sel.classList.add('goodmark');
   });
-}
-function yaml(obj, indent=0){
-  const sp='  '.repeat(indent);
-  if(obj===null) return 'null';
-  if(typeof obj!=='object') return String(obj).replace(/\n/g,' ');
-  if(Array.isArray(obj)){
-    return obj.map(x=>sp+'- '+yaml(x, indent+1).replace(/^  /,'')).join('\n');
-  }
-  let out=[];
-  for(const k of Object.keys(obj)){
-    const v=obj[k];
-    if(typeof v==='object' && v!==null){ out.push(sp+k+':\n'+yaml(v, indent+1)); }
-    else { out.push(sp+k+': '+String(v).replace(/\n/g,' ')); }
-  }
-  return out.join('\n');
-}
+  const m=document.getElementById('t7msg'); m.style.display='block';
 
-/* ===== Задание Б ===== */
-const B_state = { rows: [] };
-function B_init(){
-  B_state.rows = [{ sku:'SMM-BASE', price:200000, from:'2025-08-01', to:null, current:true }];
-  B_render();
-  $('b_status').style.display='block';
-  $('b_status').className='status warn';
-  $('b_status').textContent='Введите новую цену и дату, затем нажмите «Применить».';
-  $('b_sql').textContent='';
-}
-function B_render(){
-  const tb = $('b_table').querySelector('tbody'); tb.innerHTML='';
-  B_state.rows.forEach(r=>{
-    const tr=document.createElement('tr');
-    tr.innerHTML = `<td>${r.sku}</td><td>${fmt(r.price)}</td><td>${r.from}</td><td>${r.to||''}</td><td>${r.current?'Да':''}</td>`;
-    tb.appendChild(tr);
-  });
-}
-function B_apply(){
-  const price = parseFloat(($('b_price').value||'').replace(',','.'));
-  const newFrom = $('b_from').value;
-  const st = $('b_status'); st.style.display='block';
-  const errs=[];
-  if(!(price>0)) errs.push('Укажите положительную цену.');
-  if(!newFrom) errs.push('Укажите дату вступления.');
-  if(newFrom && newFrom < '2025-08-01') errs.push('Дата не может быть раньше 2025-08-01.');
-  if(errs.length){ st.className='status bad'; st.innerHTML='❌ '+errs.join('<br>'); return; }
-
-  const current = B_state.rows.find(r=>r.current);
-  const prevTo = dateAdd(newFrom, -1);
-  current.to = prevTo; current.current=false;
-
-  B_state.rows.push({ sku:'SMM-BASE', price:price, from:newFrom, to:null, current:true });
-
-  const overlaps = hasOverlaps(B_state.rows);
-  const currentCount = B_state.rows.filter(r=>r.current).length;
-
-  B_render();
-
-  $('b_sql').textContent =
-`-- Закрыть старую запись и открыть новую
-BEGIN;
-  UPDATE price
-     SET valid_to = DATE '${prevTo}', is_current = FALSE
-   WHERE sku = 'SMM-BASE' AND is_current = TRUE;
-
-  INSERT INTO price (sku, price, valid_from, valid_to, is_current)
-  VALUES ('SMM-BASE', ${price.toFixed(2)}, DATE '${newFrom}', NULL, TRUE);
-COMMIT;`;
-
-  if(overlaps){ st.className='status bad'; st.textContent='❌ Перекрытие периодов. Проверьте даты «по дату».';
-  } else if(currentCount!==1){ st.className='status bad'; st.textContent='❌ «Текущая» запись должна быть ровно одна.';
-  } else { st.className='status ok'; st.textContent='✅ Готово: периоды не перекрываются, текущая запись одна.'; }
-}
-function B_reset(){ $('b_price').value=''; $('b_from').value=''; B_init(); }
-function hasOverlaps(rows){
-  const arr = rows.map(x=>({from:new Date(x.from), to: x.to? new Date(x.to): null})).sort((a,b)=>a.from-b.from);
-  for(let i=1;i<arr.length;i++){
-    const prev=arr[i-1], cur=arr[i];
-    if(prev.to===null) return true;          // предыдущая не закрыта — перекрытие
-    if(prev.to >= cur.from) return true;     // даты соприкасаются некорректно/перекрываются
-  }
-  return false;
-}
-function dateAdd(dateStr, days){ const d=new Date(dateStr); d.setDate(d.getDate()+days); return d.toISOString().slice(0,10); }
-function fmt(n){ return new Intl.NumberFormat('ru-RU').format(n)+' ₽'; }
-B_init();
-
-/* ===== Задание В ===== */
-let C_gate = true; // активен
-function C_stop(){
-  C_gate = false;
-  $('c_gate').textContent = 'СТОП (до проверки)';
-  $('c_gate_hint').textContent = 'выполните проверки и нажмите «Проверить и включить платежи»';
-  const s = $('c_status'); s.style.display='block'; s.className='status warn'; s.innerHTML='⏸️ Платежи остановлены. Выполните все проверки.';
-}
-function C_check(){
-  const ok = $('c_letter').checked && $('c_bank').checked && $('c_call').checked && $('c_power').checked && $('c_log').checked && $('c_text').value.trim().length>20;
-  const s = $('c_status'); s.style.display='block';
-  if(!ok){
-    s.className='status bad';
-    s.innerHTML='❌ Не все шаги выполнены. Нужны: письмо на бланке, подтверждение банка, независимый звонок, проверка полномочий, запись в журнале и заполненный черновик.';
+  if(unset.length){
+    m.className='status bad';
+    m.innerHTML='❌ Заполните все пункты: '+unset.join('; ');
     return;
   }
-  C_gate = true;
-  $('c_gate').textContent='АКТИВЕН';
-  $('c_gate_hint').textContent='платежи включены';
-  s.className='status ok';
-  s.innerHTML='✅ Проверка пройдена. Платежи включены. Сделайте контрольную сверку первой оплаты.';
-  const log = {
-    id: 'ZI-'+todayISO().replaceAll('-','')+'-'+Math.random().toString(36).slice(2,6),
-    сценарий: 'смена_реквизитов',
-    проверки: {письмо:true, подтверждение_банка:true, обратный_звонок:true, полномочия:true, журнал:true},
-    запись: $('c_text').value.trim(),
-    время: new Date().toLocaleString('ru-RU')
-  };
-  $('c_logbox').textContent = JSON.stringify(log, null, 2);
+  if(wrong.length){
+    m.className='status bad';
+    m.innerHTML='❌ Есть несоответствия: '+wrong.join('; ')+'<br><span class="small">Подсказка: «стоп/запуск платежей» — казначей; «допники» — юрист; «УКД/НДС» — бухгалтерия; «KYC» — безопасность; «архив» — ЭДО; «деловая цель» — инициатор.</span>';
+    // подсветим неверные
+    ids.forEach(id=>{
+      const sel=document.getElementById(id);
+      if(sel.value && sel.value!==correct[id]) sel.classList.add('badmark');
+    });
+  } else {
+    m.className='status ok';
+    m.innerHTML='✅ Карта ролей составлена правильно. Можно использовать это распределение в компании.';
+    markDone('t7');
+  }
+}
+function idToText(id){
+  const map={
+    r_stop:'«Стоп» платежей',
+    r_kyc:'Проверка контрагента (KYC)',
+    r_addendum:'Допсоглашения',
+    r_ukd:'Исправления к первичке (УКД)',
+    r_primary:'Проверка первички и НДС',
+    r_pay:'Запуск платежа',
+    r_archive:'Реестр/архив',
+    r_purpose:'Деловая цель и «следы работы»'
+  }; return map[id]||id;
 }
 </script>
 </body>
 </html>
-
