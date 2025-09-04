@@ -2,119 +2,363 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Практикум: Обновление данных — Прозрачность бизнеса</title>
-<meta name="description" content="Онлайн-задания по обновлению данных: CR-конструктор, SCD Type 2 симулятор, KYC/treasury сценарий." />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Практикум: Обновление данных</title>
+<meta name="description" content="Онлайн-задания по теме «Обновление данных» для курса «Прозрачность бизнеса». Полностью на русском, работает в iframe." />
 <style>
   :root{
-    --bg:#ffffff;--fg:#0f172a;--muted:#475569;--line:#e2e8f0;--soft:#f8fafc;
-    --brand:#0ea5e9;--ok:#10b981;--bad:#ef4444;--warn:#f59e0b;
-    --shadow:0 10px 28px rgba(2,6,23,.08);
-    --r:18px;
+    --bg:#fff;--fg:#0f172a;--muted:#475569;--line:#e2e8f0;--soft:#f8fafc;
+    --brand:#0ea5e9;--ok:#10b981;--bad:#ef4444;--warn:#f59e0b;--shadow:0 10px 28px rgba(2,6,23,.08);
+    --r:16px
   }
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif}
-  .wrap{max-width:1100px;margin:24px auto;padding:0 20px}
-  h1{font-size:clamp(22px,3.4vw,34px);margin:0 0 10px}
+  .wrap{max-width:1100px;margin:22px auto;padding:0 16px}
+  h1{font-size:clamp(22px,3.4vw,34px);margin:0 0 8px}
   .muted{color:var(--muted)}
-  .tabs{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
   .tab{border:1px solid var(--line);border-radius:999px;padding:8px 12px;background:#fff;cursor:pointer}
   .tab.active{background:linear-gradient(90deg,#0ea5e9,#38bdf8);border-color:#0ea5e9;color:#fff}
-  .card{border:1px solid var(--line);border-radius:var(--r);background:#fff;box-shadow:var(--shadow);padding:18px;margin-bottom:16px}
+  section[data-tab]{border:1px solid var(--line);border-radius:var(--r);background:#fff;box-shadow:var(--shadow);padding:16px;margin:0 0 16px}
   .grid{display:grid;gap:12px}
   @media(min-width:920px){.cols-2{grid-template-columns:1fr 1fr}.cols-3{grid-template-columns:1fr 1fr 1fr}}
-  label{display:block;margin:6px 0 4px}
-  input[type="text"],input[type="date"],textarea,select{
-    width:100%;border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff
-  }
+  label{display:block;margin:8px 0 4px}
+  input[type="text"],input[type="date"],textarea,select{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff}
   textarea{min-height:100px}
-  .btn{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);
-    border-radius:12px;background:#fff;padding:8px 12px;cursor:pointer}
+  .btn{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:12px;background:#fff;padding:8px 12px;cursor:pointer}
   .btn.primary{background:#0ea5e9;color:#fff;border-color:#0ea5e9}
   .btn.ok{background:#10b981;color:#fff;border-color:#10b981}
   .btn.warn{background:#f59e0b;color:#fff;border-color:#f59e0b}
-  .kpi{display:flex;gap:12px;flex-wrap:wrap}
-  .kpi .pill{border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:#fff}
-  .status{padding:10px;border-radius:12px;margin-top:10px}
+  .status{padding:10px;border-radius:12px;margin-top:10px;display:none}
   .status.ok{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
   .status.bad{background:#fef2f2;color:#7f1d1d;border:1px solid #fecaca}
   .status.warn{background:#fff7ed;color:#7c2d12;border:1px solid #fed7aa}
-  .code{background:#0b1020;color:#e6edf3;border-radius:12px;padding:12px;overflow:auto}
   .table{width:100%;border-collapse:collapse}
   .table th,.table td{border:1px solid var(--line);padding:8px;background:#fff;vertical-align:top}
   .table th{background:#f8fafc;text-align:left}
-  .hint{font-size:14px;color:#334155;margin-top:6px}
-  .flex{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .right{margin-left:auto}
-  .small{font-size:13px;color:#64748b}
-  .badge{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 8px;font-size:12px;background:#f1f5f9}
-  .sep{height:1px;background:var(--line);margin:18px 0}
-  .score{font-weight:600}
+  .note{font-size:13px;color:#334155}
+  .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 8px;font-size:12px;background:#f1f5f9;margin-left:6px}
+  .code{background:#0b1020;color:#e6edf3;border-radius:12px;padding:12px;overflow:auto}
+  details{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:10px}
+  summary{cursor:pointer}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>Практикум: Обновление данных</h1>
-  <p class="muted">Три задания: оформляем CR, тренируем версионирование (SCD Type 2) и отрабатываем смену реквизитов c KYC/treasury-контролями. Прогресс хранится локально.</p>
+  <p class="muted">Три задания. Всё на русском, без «скачиваний» — работает в айфрейме. Если непонятно — раскрывайте «Подсказку» или «Справку» в каждом блоке.</p>
 
   <div class="tabs" id="tabs">
-    <button class="tab active" data-target="taskA">A) CR-конструктор</button>
-    <button class="tab" data-target="taskB">B) SCD Type-2 симулятор</button>
-    <button class="tab" data-target="taskC">C) Смена реквизитов (KYC+Treasury)</button>
+    <button class="tab active" data-target="A">Задание А: Заявка на изменение</button>
+    <button class="tab" data-target="B">Задание Б: Версии без перекрытий</button>
+    <button class="tab" data-target="C">Задание В: Смена реквизитов (безопасно)</button>
   </div>
 
-  <!-- TASK A -->
-  <section id="taskA" class="card">
-    <div class="flex">
-      <h2 style="margin:0">Задание A — Конструктор Change Request (CR)</h2>
-      <span class="badge right">Цель: оформить валидный CR и экспортировать YAML/JSON</span>
-    </div>
-    <div class="grid cols-2" style="margin-top:10px">
+  <!-- A -->
+  <section data-tab="A">
+    <h2 style="margin:0 0 6px">Задание А — Оформите «Заявку на изменение данных» (ЗИ)</h2>
+    <p class="note">Цель: корректно описать <u>что</u> меняем, <u>почему</u> и <u>с какой даты</u>, приложив основания. Итог можно <b>скопировать</b> и вставить в вашу систему.</p>
+    <div class="grid cols-2">
       <div>
-        <label>Инициатор</label><input id="a_initiator" type="text" placeholder="Иванова А.А., закупки" />
-        <label>Сущность</label>
+        <label>Инициатор</label>
+        <input id="a_initiator" type="text" placeholder="Иванова А.А., закупки" />
+        <label>Объект изменения</label>
         <select id="a_entity">
-          <option>Контрагент</option><option>Договор</option><option>Первичка</option><option>Справочник</option><option>Платёж</option>
+          <option>Контрагент</option>
+          <option>Договор</option>
+          <option>Первичный документ</option>
+          <option>Справочник/цены</option>
+          <option>Платёж</option>
         </select>
-        <label>ID сущности</label><input id="a_entity_id" type="text" placeholder="OOO-1234567890 / CTR-45/25 / DOC-25-0001" />
-        <label>Описание изменения</label><textarea id="a_change" placeholder="Что меняем и почему (кратко)..."></textarea>
+        <label>ID объекта</label>
+        <input id="a_entity_id" type="text" placeholder="OOO-ИНН / CTR-45/25 / DOC-25-0001" />
+        <label>Что меняем и почему</label>
+        <textarea id="a_change" placeholder="Коротко и по делу: «Исправляем сумму в акте за август, ошибка в позиции №3…»"></textarea>
       </div>
       <div>
-        <label>Дата вступления в силу (valid_from)</label><input id="a_valid_from" type="date" />
-        <label>Ссылки на основания (через запятую)</label><input id="a_evidence" type="text" placeholder="/files/letter.pdf, /files/bank_confirm.pdf" />
-        <label>Риск-чек (галочки)</label>
-        <div class="flex">
-          <label><input type="checkbox" id="a_cb_cb"> Callback по известному контакту</label>
-          <label><input type="checkbox" id="a_cb_sign"> Проверена подпись/МЧД</label>
-          <label><input type="checkbox" id="a_cb_docs"> Документы на бланке/выписка банка</label>
+        <label>Дата вступления (с какой даты действует)</label>
+        <input id="a_valid_from" type="date" />
+        <label>Ссылки на основания (через запятую)</label>
+        <input id="a_evidence" type="text" placeholder="/files/письмо.pdf, /files/подтверждение_банка.pdf" />
+        <label>Проверки риска (включите, когда выполнено)</label>
+        <label><input type="checkbox" id="a_cb_cb"> Подтверждение по известному контакту (не из письма)</label>
+        <label><input type="checkbox" id="a_cb_sign"> Проверены полномочия/подпись</label>
+        <label><input type="checkbox" id="a_cb_docs"> Документ-основание настоящий (бланк/выписка)</label>
+        <div style="margin-top:10px">
+          <button class="btn primary" onclick="A_check()">Проверить заявку</button>
+          <button class="btn" onclick="A_copy()">Скопировать итог</button>
         </div>
-        <div class="flex" style="margin-top:10px">
-          <button class="btn primary" onclick="A_validate()">Проверить CR</button>
-          <button class="btn" onclick="A_export('yaml')">Экспорт YAML</button>
-          <button class="btn" onclick="A_export('json')">Экспорт JSON</button>
-        </div>
-        <div id="a_status" class="status warn" style="display:none"></div>
+        <div id="a_status" class="status warn">Подсказка: дата должна быть сегодня или позже; нужна хотя бы одна ссылка на основание; все три проверки должны быть отмечены.</div>
       </div>
     </div>
-    <div class="sep"></div>
-    <div>
-      <div class="kpi">
-        <span class="pill">Мин. критерии: valid_from ≥ сегодня; ≥1 evidence; пройден риск-чек</span>
-        <span class="pill">Доп. критерии: entity_id заполнен; описание конкретно; ссылки валидны</span>
+    <details style="margin-top:10px"><summary><b>Справка</b></summary>
+      <ul class="note">
+        <li><b>ЗИ</b> — короткая карточка изменения. Нужна, чтобы каждый апдейт был доказуем и воспроизводим.</li>
+        <li>Основания — письма на бланке, выписки банка, допсоглашения, квитанции ЭДО, выгрузки из систем.</li>
+        <li>Подтверждение по известному контакту — звонок/письмо на те контакты, которые уже были в договоре/карточке.</li>
+      </ul>
+    </details>
+    <pre id="a_preview" class="code" style="margin-top:10px"></pre>
+  </section>
+
+  <!-- B -->
+  <section data-tab="B" style="display:none">
+    <h2 style="margin:0 0 6px">Задание Б — Обновите цену без «перекрытий» периодов</h2>
+    <p class="note">Дано: позиция <b>SMM-BASE</b>, цена 200 000 ₽, действует с «2025-08-01» по настоящее время. Введите новую цену и дату вступления — система проверит, что вы закрыли старую запись и открыли новую корректно.</p>
+    <div class="grid cols-3">
+      <div>
+        <h3 style="margin:8px 0">1) Текущие версии</h3>
+        <table class="table" id="b_table">
+          <thead><tr><th>SKU</th><th>Цена</th><th>С даты</th><th>По дату</th><th>Текущая?</th></tr></thead>
+          <tbody></tbody>
+        </table>
       </div>
-      <p class="small">Подсказка: опишите <em>что меняется</em>, <em>почему</em>, <em>с какой даты</em>; приложите основания. Для смены реквизитов обязательно — двухканальная верификация.</p>
-      <pre id="a_preview" class="code" style="display:none"></pre>
+      <div>
+        <h3 style="margin:8px 0">2) Ваше изменение</h3>
+        <label>Новая цена</label>
+        <input id="b_price" type="text" placeholder="Напр. 220000" />
+        <label>Дата вступления</label>
+        <input id="b_from" type="date" />
+        <div style="margin-top:10px">
+          <button class="btn primary" onclick="B_apply()">Применить</button>
+          <button class="btn" onclick="B_reset()">Сбросить</button>
+        </div>
+        <p class="note">Правило: предыдущая запись закрывается <u>днём ранее</u> выбранной даты; флаг «текущая» должен быть ровно у одной записи.</p>
+      </div>
+      <div>
+        <h3 style="margin:8px 0">3) Проверка</h3>
+        <div id="b_status" class="status warn">Введите цену и дату, затем нажмите «Применить».</div>
+        <details style="margin-top:10px"><summary><b>Подсказка</b></summary>
+          <p class="note">Если дата новой версии — 2025-10-01, то предыдущая запись должна закончиться 2025-09-30.</p>
+        </details>
+        <h3 style="margin:8px 0">SQL (подсказка)</h3>
+        <pre id="b_sql" class="code"></pre>
+      </div>
     </div>
   </section>
 
-  <!-- TASK B -->
-  <section id="taskB" class="card" style="display:none">
-    <div class="flex">
-      <h2 style="margin:0">Задание B — Симулятор версионирования (SCD Type 2)</h2>
-      <span class="badge right">Цель: корректно закрыть старую версию и открыть новую без перекрытий</span>
+  <!-- C -->
+  <section data-tab="C" style="display:none">
+    <h2 style="margin:0 0 6px">Задание В — Смена банковских реквизитов (безопасно)</h2>
+    <p class="note">Ситуация: контрагент прислал новые реквизиты. Ваша задача — подтвердить изменение и только после этого включить платежи.</p>
+    <div class="grid cols-2">
+      <div>
+        <label><input type="checkbox" id="c_letter"> Письмо на бланке проверено</label>
+        <label><input type="checkbox" id="c_bank"> Подтверждение из банка/выписка есть</label>
+        <label><input type="checkbox" id="c_call"> Перезвон по известному контакту выполнен</label>
+        <label><input type="checkbox" id="c_power"> Полномочия/подписант проверены</label>
+        <label><input type="checkbox" id="c_log"> Запись в журнале сделана</label>
+        <label>Черновик записи (что меняем)</label>
+        <textarea id="c_text" placeholder="Получатель, ИНН/КПП, Банк, БИК, Р/с, дата вступления..."></textarea>
+        <div style="margin-top:10px">
+          <button class="btn warn" onclick="C_stop()">Поставить «стоп» платежей</button>
+          <button class="btn primary" onclick="C_check()">Проверить и включить платежи</button>
+        </div>
+        <div id="c_status" class="status warn">Платежи включатся только если выполнены все пункты и заполнён черновик.</div>
+      </div>
+      <div>
+        <details><summary><b>Справка</b></summary>
+          <ul class="note">
+            <li>Никогда не меняйте реквизиты «по письму» без независимого подтверждения.</li>
+            <li>«Стоп» платежей обязателен до завершения проверки.</li>
+            <li>Контакты для проверки берём из договора/карточки, а не из письма.</li>
+          </ul>
+        </details>
+        <h3 style="margin:8px 0">Итог (журнал)</h3>
+        <pre id="c_logbox" class="code"></pre>
+        <p class="note">Статус платёжных операций: <b id="c_gate">АКТИВЕН</b> <span class="pill" id="c_gate_hint">нажмите «Стоп», чтобы приостановить</span></p>
+      </div>
     </div>
-    <p class="muted">Исходные данные: товар <b>SMM-BASE</b>, текущая цена 200 000 ₽, действует «с 2025-08-01 по настоящее время».</p>
-    <div class="grid cols-3">
-      <div class="card">
-        <h3 style="margin-top:0">1) Таблица версий</h3>
-        <table class="table" id="b_table">_
+  </section>
+</div>
+
+<script>
+/* ===== Общие мелочи ===== */
+function $(id){ return document.getElementById(id); }
+function todayISO(){ const d=new Date(); d.setHours(0,0,0,0); return d.toISOString().slice(0,10); }
+function copyToClipboard(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    return navigator.clipboard.writeText(text).then(()=>true).catch(()=>false);
+  } else {
+    const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta);
+    ta.select(); try{ document.execCommand('copy'); document.body.removeChild(ta); return true; }catch(e){ document.body.removeChild(ta); return false; }
+  }
+}
+
+/* ===== Вкладки ===== */
+document.querySelectorAll('.tab').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    btn.classList.add('active');
+    const t = btn.dataset.target;
+    document.querySelectorAll('section[data-tab]').forEach(s=>{
+      s.style.display = (s.getAttribute('data-tab')===t) ? 'block' : 'none';
+    });
+  });
+});
+
+/* ===== Задание А ===== */
+$('a_valid_from').value = todayISO();
+function A_check(){
+  const initiator = $('a_initiator').value.trim();
+  const entity = $('a_entity').value.trim();
+  const entity_id = $('a_entity_id').value.trim();
+  const change = $('a_change').value.trim();
+  const valid_from = $('a_valid_from').value;
+  const evidence = $('a_evidence').value.split(',').map(s=>s.trim()).filter(Boolean);
+
+  const risk_ok = $('a_cb_cb').checked && $('a_cb_sign').checked && $('a_cb_docs').checked;
+  const msgs = [];
+  if(!initiator) msgs.push('Укажите инициатора.');
+  if(!entity_id) msgs.push('Укажите ID объекта (ИНН/номер договора/ID документа).');
+  if(!(valid_from && valid_from >= todayISO())) msgs.push('Дата вступления должна быть сегодня или позже.');
+  if(evidence.length<1) msgs.push('Добавьте хотя бы одну ссылку на основание.');
+  if(change.length<20) msgs.push('Опишите, что меняем и почему (минимум 20 символов).');
+  if(!risk_ok) msgs.push('Отметьте все три проверки риска.');
+
+  const status = $('a_status'); status.style.display='block';
+  if(msgs.length){
+    status.className='status bad';
+    status.innerHTML = '❌ Требуются правки:<br>• ' + msgs.join('<br>• ');
+  } else {
+    status.className='status ok';
+    status.innerHTML = '✅ Заявка оформлена корректно. Можно копировать итог ниже.';
+  }
+
+  const payload = {
+    id: 'ZI-'+todayISO().replaceAll('-','')+'-'+Math.random().toString(36).slice(2,6),
+    инициатор: initiator,
+    объект: entity,
+    id_объекта: entity_id,
+    что_и_почему_меняем: change,
+    действует_с: valid_from,
+    основания: evidence,
+    проверки: {подтверждение_по_контакту: $('a_cb_cb').checked, полномочия_подтверждены: $('a_cb_sign').checked, документ_настоящий: $('a_cb_docs').checked}
+  };
+  $('a_preview').textContent = yaml(payload);
+}
+function A_copy(){
+  const text = $('a_preview').textContent || '';
+  if(!text.trim()){ alert('Сначала нажмите «Проверить заявку».'); return; }
+  copyToClipboard(text).then(ok=>{
+    alert(ok ? 'Скопировано в буфер обмена.' : 'Не удалось скопировать. Выделите текст вручную и нажмите Ctrl+C.');
+  });
+}
+function yaml(obj, indent=0){
+  const sp='  '.repeat(indent);
+  if(obj===null) return 'null';
+  if(typeof obj!=='object') return String(obj).replace(/\n/g,' ');
+  if(Array.isArray(obj)){
+    return obj.map(x=>sp+'- '+yaml(x, indent+1).replace(/^  /,'')).join('\n');
+  }
+  let out=[];
+  for(const k of Object.keys(obj)){
+    const v=obj[k];
+    if(typeof v==='object' && v!==null){ out.push(sp+k+':\n'+yaml(v, indent+1)); }
+    else { out.push(sp+k+': '+String(v).replace(/\n/g,' ')); }
+  }
+  return out.join('\n');
+}
+
+/* ===== Задание Б ===== */
+const B_state = { rows: [] };
+function B_init(){
+  B_state.rows = [{ sku:'SMM-BASE', price:200000, from:'2025-08-01', to:null, current:true }];
+  B_render();
+  $('b_status').style.display='block';
+  $('b_status').className='status warn';
+  $('b_status').textContent='Введите новую цену и дату, затем нажмите «Применить».';
+  $('b_sql').textContent='';
+}
+function B_render(){
+  const tb = $('b_table').querySelector('tbody'); tb.innerHTML='';
+  B_state.rows.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML = `<td>${r.sku}</td><td>${fmt(r.price)}</td><td>${r.from}</td><td>${r.to||''}</td><td>${r.current?'Да':''}</td>`;
+    tb.appendChild(tr);
+  });
+}
+function B_apply(){
+  const price = parseFloat(($('b_price').value||'').replace(',','.'));
+  const newFrom = $('b_from').value;
+  const st = $('b_status'); st.style.display='block';
+  const errs=[];
+  if(!(price>0)) errs.push('Укажите положительную цену.');
+  if(!newFrom) errs.push('Укажите дату вступления.');
+  if(newFrom && newFrom < '2025-08-01') errs.push('Дата не может быть раньше 2025-08-01.');
+  if(errs.length){ st.className='status bad'; st.innerHTML='❌ '+errs.join('<br>'); return; }
+
+  const current = B_state.rows.find(r=>r.current);
+  const prevTo = dateAdd(newFrom, -1);
+  current.to = prevTo; current.current=false;
+
+  B_state.rows.push({ sku:'SMM-BASE', price:price, from:newFrom, to:null, current:true });
+
+  const overlaps = hasOverlaps(B_state.rows);
+  const currentCount = B_state.rows.filter(r=>r.current).length;
+
+  B_render();
+
+  $('b_sql').textContent =
+`-- Закрыть старую запись и открыть новую
+BEGIN;
+  UPDATE price
+     SET valid_to = DATE '${prevTo}', is_current = FALSE
+   WHERE sku = 'SMM-BASE' AND is_current = TRUE;
+
+  INSERT INTO price (sku, price, valid_from, valid_to, is_current)
+  VALUES ('SMM-BASE', ${price.toFixed(2)}, DATE '${newFrom}', NULL, TRUE);
+COMMIT;`;
+
+  if(overlaps){ st.className='status bad'; st.textContent='❌ Перекрытие периодов. Проверьте даты «по дату».';
+  } else if(currentCount!==1){ st.className='status bad'; st.textContent='❌ «Текущая» запись должна быть ровно одна.';
+  } else { st.className='status ok'; st.textContent='✅ Готово: периоды не перекрываются, текущая запись одна.'; }
+}
+function B_reset(){ $('b_price').value=''; $('b_from').value=''; B_init(); }
+function hasOverlaps(rows){
+  const arr = rows.map(x=>({from:new Date(x.from), to: x.to? new Date(x.to): null})).sort((a,b)=>a.from-b.from);
+  for(let i=1;i<arr.length;i++){
+    const prev=arr[i-1], cur=arr[i];
+    if(prev.to===null) return true;          // предыдущая не закрыта — перекрытие
+    if(prev.to >= cur.from) return true;     // даты соприкасаются некорректно/перекрываются
+  }
+  return false;
+}
+function dateAdd(dateStr, days){ const d=new Date(dateStr); d.setDate(d.getDate()+days); return d.toISOString().slice(0,10); }
+function fmt(n){ return new Intl.NumberFormat('ru-RU').format(n)+' ₽'; }
+B_init();
+
+/* ===== Задание В ===== */
+let C_gate = true; // активен
+function C_stop(){
+  C_gate = false;
+  $('c_gate').textContent = 'СТОП (до проверки)';
+  $('c_gate_hint').textContent = 'выполните проверки и нажмите «Проверить и включить платежи»';
+  const s = $('c_status'); s.style.display='block'; s.className='status warn'; s.innerHTML='⏸️ Платежи остановлены. Выполните все проверки.';
+}
+function C_check(){
+  const ok = $('c_letter').checked && $('c_bank').checked && $('c_call').checked && $('c_power').checked && $('c_log').checked && $('c_text').value.trim().length>20;
+  const s = $('c_status'); s.style.display='block';
+  if(!ok){
+    s.className='status bad';
+    s.innerHTML='❌ Не все шаги выполнены. Нужны: письмо на бланке, подтверждение банка, независимый звонок, проверка полномочий, запись в журнале и заполненный черновик.';
+    return;
+  }
+  C_gate = true;
+  $('c_gate').textContent='АКТИВЕН';
+  $('c_gate_hint').textContent='платежи включены';
+  s.className='status ok';
+  s.innerHTML='✅ Проверка пройдена. Платежи включены. Сделайте контрольную сверку первой оплаты.';
+  const log = {
+    id: 'ZI-'+todayISO().replaceAll('-','')+'-'+Math.random().toString(36).slice(2,6),
+    сценарий: 'смена_реквизитов',
+    проверки: {письмо:true, подтверждение_банка:true, обратный_звонок:true, полномочия:true, журнал:true},
+    запись: $('c_text').value.trim(),
+    время: new Date().toLocaleString('ru-RU')
+  };
+  $('c_logbox').textContent = JSON.stringify(log, null, 2);
+}
+</script>
+</body>
+</html>
+
