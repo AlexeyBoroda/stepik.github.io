@@ -10,18 +10,15 @@
     --card:#ffffff; --border:#e2e8f0; --shadow:0 10px 28px rgba(0,0,0,.08);
     --accent:#e11d48; --accent2:#2563eb; --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
     --radius:16px; --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
-    --mono:ui-monospace,Menlo,Consolas,monospace;
   }
   body{margin:0;background:#ffffff;color:#0f172a;font:16px/1.6 var(--sans)}
   a{color:var(--accent2);text-decoration:none}
   a:hover{text-decoration:underline}
   h1,h2,h3{line-height:1.25;margin:1.1em 0 .5em}
   .wrap{max-width:1200px;margin:0 auto;padding:22px}
-  .grid{display:grid;grid-template-columns:1fr;gap:16px}
-  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
-  .lead{color:var(--muted)}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:16px}
   .toolbar{display:flex;gap:10px;flex-wrap:wrap}
-  .btn{border:1px solid var(--border);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer}
+  .btn{border:1px solid var(--border);background:var(--card);padding:8px 12px;border-radius:10px;cursor:pointer}
   .btn-accent{background:var(--accent);color:#fff;border-color:transparent}
   .muted{color:var(--muted)}
   .kpi{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
@@ -48,13 +45,13 @@
 </style>
 </head>
 <body>
-<div class="wrap grid">
+<div class="wrap">
 
 <header class="card">
   <h1>Интерактивный чек-лист проверки контрагента</h1>
-  <p class="lead">Введите данные компании, пройдите пункты проверки и получите итоговый рейтинг с рекомендациями.</p>
+  <p class="muted">Введите данные компании и заполните чек-лист. Итоговая записка и рейтинг формируются автоматически.</p>
 
-  <!-- 🔹 Поля реквизитов -->
+  <!-- 🔹 Реквизиты -->
   <div class="toolbar" style="flex-direction:column;align-items:flex-start;gap:8px;margin-bottom:12px">
     <label>Название компании:
       <input id="compName" type="text" placeholder="ООО «Пример»" style="width:300px" />
@@ -93,9 +90,7 @@
   <div class="table-wrap">
     <table id="tbl">
       <thead>
-        <tr>
-          <th>#</th><th>Пункт</th><th>Оценка</th><th>Вес</th><th>Готово</th><th>Примечание</th>
-        </tr>
+        <tr><th>#</th><th>Пункт</th><th>Оценка</th><th>Вес</th><th>Готово</th><th>Примечание</th></tr>
       </thead>
       <tbody id="tbody"></tbody>
     </table>
@@ -104,28 +99,32 @@
 
 <section class="card">
   <h2>Итоговая записка</h2>
-  <textarea id="summary" rows="10"></textarea>
+  <textarea id="summary" rows="12"></textarea>
   <div class="toolbar"><button class="btn btn-accent" id="buildSummary">Собрать</button></div>
 </section>
 
-<footer class="card"><div class="muted">© Учебный модуль. Белый фон, версия с реквизитами компании.</div></footer>
+<footer class="card"><div class="muted">© Учебный модуль. Версия с реквизитами и белым фоном.</div></footer>
 
 </div>
 
 <script>
-const CONFIG=[{id:"1",text:"Компания зарегистрирована и действует",w:10},
-              {id:"2",text:"Адрес не массовый, сведения достоверны",w:10},
-              {id:"3",text:"Налоговые долги отсутствуют",w:10},
-              {id:"4",text:"Есть бухгалтерская отчетность (ГИР БО)",w:10},
-              {id:"5",text:"Нет судебных споров и ИП",w:10},
-              {id:"6",text:"Нет процедур банкротства",w:10},
-              {id:"7",text:"Лицензии и СРО действуют (если нужны)",w:10},
-              {id:"8",text:"Структура собственников прозрачна",w:10},
-              {id:"9",text:"Репутация положительная",w:10},
-              {id:"10",text:"Нет санкционных рисков",w:10}];
+const CONFIG=[
+  {id:"1",text:"Компания зарегистрирована (ЕГРЮЛ)",w:8},
+  {id:"2",text:"Адрес не массовый, сведения достоверны",w:7},
+  {id:"3",text:"Руководитель/подпись подтверждены",w:5},
+  {id:"4",text:"Нет налоговых долгов (ФНС)",w:8},
+  {id:"5",text:"Есть отчётность в ГИР БО",w:8},
+  {id:"6",text:"Финансовые показатели устойчивы",w:10},
+  {id:"7",text:"Судебные споры не критичны",w:8},
+  {id:"8",text:"Нет ИП и банкротства",w:8},
+  {id:"9",text:"Лицензии/СРО действуют",w:7},
+  {id:"10",text:"Структура собственников прозрачна",w:6},
+  {id:"11",text:"Репутация положительная",w:7},
+  {id:"12",text:"Нет санкционных рисков",w:8}
+];
 
 function render(){
-  const tb=document.getElementById('tbody');tb.innerHTML="";
+  const tb=document.getElementById("tbody");tb.innerHTML="";
   CONFIG.forEach((p,i)=>{
     const tr=document.createElement("tr");
     tr.dataset.id=p.id;
@@ -146,7 +145,7 @@ function render(){
   });
   document.getElementById("total").textContent=CONFIG.length;
 }
-function coef(val){if(val==="ok")return 1;if(val==="risk")return 0.5;if(val==="bad")return 0;return 0;}
+function coef(v){if(v==="ok")return 1;if(v==="risk")return 0.5;if(v==="bad")return 0;return 0;}
 function grade(s){if(s>=85)return"A";if(s>=70)return"B";if(s>=50)return"C";return"D";}
 function calc(){
   let score=0,done=0;
