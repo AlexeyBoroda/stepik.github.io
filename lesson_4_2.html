@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Практика — Сканер контрагента: распознать «однодневку»</title>
+<meta name="color-scheme" content="light only">
+<style>
+  :root{
+    --bg:#ffffff; --text:#0f1c3f; --muted:#606b86; --soft:#f4f6fa; --card:#ffffff; --accent:#d31f2b;
+    --ok:#1f8f4e; --warn:#c77800; --bad:#a00017; --border:#e6e9ef;
+    --shadow:0 10px 24px rgba(15,28,63,.06), 0 2px 6px rgba(15,28,63,.05);
+    --radius:18px;
+  }
+  html,body{margin:0;background:var(--bg);color:var(--text);font:16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+  .wrap{max-width:1160px;margin:0 auto;padding:28px 18px 80px}
+  h1{font-size:28px;margin:0 0 8px}
+  h2{font-size:22px;margin:0 0 10px}
+  h3{font-size:18px;margin:12px 0 8px}
+  p{margin:8px 0}
+  .hero{background:linear-gradient(180deg,#fff,#fafbfd);border:1px solid var(--border);border-radius:24px;padding:24px;box-shadow:var(--shadow)}
+  .badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .badge{font-size:13px;color:var(--muted);background:var(--soft);border:1px solid var(--border);border-radius:999px;padding:5px 10px}
+  .grid{display:grid;gap:18px}
+  @media (min-width:900px){ .cols-2{grid-template-columns:1fr 1fr} .cols-3{grid-template-columns:repeat(3,1fr)} }
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+  .soft{background:var(--soft);border:1px dashed var(--border)}
+  .note{color:var(--muted);font-size:14px}
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  button{appearance:none;border:1px solid var(--border);background:#fff;border-radius:12px;padding:10px 14px;font-weight:650;cursor:pointer;transition:.2s}
+  button:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+  .btn-accent{background:var(--accent);color:#fff;border-color:transparent}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:var(--soft);font-size:13px;color:var(--muted);margin:4px 6px 0 0}
+  .pill.bad{background:#fff1f3;border-color:#ffd7de;color:var(--bad)}
+  .pill.warn{background:#fff7ea;border-color:#ffe3bd;color:var(--warn)}
+  .pill.ok{background:#eef9f3;border-color:#dff1e7;color:var(--ok)}
+  .pair{display:flex;gap:10px;align-items:center}
+  .kv{display:grid;grid-template-columns:140px 1fr;gap:6px}
+  .kv b{color:#253163}
+  .flag{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:12px;border:1px dashed var(--border);background:#fff;margin:8px 0}
+  .chip{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:#fff;font-size:13px}
+  /* риск-метр */
+  .risk{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;margin-top:6px}
+  .bar{height:12px;border-radius:999px;background:#edf0f6;position:relative;overflow:hidden;border:1px solid var(--border)}
+  .needle{position:absolute;left:0;top:0;height:100%;width:0;background:linear-gradient(90deg,#15a24a,#ffc400,#ff5a67)}
+  .risk .score{font-weight:800}
+  /* чек-лист */
+  .checklist{display:grid;gap:10px}
+  .check{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:flex-start;border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff}
+  .check input[type="checkbox"]{transform:scale(1.15);margin-top:4px}
+  .weight{font-size:12px;color:var(--muted)}
+  /* drag & drop */
+  .dnd{display:grid;gap:10px}
+  .dnd-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .drag-items,.drop-zones{display:grid;gap:10px}
+  .drag{padding:10px;border:1px solid var(--border);border-radius:12px;background:#fff;cursor:grab;user-select:none}
+  .zone{min-height:58px;border:2px dashed #cbd3e3;border-radius:12px;padding:10px;background:#fbfcff}
+  .zone.filled{border-color:#a3b0cc;background:#f2f5fb}
+  .zone h4{margin:0 0 6px;font-size:14px;color:#334}
+  .drag.correct{background:#eef9f3;border-color:#dff1e7}
+  .drag.wrong{background:#fff1f3;border-color:#ffd7de}
+  .sr-only{position:absolute !important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px)}
+  /* отчёт */
+  textarea.report{width:100%;min-height:160px;border:1px solid var(--border);border-radius:12px;padding:12px;font-family:ui-monospace,Consolas,monospace}
+  .status{font-size:13px;color:var(--muted)}
+  /* печать */
+  @media print{button{display:none !important} .card{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <section class="hero">
+    <h1>Практика: 🎯 Сканер контрагента — распознать «однодневку»</h1>
+    <p>Вы разберёте карточку компании, отметите «красные флаги», сопоставите факты с источниками проверки и сформируете решение: ✅ сотрудничать · ⚠️ с предохранителями · ⛔ отказаться.</p>
+    <div class="badges">
+      <span class="badge">⏱ 20–30 мин</span>
+      <span class="badge">🧪 Активности: кейс + чек-лист + dnd</span>
+      <span class="badge">💾 Прогресс сохраняется</span>
+    </div>
+    <div class="toolbar">
+      <button class="btn-accent" id="btnNew">🔄 Сгенерировать новый кейс</button>
+      <button id="btnReset">♻️ Сбросить прогресс</button>
+      <button id="btnPrint">🖨️ Печать / PDF</button>
+    </div>
+  </section>
+
+  <!-- АКТИВНОСТЬ 1: Карточка контрагента -->
+  <section class="card" id="caseCard" aria-labelledby="caseTitle">
+    <h2 id="caseTitle">1) 🧩 Кейс: изучите карточку контрагента</h2>
+    <div id="caseBody" class="grid cols-2">
+      <!-- левая колонка — профиль -->
+      <div class="soft" style="border-radius:14px;padding:14px">
+        <h3>📇 Профиль</h3>
+        <div class="kv"><b>Название:</b><div id="c_name">—</div></div>
+        <div class="kv"><b>ИНН / ОГРН:</b><div id="c_ids">—</div></div>
+        <div class="kv"><b>Возраст:</b><div id="c_age">—</div></div>
+        <div class="kv"><b>Адрес:</b><div id="c_addr">—</div></div>
+        <div class="kv"><b>Директор:</b><div id="c_ceo">—</div></div>
+        <div class="kv"><b>Учредители:</b><div id="c_owners">—</div></div>
+        <div class="kv"><b>ОКВЭД:</b><div id="c_okved">—</div></div>
+        <div class="kv"><b>Сотрудники:</b><div id="c_staff">—</div></div>
+      </div>
+      <!-- правая колонка — операции/налоги -->
+      <div class="soft" style="border-radius:14px;padding:14px">
+        <h3>📊 Операции и налоги</h3>
+        <div class="kv"><b>Обороты:</b><div id="c_turn">—</div></div>
+        <div class="kv"><b>Налоги/оборот:</b><div id="c_tax">—</div></div>
+        <div class="kv"><b>Обнал/наличка:</b><div id="c_cash">—</div></div>
+        <div class="kv"><b>Транзиты:</b><div id="c_transit">—</div></div>
+        <div class="kv"><b>Суды:</b><div id="c_courts">—</div></div>
+        <div class="kv"><b>Сайт/след:</b><div id="c_web">—</div></div>
+        <div class="kv"><b>Примечания:</b><div id="c_notes">—</div></div>
+      </div>
+    </div>
+    <p class="note">Подсказка: мысленно сопоставьте данные с открытыми источниками (ФНС «Прозрачный бизнес», ГИР БО, Rusprofile, КАД «Арбитр», сервис ЦБ «Знай своего клиента»).</p>
+  </section>
+
+  <!-- АКТИВНОСТЬ 2: Чек-лист с весами и рискометром -->
+  <section class="card" id="checklistCard" aria-labelledby="chkTitle">
+    <h2 id="chkTitle">2) ✅ Чек-лист «красных флагов» (оцените по кейсу)</h2>
+    <div class="risk" aria-live="polite">
+      <div class="score" id="riskScore">Риск: 0 / 100</div>
+      <div class="bar"><div class="needle" id="riskNeedle"></div></div>
+    </div>
+    <div class="checklist" id="checklist">
+      <!-- генерируется скриптом -->
+    </div>
+    <p class="note">😎 Подход: учитываем не один признак, а совокупность. Вес — значимость индикатора (чем выше, тем «краснее»).</p>
+  </section>
+
+  <!-- АКТИВНОСТЬ 3: DnD сопоставление -->
+  <section class="card" id="dndCard" aria-labelledby="dndTitle">
+    <h2 id="dndTitle">3) 🧠 Сопоставьте факт ↔ источник проверки (перетащите)</h2>
+    <div class="dnd">
+      <div class="dnd-row">
+        <div class="drag-items" id="dragItems" aria-label="Факты для проверки">
+          <!-- drag items -->
+        </div>
+        <div class="drop-zones" id="dropZones" aria-label="Источники проверки">
+          <!-- drop zones -->
+        </div>
+      </div>
+      <div class="toolbar">
+        <button id="btnCheckDnD" class="btn-accent">✔️ Проверить сопоставление</button>
+        <span class="status" id="dndStatus" role="status" aria-live="polite"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Результат и отчет -->
+  <section class="card" id="reportCard" aria-labelledby="repTitle">
+    <h2 id="repTitle">4) 📝 Итог: решение и рекомендации</h2>
+    <div class="pair">
+      <div id="decisionPills"></div>
+    </div>
+    <h3>Сформированный мини-отчёт</h3>
+    <textarea class="report" id="reportText" spellcheck="false"></textarea>
+    <div class="toolbar">
+      <button id="btnCopy">📋 Скопировать отчёт</button>
+      <span class="status" id="copyStatus">Вы также можете выделить текст вручную и нажать Ctrl/Cmd+C.</span>
+    </div>
+  </section>
+
+  <section class="card soft">
+    <h2>🔗 Полезно для практики</h2>
+    <p class="note">🌐 ФНС «Прозрачный бизнес» · ГИР БО · Rusprofile · КАД «Арбитр» · ГАС «Правосудие» · ЦБ «Знай своего клиента» — проверьте по реальным кейсам своих поставщиков.</p>
+  </section>
+</div>
+
+<script>
+/* ==========
+   ДАННЫЕ КЕЙСОВ
+   ========== */
+const CASES = [
+  {
+    name: "ООО «Интегро Маркет»",
+    ids: "ИНН 7712••• / ОГРН 1.2 млн серия",
+    age: "8 месяцев (рег. — недавно)",
+    addr: "г. Москва, ул. Примерная, д.5 — адрес в коворкинге (массовый)",
+    ceo: "Иванов С.В. (рук. в 22 компаниях)",
+    owners: "Два физлица, по 50%",
+    okved: "62.01, 73.11, 73.20 — IT + маркетинг",
+    staff: "1–2 чел., ФОТ минимальный",
+    turn: "Обороты высокие (20–30 млн/мес.)",
+    tax: "Налоги/оборот ~0,4%",
+    cash: "Регулярные снятия наличных",
+    transit: "Есть «поступило → сразу ушло»",
+    courts: "Спор по взысканию 1,8 млн (КАД)",
+    web: "Сайт-визитка, кейсы не подтверждаются",
+    notes: "Платёж «за логистику», хотя ОКВЭД — IT/маркетинг",
+    // подсказки для чек-листа
+    hints: ["mass_addr","mass_ceo","low_tax","cash","transit","mismatch","young","no_staff"]
+  },
+  {
+    name: "ООО «СкладПоставка»",
+    ids: "ИНН 7810••• / ОГРН 1.1 млн серия",
+    age: "3 года",
+    addr: "СПб, пр. Логистический, 10 — склад 3PL (не массовый)",
+    ceo: "Петров А.Н. (1–2 юрлица)",
+    owners: "Один учредитель",
+    okved: "46.49 — оптовая торговля",
+    staff: "15–20 чел., ФОТ соразмерен",
+    turn: "Обороты стабильные (5–7 млн/мес.)",
+    tax: "Налоги/оборот ~1,4%",
+    cash: "Нал не используется",
+    transit: "Транзитов не наблюдается",
+    courts: "Текущих споров нет",
+    web: "Сайт, фото склада, контакты, отзывы",
+    notes: "Документы предоставляются заранее",
+    hints: []
+  },
+  {
+    name: "ООО «Альфа-Сервис»",
+    ids: "ИНН 5408••• / ОГРН 1.0 млн серия",
+    age: "1 год и 2 месяца",
+    addr: "Новосибирск, ул. Центральная, 12 — офис (массовый)",
+    ceo: "Смирнов Д.А. (рук. в 18 компаниях)",
+    owners: "Физлицо 100%",
+    okved: "43.29 — прочие строительные работы",
+    staff: "Нет НДФЛ/взносов",
+    turn: "Обороты скачкообразные (до 12 млн/мес.)",
+    tax: "Налоги/оборот ~0,6%",
+    cash: "Крупные снятия после зачислений",
+    transit: "«Получил-перевёл» на услуги маркетинга",
+    courts: "Есть дело о фиктивности сделки",
+    web: "Сайта нет",
+    notes: "Назначения платежей не соответствуют договору",
+    hints: ["mass_addr","mass_ceo","no_staff","low_tax","cash","transit","mismatch","spory"]
+  },
+  {
+    name: "ООО «Бета-Тех»",
+    ids: "ИНН 5032••• / ОГРН 1.3 млн серия",
+    age: "6 лет",
+    addr: "г. Тула, промзона — собственное помещение",
+    ceo: "Орлова М.В. (1 юрлицо)",
+    owners: "2 учредителя",
+    okved: "28.99 — производство оборудования",
+    staff: "40+ чел., ФОТ высокий",
+    turn: "Обороты предсказуемые",
+    tax: "Налоги/оборот ~2,2%",
+    cash: "Нал — только под хозяйственные нужды по отчётам",
+    transit: "Нет транзитов",
+    courts: "Плановые споры (не критично)",
+    web: "Сайт, кейсы, сертификаты",
+    notes: "Полный комплект первички",
+    hints: []
+  }
+];
+
+// чек-лист: ключ, текст, вес
+const CHECKS = [
+  {key:"mass_addr", text:"🏢 Массовый адрес регистрации / нет подтверждённого офиса", weight:12},
+  {key:"mass_ceo", text:"🧑‍💼 Директор/учредитель в десятках фирм / частая ротация", weight:12},
+  {key:"young", text:"🆕 Короткий срок существования (≤ 1–2 лет)", weight:6},
+  {key:"no_staff", text:"👥 Отсутствие сотрудников (НДФЛ/взносы не видны)", weight:10},
+  {key:"low_tax", text:"📉 Аномально низкая налоговая нагрузка (~< 0,9% при крупных оборотах)", weight:12},
+  {key:"cash", text:"💸 Чрезмерное обналичивание / крупные снятия без первички", weight:10},
+  {key:"transit", text:"🔁 Транзитные операции «поступило → сразу ушло»", weight:12},
+  {key:"mismatch", text:"🧭 Несоответствие платежей ОКВЭД/договору; странные назначения", weight:10},
+  {key:"spory", text:"⚖️ Судебные дела о фиктивности / банкротстве", weight:8},
+  {key:"no_web", text:"🌐 Нет сайта/кейсов/цифрового следа", weight:6},
+];
+
+const DND_SOURCES = [
+  {id:"pb", label:"ФНС «Прозрачный бизнес» (ЕГРЮЛ/ЕГРИП, массовые адреса)", accepts:["mass_addr","young","no_staff"]},
+  {id:"bo", label:"ГИР БО (бухотчётность, аудиторские заключения)", accepts:["low_tax"]},
+  {id:"rp", label:"Rusprofile (связи, массовое руководство)", accepts:["mass_ceo"]},
+  {id:"kad", label:"КАД «Арбитр» / ГАС «Правосудие» (суды)", accepts:["spory"]},
+  {id:"web", label:"Официальный сайт/цифровой след", accepts:["no_web","mismatch"]},
+  {id:"logic", label:"Логика операций/первичка (договоры, ТЗ, акты)", accepts:["transit","cash","mismatch"]},
+];
+
+const DND_FACTS = [
+  {key:"mass_addr", text:"🏢 Массовый адрес / коворкинг без подтверждения"},
+  {key:"mass_ceo", text:"🧑‍💼 Директор одновременно в 20+ фирмах"},
+  {key:"low_tax", text:"📉 Налоги/оборот ~0,4–0,6% при крупных оборотах"},
+  {key:"transit", text:"🔁 «Поступило → сразу ушло» (цепочки)"},
+  {key:"cash", text:"💸 Крупные снятия наличных без первички"},
+  {key:"spory", text:"⚖️ Спор о фиктивности / взыскания миллионы"},
+  {key:"mismatch", text:"🧭 Платёж «за логистику» при ОКВЭД IT/маркетинг"},
+  {key:"no_staff", text:"👥 Нет НДФЛ/взносов (штат не просматривается)"},
+  {key:"young", text:"🆕 Компания зарегистрирована недавно"},
+  {key:"no_web", text:"🌐 Сайта/кейсов нет"},
+];
+
+/* ==========
+   СОСТОЯНИЕ + УТИЛИТЫ
+   ========== */
+const LS_KEY = "odnd_practice_v1";
+let state = {
+  caseIndex: 0,
+  checks: {},      // {key: boolean}
+  dnd: {},         // {factKey: sourceId}
+};
+
+function saveState(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+function loadState(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){ state = {...state, ...JSON.parse(raw)}; }
+  }catch(e){}
+}
+function resetState(){
+  state = { caseIndex: 0, checks:{}, dnd:{} };
+  saveState();
+}
+
+/* ==========
+   ИНИЦИАЛИЗАЦИЯ UI
+   ========== */
+const el = (sel) => document.querySelector(sel);
+const els = (sel) => Array.from(document.querySelectorAll(sel));
+
+function renderCase(){
+  const c = CASES[state.caseIndex];
+  el("#c_name").textContent = c.name;
+  el("#c_ids").textContent = c.ids;
+  el("#c_age").textContent = c.age;
+  el("#c_addr").textContent = c.addr;
+  el("#c_ceo").textContent = c.ceo;
+  el("#c_owners").textContent = c.owners;
+  el("#c_okved").textContent = c.okved;
+  el("#c_staff").textContent = c.staff;
+  el("#c_turn").textContent = c.turn;
+  el("#c_tax").textContent = c.tax;
+  el("#c_cash").textContent = c.cash;
+  el("#c_transit").textContent = c.transit;
+  el("#c_courts").textContent = c.courts;
+  el("#c_web").textContent = c.web;
+  el("#c_notes").textContent = c.notes;
+}
+
+function renderChecklist(){
+  const box = el("#checklist");
+  box.innerHTML = "";
+  CHECKS.forEach(ch=>{
+    const row = document.createElement("div");
+    row.className = "check";
+    const input = document.createElement("input");
+    input.type="checkbox"; input.id="chk_"+ch.key; input.checked = !!state.checks[ch.key];
+    input.addEventListener("change", ()=>{
+      state.checks[ch.key] = input.checked;
+      saveState();
+      updateRisk();
+      buildReport();
+    });
+    const label = document.createElement("label");
+    label.setAttribute("for", input.id);
+    label.textContent = ch.text;
+    const weight = document.createElement("div");
+    weight.className="weight";
+    weight.textContent = `вес: +${ch.weight}`;
+    row.appendChild(input); row.appendChild(label); row.appendChild(weight);
+    box.appendChild(row);
+  });
+
+  // авто-подстановка подсказок из кейса (не отмечаем, только подсветка советом)
+  const hints = new Set(CASES[state.caseIndex].hints);
+  CHECKS.forEach(ch=>{
+    if(hints.has(ch.key)){
+      const label = el(`#chk_${ch.key} + label`);
+      if(label) label.innerHTML += ' <span class="pill warn">🛈 подсказка из кейса</span>';
+    }
+  });
+
+  updateRisk();
+}
+
+function calcRisk(){
+  let sum = 0;
+  for(const ch of CHECKS){ if(state.checks[ch.key]) sum += ch.weight; }
+  return Math.max(0, Math.min(100, sum));
+}
+
+function updateRisk(){
+  const score = calcRisk();
+  el("#riskScore").textContent = `Риск: ${score} / 100`;
+  el("#riskNeedle").style.width = score + "%";
+  buildDecision(score);
+}
+
+function buildDecision(score){
+  const wrap = el("#decisionPills");
+  wrap.innerHTML = "";
+  let decision = "—";
+  let pill = document.createElement("div");
+  pill.className = "pill";
+  if(score <= 25){
+    pill.classList.add("ok");
+    pill.textContent = "✅ Решение: сотрудничать (низкий риск)";
+    decision = "✅ Сотрудничать";
+  }else if(score <= 55){
+    pill.classList.add("warn");
+    pill.textContent = "⚠️ Решение: сотрудничать с предохранителями";
+    decision = "⚠️ С предохранителями";
+  }else{
+    pill.classList.add("bad");
+    pill.textContent = "⛔ Решение: отказаться / перенести до доп.проверки";
+    decision = "⛔ Отказ/перенос";
+  }
+  wrap.appendChild(pill);
+  wrap.dataset.decision = decision;
+}
+
+/* Drag & Drop */
+function renderDnD(){
+  const dragBox = el("#dragItems");
+  const zoneBox = el("#dropZones");
+  dragBox.innerHTML = ""; zoneBox.innerHTML = "";
+
+  // факты
+  DND_FACTS.forEach(f=>{
+    const d = document.createElement("div");
+    d.className = "drag";
+    d.textContent = f.text;
+    d.setAttribute("draggable","true");
+    d.dataset.key = f.key;
+    d.addEventListener("dragstart", onDragStart);
+    d.addEventListener("dragend", onDragEnd);
+    dragBox.appendChild(d);
+  });
+
+  // зоны
+  DND_SOURCES.forEach(s=>{
+    const z = document.createElement("div");
+    z.className = "zone";
+    z.dataset.source = s.id;
+    z.innerHTML = `<h4>📌 ${s.label}</h4><div class="drop-here note">перетащите факты сюда</div>`;
+    z.addEventListener("dragover", e=>{ e.preventDefault(); });
+    z.addEventListener("drop", onDrop);
+    zoneBox.appendChild(z);
+  });
+
+  // восстановление
+  for(const [fact, src] of Object.entries(state.dnd||{})){
+    const factEl = dragBox.querySelector(`.drag[data-key="${fact}"]`);
+    const zone = zoneBox.querySelector(`.zone[data-source="${src}"]`);
+    if(factEl && zone){ zone.appendChild(factEl); zone.classList.add("filled"); }
+  }
+}
+
+let dragEl = null;
+function onDragStart(e){ dragEl = e.target; e.dataTransfer.setData("text/plain", dragEl.dataset.key); }
+function onDragEnd(){ dragEl = null; }
+function onDrop(e){
+  e.preventDefault();
+  const key = e.dataTransfer.getData("text/plain");
+  const zone = e.currentTarget;
+  if(!key) return;
+  const item = document.querySelector(`.drag[data-key="${key}"]`);
+  if(item){
+    zone.appendChild(item);
+    zone.classList.add("filled");
+    state.dnd[key] = zone.dataset.source;
+    saveState();
+  }
+}
+
+function checkDnD(){
+  // маркируем правильность
+  els(".drag").forEach(d => { d.classList.remove("correct","wrong"); });
+  let ok = 0, total = 0;
+  for(const f of DND_FACTS){
+    total++;
+    const src = state.dnd[f.key];
+    const found = DND_SOURCES.find(s=>s.id===src);
+    if(found && found.accepts.includes(f.key)){ ok++; markDrag(f.key,true); } else { markDrag(f.key,false); }
+  }
+  const status = el("#dndStatus");
+  status.textContent = `Результат: ${ok} из ${total}`;
+}
+
+function markDrag(key, isOk){
+  const d = document.querySelector(`.drag[data-key="${key}"]`);
+  if(!d) return;
+  d.classList.add(isOk ? "correct" : "wrong");
+}
+
+/* ОТЧЁТ */
+function buildReport(){
+  const c = CASES[state.caseIndex];
+  const score = calcRisk();
+  const decision = el("#decisionPills").dataset.decision || "—";
+  const checked = CHECKS.filter(ch=>state.checks[ch.key]).map(ch=>"• "+ch.text);
+  const dndPairs = Object.entries(state.dnd).map(([fk,src])=>{
+    const fact = DND_FACTS.find(f=>f.key===fk)?.text || fk;
+    const srcL = DND_SOURCES.find(s=>s.id===src)?.label || src;
+    return `• ${fact} → ${srcL}`;
+  }).join("\n");
+  const recs = (()=>{
+    if(score <= 25){
+      return [
+        "✅ Оформить договор/ТЗ/акты заранее",
+        "✅ Синхронизировать назначения платежей с договором",
+        "✅ Периодический мониторинг по ФНС/ГИР БО/Rusprofile"
+      ];
+    }else if(score <= 55){
+      return [
+        "⚠️ Оплата по вехам, акты с доказуемыми метриками",
+        "⚠️ Банковская гарантия/залог при предоплате",
+        "⚠️ Фото/видео подтверждение офиса/склада, проверка персонала",
+        "⚠️ Письменные пояснения экономического смысла нестандартных операций"
+      ];
+    }else{
+      return [
+        "⛔ Отказ / перенос до устранения красных флагов",
+        "⛔ Запрос альтернативного поставщика",
+        "⛔ Провести углублённую проверку: бенефициары, судебка, отчётность"
+      ];
+    }
+  })();
+
+  const txt =
+`🎯 Сканер контрагента — мини-отчёт
+===================================
+Компания: ${c.name}
+ИНН/ОГРН: ${c.ids}
+Возраст/адрес: ${c.age}; ${c.addr}
+Директор/учредители: ${c.ceo}; ${c.owners}
+ОКВЭД: ${c.okved}
+Сотрудники: ${c.staff}
+Операции/налоги: ${c.turn}; налоги/оборот: ${c.tax}
+Нал/транзиты: ${c.cash}; ${c.transit}
+Суды/веб: ${c.courts}; ${c.web}
+Примечания: ${c.notes}
+
+🔎 Отмеченные «красные флаги» (${checked.length} шт.):
+${checked.join("\n") || "—"}
+
+🧠 Сопоставление факт → источник:
+${dndPairs || "—"}
+
+📈 Итоговый риск: ${score} / 100
+🧭 Решение: ${decision}
+
+🛡️ Рекомендации:
+${recs.map(r=>"• "+r).join("\n")}
+`;
+  el("#reportText").value = txt;
+}
+
+function copyReport(){
+  const ta = el("#reportText");
+  ta.select(); ta.setSelectionRange(0, 99999);
+  let ok = false;
+  try{ ok = document.execCommand("copy"); }catch(e){}
+  el("#copyStatus").textContent = ok ? "Скопировано ✔" : "Не удалось скопировать — используйте Ctrl/Cmd+C.";
+}
+
+/* ==========
+   ГЕНЕРАЦИЯ/СБРОС/ПЕЧАТЬ
+   ========== */
+function newCase(random=true){
+  if(random){
+    state.caseIndex = Math.floor(Math.random()*CASES.length);
+  }
+  // авто-предзаполнение логичных флагов под кейс? — не отмечаем; даём студенту решить.
+  saveState();
+  renderCase();
+  renderChecklist();
+  renderDnD();
+  buildReport();
+}
+
+function resetAll(){
+  if(!confirm("Сбросить прогресс?")) return;
+  resetState();
+  newCase(false);
+  // очистка чеков/зон
+  els("#checklist input[type='checkbox']").forEach(i=> i.checked=false);
+  els(".zone").forEach(z=>{ z.innerHTML = z.innerHTML; });
+  updateRisk();
+  buildReport();
+}
+
+function printPage(){ window.print(); }
+
+/* ==========
+   START
+   ========== */
+loadState();
+renderCase();
+renderChecklist();
+renderDnD();
+buildReport();
+updateRisk();
+
+/* если нет сохранённого кейса — сгенерируем */
+if(typeof state.caseIndex !== "number"){ state.caseIndex = 0; saveState(); }
+
+el("#btnNew").addEventListener("click", ()=>{ state.checks={}; state.dnd={}; saveState(); newCase(true); });
+el("#btnReset").addEventListener("click", resetAll);
+el("#btnPrint").addEventListener("click", printPage);
+el("#btnCopy").addEventListener("click", copyReport);
+el("#btnCheckDnD").addEventListener("click", checkDnD);
+</script>
+</body>
+</html>
