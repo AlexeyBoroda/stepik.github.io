@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Практикум: Обновление данных — Прозрачность бизнеса</title>
+<meta name="description" content="Онлайн-задания по обновлению данных: CR-конструктор, SCD Type 2 симулятор, KYC/treasury сценарий." />
+<style>
+  :root{
+    --bg:#ffffff;--fg:#0f172a;--muted:#475569;--line:#e2e8f0;--soft:#f8fafc;
+    --brand:#0ea5e9;--ok:#10b981;--bad:#ef4444;--warn:#f59e0b;
+    --shadow:0 10px 28px rgba(2,6,23,.08);
+    --r:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif}
+  .wrap{max-width:1100px;margin:24px auto;padding:0 20px}
+  h1{font-size:clamp(22px,3.4vw,34px);margin:0 0 10px}
+  .muted{color:var(--muted)}
+  .tabs{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+  .tab{border:1px solid var(--line);border-radius:999px;padding:8px 12px;background:#fff;cursor:pointer}
+  .tab.active{background:linear-gradient(90deg,#0ea5e9,#38bdf8);border-color:#0ea5e9;color:#fff}
+  .card{border:1px solid var(--line);border-radius:var(--r);background:#fff;box-shadow:var(--shadow);padding:18px;margin-bottom:16px}
+  .grid{display:grid;gap:12px}
+  @media(min-width:920px){.cols-2{grid-template-columns:1fr 1fr}.cols-3{grid-template-columns:1fr 1fr 1fr}}
+  label{display:block;margin:6px 0 4px}
+  input[type="text"],input[type="date"],textarea,select{
+    width:100%;border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff
+  }
+  textarea{min-height:100px}
+  .btn{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);
+    border-radius:12px;background:#fff;padding:8px 12px;cursor:pointer}
+  .btn.primary{background:#0ea5e9;color:#fff;border-color:#0ea5e9}
+  .btn.ok{background:#10b981;color:#fff;border-color:#10b981}
+  .btn.warn{background:#f59e0b;color:#fff;border-color:#f59e0b}
+  .kpi{display:flex;gap:12px;flex-wrap:wrap}
+  .kpi .pill{border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:#fff}
+  .status{padding:10px;border-radius:12px;margin-top:10px}
+  .status.ok{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
+  .status.bad{background:#fef2f2;color:#7f1d1d;border:1px solid #fecaca}
+  .status.warn{background:#fff7ed;color:#7c2d12;border:1px solid #fed7aa}
+  .code{background:#0b1020;color:#e6edf3;border-radius:12px;padding:12px;overflow:auto}
+  .table{width:100%;border-collapse:collapse}
+  .table th,.table td{border:1px solid var(--line);padding:8px;background:#fff;vertical-align:top}
+  .table th{background:#f8fafc;text-align:left}
+  .hint{font-size:14px;color:#334155;margin-top:6px}
+  .flex{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .right{margin-left:auto}
+  .small{font-size:13px;color:#64748b}
+  .badge{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 8px;font-size:12px;background:#f1f5f9}
+  .sep{height:1px;background:var(--line);margin:18px 0}
+  .score{font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Практикум: Обновление данных</h1>
+  <p class="muted">Три задания: оформляем CR, тренируем версионирование (SCD Type 2) и отрабатываем смену реквизитов c KYC/treasury-контролями. Прогресс хранится локально.</p>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-target="taskA">A) CR-конструктор</button>
+    <button class="tab" data-target="taskB">B) SCD Type-2 симулятор</button>
+    <button class="tab" data-target="taskC">C) Смена реквизитов (KYC+Treasury)</button>
+  </div>
+
+  <!-- TASK A -->
+  <section id="taskA" class="card">
+    <div class="flex">
+      <h2 style="margin:0">Задание A — Конструктор Change Request (CR)</h2>
+      <span class="badge right">Цель: оформить валидный CR и экспортировать YAML/JSON</span>
+    </div>
+    <div class="grid cols-2" style="margin-top:10px">
+      <div>
+        <label>Инициатор</label><input id="a_initiator" type="text" placeholder="Иванова А.А., закупки" />
+        <label>Сущность</label>
+        <select id="a_entity">
+          <option>Контрагент</option><option>Договор</option><option>Первичка</option><option>Справочник</option><option>Платёж</option>
+        </select>
+        <label>ID сущности</label><input id="a_entity_id" type="text" placeholder="OOO-1234567890 / CTR-45/25 / DOC-25-0001" />
+        <label>Описание изменения</label><textarea id="a_change" placeholder="Что меняем и почему (кратко)..."></textarea>
+      </div>
+      <div>
+        <label>Дата вступления в силу (valid_from)</label><input id="a_valid_from" type="date" />
+        <label>Ссылки на основания (через запятую)</label><input id="a_evidence" type="text" placeholder="/files/letter.pdf, /files/bank_confirm.pdf" />
+        <label>Риск-чек (галочки)</label>
+        <div class="flex">
+          <label><input type="checkbox" id="a_cb_cb"> Callback по известному контакту</label>
+          <label><input type="checkbox" id="a_cb_sign"> Проверена подпись/МЧД</label>
+          <label><input type="checkbox" id="a_cb_docs"> Документы на бланке/выписка банка</label>
+        </div>
+        <div class="flex" style="margin-top:10px">
+          <button class="btn primary" onclick="A_validate()">Проверить CR</button>
+          <button class="btn" onclick="A_export('yaml')">Экспорт YAML</button>
+          <button class="btn" onclick="A_export('json')">Экспорт JSON</button>
+        </div>
+        <div id="a_status" class="status warn" style="display:none"></div>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div>
+      <div class="kpi">
+        <span class="pill">Мин. критерии: valid_from ≥ сегодня; ≥1 evidence; пройден риск-чек</span>
+        <span class="pill">Доп. критерии: entity_id заполнен; описание конкретно; ссылки валидны</span>
+      </div>
+      <p class="small">Подсказка: опишите <em>что меняется</em>, <em>почему</em>, <em>с какой даты</em>; приложите основания. Для смены реквизитов обязательно — двухканальная верификация.</p>
+      <pre id="a_preview" class="code" style="display:none"></pre>
+    </div>
+  </section>
+
+  <!-- TASK B -->
+  <section id="taskB" class="card" style="display:none">
+    <div class="flex">
+      <h2 style="margin:0">Задание B — Симулятор версионирования (SCD Type 2)</h2>
+      <span class="badge right">Цель: корректно закрыть старую версию и открыть новую без перекрытий</span>
+    </div>
+    <p class="muted">Исходные данные: товар <b>SMM-BASE</b>, текущая цена 200 000 ₽, действует «с 2025-08-01 по настоящее время».</p>
+    <div class="grid cols-3">
+      <div class="card">
+        <h3 style="margin-top:0">1) Таблица версий</h3>
+        <table class="table" id="b_table">_
