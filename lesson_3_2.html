@@ -44,6 +44,16 @@
   .row-hint{font-size:12px;color:#64748b;margin-left:6px}
   .badmark{outline:2px solid var(--bad);outline-offset:2px;border-radius:8px}
   .goodmark{outline:2px solid var(--ok);outline-offset:2px;border-radius:8px}
+
+  /* визуальный маркер выполненного задания */
+  section.card{position:relative}
+  section.card.done::after{
+    content:"✔ Отмечено";
+    position:absolute; top:10px; right:12px;
+    background:#10b981; color:#fff; padding:4px 10px;
+    border-radius:999px; font-size:12px; box-shadow:0 6px 16px rgba(16,185,129,.3);
+  }
+  button[disabled]{opacity:.6; cursor:not-allowed}
 </style>
 </head>
 <body>
@@ -320,20 +330,82 @@
 </div>
 
 <script>
-/* ===== Прогресс ===== */
+/* ===== Прогресс (устойчиво к блокировке хранилища) ===== */
 const KEY='pb-upd-practice-v1';
-const state=JSON.parse(localStorage.getItem(KEY)||'{}');
+let state={};
+try{ state=JSON.parse(localStorage.getItem(KEY)||'{}') }catch(e){ state={} }
+
 const tasks=['t1','t2','t3','t4','t5','t6','t7'];
-function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
-function markDone(id){ state[id]=true; save(); updateProgress(); }
+
+function persist(){
+  try{
+    localStorage.setItem(KEY, JSON.stringify(state));
+    return true; // сохранено
+  }catch(e){
+    return false; // хранилище недоступно
+  }
+}
+
+function markDone(id){
+  // 1) логика состояния
+  state[id]=true;
+  const saved = persist();
+
+  // 2) визуальная отметка на карточке
+  const sec = document.getElementById(id);
+  if(sec){ sec.classList.add('done'); }
+
+  // 3) меняем саму кнопку («Отмечено», отключаем)
+  if(sec){
+    const btn = Array.from(sec.querySelectorAll('button')).find(b=>{
+      const h = (b.getAttribute('onclick')||''); return h.includes("markDone(");
+    });
+    if(btn){ btn.disabled=true; btn.classList.add('ok'); btn.textContent='Отмечено'; }
+  }
+
+  // 4) показываем локальный зелёный статус в блоке задания
+  if(sec){
+    let note = sec.querySelector('.js-done-note');
+    if(!note){
+      note = document.createElement('div');
+      note.className='status ok js-done-note';
+      sec.appendChild(note);
+    }
+    note.style.display='block';
+    note.innerHTML = saved
+      ? '✅ Задание отмечено выполненным. Прогресс сохранён.'
+      : '✅ Задание отмечено. ⚠️ Прогресс между визитами может не сохраниться (браузер блокирует хранилище).';
+  }
+
+  // 5) обновляем общий прогресс сверху
+  updateProgress();
+}
+
 function updateProgress(){
   const done = tasks.filter(t=>state[t]).length;
   const pct = Math.round(done/tasks.length*100);
-  const bar=document.getElementById('progressBar'); const txt=document.getElementById('progressText');
-  if(bar) bar.style.width=pct+'%'; if(txt) txt.textContent=pct+'%';
-  tasks.forEach(id=>{ if(state[id]) document.getElementById(id)?.classList.add('done'); });
+  const bar = document.getElementById('progressBar');
+  const txt = document.getElementById('progressText');
+  if(bar) bar.style.width = pct+'%';
+  if(txt) txt.textContent = pct+'%';
+  // визуально подсветим все уже выполненные
+  tasks.forEach(id=>{
+    const sec=document.getElementById(id);
+    if(!sec) return;
+    if(state[id]){
+      sec.classList.add('done');
+      const btn = Array.from(sec.querySelectorAll('button')).find(b=>{
+        const h=(b.getAttribute('onclick')||''); return h.includes("markDone(");
+      });
+      if(btn){ btn.disabled=true; btn.classList.add('ok'); btn.textContent='Отмечено'; }
+    }
+  });
 }
+// вызвать при загрузке
 updateProgress();
+
+/* ===== Хелперы ===== */
+function $(id){ return document.getElementById(id); }
 
 /* ===== Задание 1 ===== */
 function checkT1(){
