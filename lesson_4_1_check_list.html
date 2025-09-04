@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Чек-лист проверки контрагента — интерактивный рейтинг (A–D)</title>
+<meta name="color-scheme" content="light dark" />
+<style>
+  :root{
+    --bg:#ffffff; --fg:#0f172a; --muted:#64748b;
+    --card:#f8fafc; --border:#e2e8f0; --shadow:0 10px 28px rgba(0,0,0,.08);
+    --accent:#e11d48; --accent2:#2563eb; --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
+    --radius:16px; --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+    --mono:ui-monospace,Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --bg:#0b1020; --fg:#e5e7eb; --muted:#9aa4b2; --card:#0f1530; --border:#1f2a44; --shadow:0 10px 28px rgba(0,0,0,.45) }
+  }
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+  a{color:var(--accent2);text-decoration:none} a:hover{text-decoration:underline}
+  h1,h2,h3{line-height:1.25;margin:1.1em 0 .5em}
+  h1{font-size:clamp(26px,3.4vw,38px)}
+  h2{font-size:clamp(20px,2.6vw,26px)} h3{font-size:clamp(18px,2.2vw,22px)}
+  .wrap{max-width:1200px;margin:0 auto;padding:22px}
+  .grid{display:grid;grid-template-columns:1fr;gap:16px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+  .lead{color:var(--muted)}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap}
+  .btn{appearance:none;border:1px solid var(--border);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer}
+  .btn:hover{transform:translateY(-1px)}
+  .btn-accent{background:var(--accent);color:#fff;border-color:transparent}
+  .btn-ghost{background:transparent}
+  .muted{color:var(--muted)}
+  .tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);color:var(--muted)}
+  .kpi{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .kpi .badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:12px;padding:8px 12px;background:rgba(127,127,127,.06)}
+  .score{font:600 24px/1 var(--sans)}
+  .grade{font:700 24px/1 var(--sans)}
+  .grade.A{color:var(--ok)} .grade.B{color:var(--accent2)} .grade.C{color:var(--warn)} .grade.D{color:var(--bad)}
+  .progress{display:flex;align-items:center;gap:10px}
+  .bar{height:10px;background:rgba(127,127,127,.25);border-radius:999px;overflow:hidden;flex:1}
+  .bar>span{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+  .pill{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid var(--border);font-size:12px}
+
+  /* Таблица */
+  .table-wrap{overflow:auto}
+  table{width:100%;border-collapse:separate;border-spacing:0}
+  th,td{border:1px solid var(--border);padding:10px;vertical-align:top}
+  th{position:sticky;top:0;background:var(--card);z-index:1}
+  tr:nth-child(even) td{background:rgba(127,127,127,.04)}
+  textarea,input[type="text"]{
+    width:100%;box-sizing:border-box;background:transparent;color:var(--fg);
+    border:1px solid var(--border);border-radius:8px;padding:8px;font:14px/1.4 var(--sans)
+  }
+  .center{text-align:center}
+
+  /* Сегменты оценки */
+  .seg{display:inline-grid;grid-auto-flow:column;gap:6px}
+  .seg input{display:none}
+  .seg label{
+    user-select:none;cursor:pointer;border:1px solid var(--border);padding:6px 8px;border-radius:999px;background:rgba(127,127,127,.06);font-size:12px
+  }
+  .seg input:checked + label{border-color:transparent;background:linear-gradient(90deg,var(--accent2),var(--accent));color:#fff}
+  .seg label[data-val="ok"]{background:rgba(22,163,74,.12)}
+  .seg label[data-val="risk"]{background:rgba(217,119,6,.12)}
+  .seg label[data-val="bad"]{background:rgba(220,38,38,.12)}
+  .seg input:checked + label[data-val="ok"]{background:var(--ok)}
+  .seg input:checked + label[data-val="risk"]{background:var(--warn)}
+  .seg input:checked + label[data-val="bad"]{background:var(--bad)}
+
+  /* Печать */
+  @media print{
+    .toolbar,.import-export{display:none!important}
+    .card{box-shadow:none;border-color:#ddd;break-inside:avoid}
+    a{text-decoration:underline;color:#000}
+  }
+</style>
+</head>
+<body>
+<div class="wrap grid">
+
+  <header class="card">
+    <h1>Интерактивный чек-лист проверки контрагента</h1>
+    <p class="lead">Проходим по пунктам, отмечаем «Готово», выставляем оценку (OK / Риск / Плохо / Н/П), получаем балл 0–100 и рейтинг A–D с рекомендациями. Все ссылки — на официальные источники.</p>
+    <div class="toolbar" role="group" aria-label="Утилиты">
+      <button class="btn" id="expand">Развернуть детали</button>
+      <button class="btn" id="collapse">Свернуть детали</button>
+      <button class="btn btn-accent" id="print">Печать / PDF</button>
+    </div>
+  </header>
+
+  <section class="card">
+    <h2>Итог по проверке</h2>
+    <div class="kpi">
+      <div class="badge"><span class="muted">Суммарный балл:</span> <span id="score" class="score">0</span>/100</div>
+      <div class="badge"><span class="muted">Рейтинг:</span> <span id="grade" class="grade D">D</span></div>
+      <div class="badge"><span class="muted">Заполнено шагов:</span>
+        <div class="progress" style="min-width:220px">
+          <div class="bar"><span id="bar" style="width:0%"></span></div>
+          <span><span id="done">0</span>/<span id="total">0</span></span>
+        </div>
+      </div>
+      <span class="tag" id="modelTag">Модель: нейтральная</span>
+    </div>
+    <p class="muted">Баллы считаются по весам пунктов (см. «Модель и формулы» в конце). «Н/П» — нет данных / не применимо. В нейтральной модели «Н/П» не влияет на результат; в консервативной — даёт 25% от веса.</p>
+    <div class="toolbar import-export" style="margin-top:8px">
+      <button class="btn" id="toggleModel">Переключить модель (нейтральная ⇄ консервативная)</button>
+      <button class="btn" id="export">Экспорт JSON</button>
+      <label class="btn btn-ghost" for="importFile">Импорт JSON</label>
+      <input id="importFile" type="file" accept="application/json" hidden />
+      <button class="btn" id="reset">Сбросить всё</button>
+    </div>
+  </section>
+
+  <section class="card" id="links">
+    <h2>Быстрые ссылки на источники</h2>
+    <div class="toolbar" style="flex-wrap:wrap">
+      <a class="btn" href="https://egrul.nalog.ru/" target="_blank" rel="noopener">ЕГРЮЛ/ЕГРИП (ФНС)</a>
+      <a class="btn" href="https://pb.nalog.ru/" target="_blank" rel="noopener">Прозрачный бизнес (ФНС)</a>
+      <a class="btn" href="https://bo.nalog.ru/" target="_blank" rel="noopener">Бухгалтерская отчётность (ГИР БО)</a>
+      <a class="btn" href="https://cbr.ru/counteraction_m_ter/platform_zsk/proverka-po-inn/" target="_blank" rel="noopener">«Знай своего клиента» (ЦБ, ЗСК)</a>
+      <a class="btn" href="https://kad.arbitr.ru/" target="_blank" rel="noopener">Арбитраж</a>
+      <a class="btn" href="https://fssp.gov.ru/iss/ip" target="_blank" rel="noopener">ФССП (исп. производства)</a>
+      <a class="btn" href="https://bankrot.fedresurs.ru/" target="_blank" rel="noopener">ЕФРСБ (банкротство)</a>
+      <a class="btn" href="https://www.reestr-zalogov.ru/" target="_blank" rel="noopener">Реестр залогов</a>
+      <a class="btn" href="https://www.rusprofile.ru/" target="_blank" rel="noopener">Rusprofile</a>
+    </div>
+  </section>
+
+  <!-- Таблица чек-листа строится из конфигурации -->
+  <section class="card">
+    <h2>Чек-лист</h2>
+    <p class="muted">Для каждого пункта: отметьте «Готово», выберите оценку, оставьте примечание. Баллы начисляются автоматически.</p>
+    <div class="table-wrap">
+      <table id="tbl">
+        <thead>
+          <tr>
+            <th class="center">#</th>
+            <th>Блок / Пункт</th>
+            <th>Ресурс</th>
+            <th>Оценка</th>
+            <th>Вес</th>
+            <th>Готово</th>
+            <th>Примечание</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <!-- Строки будут вставлены скриптом -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Сводка и рекомендации</h2>
+    <textarea id="summary" rows="10" placeholder="Краткая записка появится после заполнения чек-листа…"></textarea>
+    <div class="toolbar" style="margin-top:8px">
+      <button class="btn" id="buildSummary">Обновить записку</button>
+      <button class="btn btn-accent" id="print2">Печать / PDF</button>
+    </div>
+    <p class="muted">
+      Подсказка: при печати браузер позволяет «Сохранить как PDF». Стили уже оптимизированы для чистой печатной версии.
+    </p>
+  </section>
+
+  <section class="card" id="model">
+    <h2>Модель и формулы (просто)</h2>
+    <ul>
+      <li><strong>Структура:</strong> 6 блоков (=направления проверки), внутри — конкретные пункты. У каждого пункта есть <em>вес</em> (сколько он стоит в баллах).</li>
+      <li><strong>Оценка пункта:</strong>
+        <span class="pill">OK = 100%</span>,
+        <span class="pill">Риск = 50%</span>,
+        <span class="pill">Плохо = 0%</span>,
+        <span class="pill">Н/П = 0% (нейтральная) / 25% (консервативная)</span>.
+      </li>
+      <li><strong>Счёт:</strong> итог = сумма(вес × коэффициент оценки). Максимум = 100.</li>
+      <li><strong>Рейтинг:</strong> A ≥ 85 (низкий риск); B 70–84 (умеренный); C 50–69 (повышенный); D &lt; 50 (высокий).</li>
+      <li><strong>Рекомендации по рейтингу:</strong>
+        <ul>
+          <li><strong>A:</strong> обычные условия; отсрочка оплаты возможна; мониторинг — раз в год.</li>
+          <li><strong>B:</strong> часть цены через аккредитив/гарантию; отсрочка ограничена; мониторинг — раз в полгода.</li>
+          <li><strong>C:</strong> предоплата ≤20% + гарантия; маленькие партии; мониторинг — ежеквартально.</li>
+          <li><strong>D:</strong> либо отказ, либо предоплата 100%/эскроу, жёсткие условия, пилотная партия.</li>
+        </ul>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="card">
+    <div class="muted">© Учебный модуль «Работа с контрагентами». Встроенные данные сохраняются локально (если браузер и iframe позволяют), экспорт/импорт — через JSON-файл. Версия 1.0.</div>
+  </footer>
+
+</div>
+
+<script>
+/* ========= Безопасное локальное хранилище (fallback при жёстком sandbox) ========= */
+const store = (()=>{try{const t='__t__';localStorage.setItem(t,'1');localStorage.removeItem(t);return localStorage}catch(e){return {getItem:()=>null,setItem:()=>{},removeItem:()=>{}}}})();
+
+/* ========= Конфигурация чек-листа и весов =========
+  Сумма весов = 100. Можно менять — расчёт подстроится автоматически.
+*/
+const CONFIG = [
+  {
+    title: "1) Регистрация и полномочия (ЕГРЮЛ)",
+    items: [
+      { id:"1.1", text:"Организация существует, статус действующая", weight:4, link:"https://egrul.nalog.ru/" },
+      { id:"1.2", text:"Адрес не массовый, нет пометки «сведения недостоверны»", weight:3, link:"https://egrul.nalog.ru/" },
+      { id:"1.3", text:"Руководитель и право подписи подтверждены (устав/доверенность)", weight:2, link:"https://egrul.nalog.ru/" },
+      { id:"1.4", text:"ОКВЭД соответствует фактической деятельности", weight:1, link:"https://egrul.nalog.ru/" },
+    ]
+  },
+  {
+    title: "2) Налоги и отчётность (ФНС, ГИР БО)",
+    items: [
+      { id:"2.1", text:"Налоговая дисциплина: долгов нет / пояснения убедительны", weight:8, link:"https://pb.nalog.ru/" },
+      { id:"2.2", text:"Отчётность в ГИР БО: выручка/прибыль адекватны, есть динамика 2–3 года", weight:8, link:"https://bo.nalog.ru/" },
+      { id:"2.3", text:"Есть сотрудники и ЭДО (по данным ФНС)", weight:4, link:"https://pb.nalog.ru/" },
+    ]
+  },
+  {
+    title: "3) Финансовое состояние (смысл)",
+    items: [
+      { id:"3.1", text:"Денежный поток от основной деятельности не отрицательный системно", weight:8, link:"https://bo.nalog.ru/" },
+      { id:"3.2", text:"Долговая нагрузка обслуживаемая (проценты покрываются)", weight:6, link:"https://bo.nalog.ru/" },
+      { id:"3.3", text:"Запасы/дебиторка не «зависают» на длинный срок", weight:6, link:"https://bo.nalog.ru/" },
+    ]
+  },
+  {
+    title: "4) Судебные споры, ИП, банкротство",
+    items: [
+      { id:"4.1", text:"Судебные дела: немного, тематика не критичная", weight:8, link:"https://kad.arbitr.ru/" },
+      { id:"4.2", text:"Исполнительные производства: отсутствуют / незначительные", weight:6, link:"https://fssp.gov.ru/iss/ip" },
+      { id:"4.3", text:"Нет процедур банкротства (компания/группа)", weight:6, link:"https://bankrot.fedresurs.ru/" },
+    ]
+  },
+  {
+    title: "5) Операционные возможности и лицензии",
+    items: [
+      { id:"5.1", text:"Лицензии/СРО/сертификаты в порядке (если требуются)", weight:6, link:"" },
+      { id:"5.2", text:"Персонал, площадки, оборудование соответствуют объёму", weight:5, link:"" },
+      { id:"5.3", text:"Логистика и приёмка: понятные процедуры и документы", weight:4, link:"" },
+    ]
+  },
+  {
+    title: "6) Санкции, бенефициары, репутация",
+    items: [
+      { id:"6.1", text:"Проверка по ЗСК ЦБ: совпадений/рисков нет", weight:6, link:"https://cbr.ru/counteraction_m_ter/platform_zsk/proverka-po-inn/" },
+      { id:"6.2", text:"Бенефициары и структура владения понятны", weight:5, link:"https://egrul.nalog.ru/" },
+      { id:"6.3", text:"Репутация: сайт, отзывы, медиа без системного негатива", weight:4, link:"https://www.rusprofile.ru/" },
+    ]
+  }
+];
+// Контроль: вывести сумму весов
+const TOTAL_WEIGHT = CONFIG.flatMap(s=>s.items).reduce((a,b)=>a+b.weight,0);
+
+/* ========= Состояние и модель ========= */
+const STATE_KEY = "ctr_check_v1";
+let model = { name:"neutral", npFactor:0.0 }; // neutral: Н/П = 0%; conservative: 25%
+
+/* ========= Вспомогательные ========= */
+const $ = (s, root=document) => root.querySelector(s);
+const $$ = (s, root=document) => Array.from(root.querySelectorAll(s));
+
+function saveState(){
+  const rows = $$("#tbody tr");
+  const data = rows.map(tr=>{
+    const id = tr.dataset.id;
+    const grade = tr.querySelector('input[name="g_'+id+'"]:checked')?.value || "na";
+    const done = tr.querySelector('.chb')?.checked || false;
+    const note = tr.querySelector('textarea')?.value || "";
+    return { id, grade, done, note };
+  });
+  const payload = { model:model.name, data };
+  try{ store.setItem(STATE_KEY, JSON.stringify(payload)); }catch(e){}
+}
+function loadState(){
+  try{
+    const raw = store.getItem(STATE_KEY);
+    if(!raw) return;
+    const payload = JSON.parse(raw);
+    if(payload?.model === "conservative"){ setModelConservative(); }
+    payload?.data?.forEach(row=>{
+      const tr = $(`tr[data-id="${row.id}"]`);
+      if(!tr) return;
+      const input = tr.querySelector(`input[name="g_${row.id}"][value="${row.grade}"]`);
+      if(input){ input.checked = true; }
+      const chb = tr.querySelector('.chb'); if(chb) chb.checked = !!row.done;
+      const ta = tr.querySelector('textarea'); if(ta) ta.value = row.note||"";
+    });
+  }catch(e){}
+}
+
+/* ========= Рендер чек-листа ========= */
+function renderTable(){
+  const tbody = $("#tbody");
+  let idx = 0;
+  CONFIG.forEach(section=>{
+    // Строка-заголовок секции
+    const trHead = document.createElement('tr');
+    trHead.innerHTML = `
+      <td class="center">—</td>
+      <td colspan="6"><strong>${section.title}</strong></td>
+    `;
+    tbody.appendChild(trHead);
+
+    section.items.forEach(item=>{
+      idx++;
+      const tr = document.createElement('tr');
+      tr.dataset.id = item.id;
+      tr.innerHTML = `
+        <td class="center">${idx}</td>
+        <td>${item.text}</td>
+        <td>${item.link ? `<a href="${item.link}" target="_blank" rel="noopener">${new URL(item.link).host}</a>` : '<span class="muted">по запросу</span>'}</td>
+        <td>
+          <div class="seg">
+            <input id="ok_${item.id}"   type="radio" name="g_${item.id}" value="ok"><label data-val="ok"   for="ok_${item.id}">OK</label>
+            <input id="risk_${item.id}" type="radio" name="g_${item.id}" value="risk"><label data-val="risk" for="risk_${item.id}">Риск</label>
+            <input id="bad_${item.id}"  type="radio" name="g_${item.id}" value="bad"><label data-val="bad"  for="bad_${item.id}">Плохо</label>
+            <input id="na_${item.id}"   type="radio" name="g_${item.id}" value="na" checked><label for="na_${item.id}">Н/П</label>
+          </div>
+        </td>
+        <td class="center"><span class="pill">${item.weight}</span></td>
+        <td class="center"><input class="chb" type="checkbox" /></td>
+        <td><textarea rows="2" placeholder="Краткий свод/обоснование…"></textarea></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  });
+  // total
+  $("#total").textContent = $$("#tbody tr").filter(tr=>tr.dataset.id).length;
+}
+
+/* ========= Расчёт баллов и рейтинга ========= */
+function coef(val){
+  if(val==="ok") return 1.0;
+  if(val==="risk") return 0.5;
+  if(val==="bad") return 0.0;
+  return model.npFactor; // "na"
+}
+function calc(){
+  let score = 0;
+  let done = 0;
+  CONFIG.forEach(section=>{
+    section.items.forEach(item=>{
+      const v = document.querySelector(`input[name="g_${item.id}"]:checked`)?.value || "na";
+      score += item.weight * coef(v);
+      const isDone = document.querySelector(`tr[data-id="${item.id}"] .chb`)?.checked;
+      if(isDone) done++;
+    });
+  });
+  const totalRows = $$("#tbody tr").filter(tr=>tr.dataset.id).length;
+  $("#done").textContent = done;
+  $("#bar").style.width = (totalRows? Math.round(100*done/totalRows) : 0) + "%";
+  $("#score").textContent = Math.round(score);
+
+  const g = gradeFromScore(score);
+  const gradeEl = $("#grade");
+  gradeEl.textContent = g;
+  gradeEl.className = `grade ${g}`;
+}
+function gradeFromScore(s){
+  if(s>=85) return "A";
+  if(s>=70) return "B";
+  if(s>=50) return "C";
+  return "D";
+}
+function describeGrade(g){
+  return ({
+    "A": "Низкий риск. Работать на стандартных условиях. Отсрочка возможна.",
+    "B": "Умеренный риск. Часть суммы через аккредитив/гарантию. Мониторинг чаще.",
+    "C": "Повышенный риск. Предоплата ≤20% + гарантия. Малые партии.",
+    "D": "Высокий риск. Либо отказ, либо жёсткие условия/эскроу и пилот."
+  })[g] || "";
+}
+
+/* ========= Сводка ========= */
+function buildSummary(){
+  const lines = [];
+  const now = new Date();
+  lines.push(`Итоговая записка по проверке контрагента — ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`);
+  lines.push(`Модель: ${model.name==="neutral"?"нейтральная":"консервативная"}; Балл: ${$("#score").textContent}/100; Рейтинг: ${$("#grade").textContent}`);
+  lines.push(`Комментарий: ${describeGrade($("#grade").textContent)}`);
+  lines.push("");
+
+  CONFIG.forEach(section=>{
+    lines.push(section.title);
+    section.items.forEach(item=>{
+      const v = document.querySelector(`input[name="g_${item.id}"]:checked`)?.value || "na";
+      const note = document.querySelector(`tr[data-id="${item.id}"] textarea`)?.value || "";
+      const mark = ({"ok":"OK","risk":"Риск","bad":"Плохо","na":"Н/П"})[v];
+      lines.push(`— ${item.id} ${item.text} — [${mark}] (вес ${item.weight}) ${note? " // " + note : ""}`);
+    });
+    lines.push("");
+  });
+
+  $("#summary").value = lines.join("\n");
+}
+
+/* ========= Печать ========= */
+function doPrint(){ window.print(); }
+
+/* ========= Экспорт/Импорт ========= */
+function exportJSON(){
+  const rows = $$("#tbody tr").filter(tr=>tr.dataset.id);
+  const payload = {
+    version:"1.0",
+    model:model.name,
+    updated:new Date().toISOString(),
+    rows: rows.map(tr=>{
+      const id = tr.dataset.id;
+      const text = tr.cells[1].textContent.trim();
+      const link = tr.cells[2].querySelector('a')?.href || "";
+      const grade = tr.querySelector(`input[name="g_${id}"]:checked`)?.value || "na";
+      const done = tr.querySelector('.chb')?.checked || false;
+      const note = tr.querySelector('textarea')?.value || "";
+      const weight = Number(tr.cells[4].innerText.trim());
+      return {id,text,link,grade,done,note,weight};
+    }),
+    score: $("#score").textContent,
+    rating: $("#grade").textContent
+  };
+  const blob = new Blob([JSON.stringify(payload,null,2)], {type:"application/json"});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `checklist_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function importJSON(file){
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      const data = JSON.parse(e.target.result);
+      if(data?.model==="conservative") setModelConservative(); else setModelNeutral();
+      (data?.rows||[]).forEach(r=>{
+        const tr = $(`tr[data-id="${r.id}"]`);
+        if(!tr) return;
+        const inp = tr.querySelector(`input[name="g_${r.id}"][value="${r.grade||"na"}"]`);
+        if(inp) inp.checked = true;
+        const chb = tr.querySelector('.chb'); if(chb) chb.checked = !!r.done;
+        const ta  = tr.querySelector('textarea'); if(ta) ta.value = r.note||"";
+      });
+      calc(); buildSummary(); saveState();
+    }catch(err){ alert("Не удалось прочитать файл JSON"); }
+  };
+  reader.readAsText(file, "utf-8");
+}
+
+/* ========= Модель: нейтральная/консервативная ========= */
+function setModelNeutral(){
+  model = { name:"neutral", npFactor:0.0 };
+  $("#modelTag").textContent = "Модель: нейтральная";
+  saveState(); calc(); buildSummary();
+}
+function setModelConservative(){
+  model = { name:"conservative", npFactor:0.25 };
+  $("#modelTag").textContent = "Модель: консервативная (Н/П = 25%)";
+  saveState(); calc(); buildSummary();
+}
+
+/* ========= Инициализация ========= */
+renderTable();
+$("#total").textContent = $$("#tbody tr").filter(tr=>tr.dataset.id).length;
+loadState();
+calc();
+
+document.addEventListener('input', (e)=>{
+  if(e.target.matches('input[type="radio"], textarea')){ calc(); saveState(); }
+});
+document.addEventListener('change', (e)=>{
+  if(e.target.matches('.chb')){ calc(); saveState(); }
+});
+
+$("#buildSummary").addEventListener('click', ()=>{ buildSummary(); });
+$("#print").addEventListener('click', doPrint);
+$("#print2").addEventListener('click', doPrint);
+$("#reset").addEventListener('click', ()=>{
+  $$("#tbody tr").forEach(tr=>{
+    const id = tr.dataset.id;
+    if(id){
+      tr.querySelector(`input[name="g_${id}"][value="na"]`).checked = true;
+      tr.querySelector('.chb').checked = false;
+      tr.querySelector('textarea').value = "";
+    }
+  });
+  store.removeItem(STATE_KEY);
+  calc(); buildSummary();
+});
+$("#export").addEventListener('click', exportJSON);
+$("#importFile").addEventListener('change', (e)=>{ if(e.target.files?.[0]) importJSON(e.target.files[0]); });
+
+$("#toggleModel").addEventListener('click', ()=>{
+  if(model.name==="neutral") setModelConservative(); else setModelNeutral();
+});
+
+$("#expand").addEventListener('click', ()=>document.querySelectorAll('details').forEach(d=>d.open=true));
+$("#collapse").addEventListener('click', ()=>document.querySelectorAll('details').forEach(d=>d.open=false));
+
+// Первичная записка
+buildSummary();
+</script>
+</body>
+</html>
