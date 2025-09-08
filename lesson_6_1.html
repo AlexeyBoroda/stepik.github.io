@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Практические онлайн-задачи — «Основные риски» | Как вести бизнес, чтобы не заблокировали счета в банке</title>
+<style>
+  :root{
+    --bg:#ffffff;
+    --text:#0f172a;
+    --muted:#64748b;
+    --line:#e2e8f0;
+    --card:#f8fafc;
+    --accent:#1f3a8a;
+    --ok:#059669;
+    --warn:#b45309;
+    --bad:#dc2626;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+    font:16px/1.6 "Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans","Helvetica Neue",sans-serif}
+  .wrap{max-width:1100px;margin:24px auto 96px;padding:0 16px}
+  h1{margin:0 0 6px;font-size:28px;line-height:1.25}
+  .lead{margin:0 0 16px;color:var(--muted)}
+  .badge{display:inline-block;background:var(--card);border:1px solid var(--line);color:var(--accent);
+    padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;letter-spacing:.3px}
+  .grid{display:grid;gap:16px}
+  @media(min-width:900px){.grid{grid-template-columns:1fr 1fr}}
+  section.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}
+  section.card h2{margin:0 0 10px;font-size:22px}
+  .hint{font-size:14px;color:var(--muted)}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  input[type="number"],input[type="text"],textarea,select{
+    width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff
+  }
+  textarea{min-height:110px;resize:vertical}
+  button{
+    appearance:none;border:1px solid var(--line);border-radius:12px;background:#fff;
+    padding:10px 14px;font-weight:700;cursor:pointer
+  }
+  button.primary{background:var(--accent);border-color:transparent;color:#fff}
+  button.ghost{background:#fff}
+  button:disabled{opacity:.6;cursor:not-allowed}
+  .kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px}
+  .tile b{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+  .score{display:inline-flex;align-items:center;gap:8px;font-weight:800}
+  .dot{width:10px;height:10px;border-radius:999px;background:var(--muted);display:inline-block}
+  .dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.bad{background:var(--bad)}
+  .alert{border-left:4px solid var(--accent);background:var(--card);padding:12px;border-radius:10px}
+  .alert.warn{border-left-color:var(--warn)} .alert.bad{border-left-color:var(--bad)} .alert.ok{border-left-color:var(--ok)}
+  .list{display:grid;gap:8px;margin:10px 0}
+  .pill{display:inline-block;padding:6px 10px;border-radius:999px;border:1px dashed var(--line);background:#fff;font-size:14px}
+  .dropzone{min-height:120px;border:2px dashed var(--line);border-radius:12px;padding:10px;background:#fff}
+  .dz-title{font-size:14px;color:var(--muted);margin-bottom:6px}
+  .chip{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);
+        border-radius:999px;padding:6px 10px;margin:5px 6px;cursor:grab}
+  .chip[data-category="ok"]{border-color:#c7f3d8;background:#f1fdf5}
+  .chip[data-category="explain"]{border-color:#fde7c7;background:#fff8ed}
+  .chip[data-category="risk"]{border-color:#ffd1d1;background:#fff5f5}
+  .dz{display:flex;flex-wrap:wrap}
+  .flex{display:flex;gap:10px;flex-wrap:wrap}
+  .small{font-size:12px;color:var(--muted)}
+  .sep{height:1px;background:var(--line);margin:14px 0}
+  .right{display:flex;gap:10px;justify-content:flex-end}
+  .success{color:var(--ok);font-weight:800}
+  .warning{color:var(--warn);font-weight:800}
+  .danger{color:var(--bad);font-weight:800}
+  .mt8{margin-top:8px} .mt12{margin-top:12px} .mt16{margin-top:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="badge">Практика (HTML + CSS + JS) · Белый фон · Для встраивания через &lt;iframe&gt; на Stepik</span>
+  <h1>Практические онлайн-задачи: «Основные риски»</h1>
+  <p class="lead">Три интерактивные задачи: ① Самопроверка рисков (калькулятор + рекомендации), ② Классификация операций (drag&drop), ③ Симулятор ответа банку с авто-генерацией пояснения.</p>
+
+  <!-- ЗАДАЧА 1 -->
+  <section class="card" id="task1">
+    <h2>Задача 1. Самопроверка рисков компании</h2>
+    <p class="hint">Заполните поля и отметьте признаки — система рассчитает ориентир «налоги/оборот», проанализирует профиль и даст рекомендации.</p>
+    <div class="grid">
+      <div>
+        <label>Месячный оборот по расчётным счетам, ₽
+          <input type="number" id="t1_turnover" placeholder="Напр.: 12 000 000" min="0" step="1000">
+        </label>
+      </div>
+      <div>
+        <label>Налоги, перечисленные за месяц, ₽ (включая НДС/налог, авансы, пени)
+          <input type="number" id="t1_taxes" placeholder="Напр.: 180 000" min="0" step="1000">
+        </label>
+      </div>
+      <div>
+        <label>ФОТ + НДФЛ + страховые взносы за месяц, ₽
+          <input type="number" id="t1_payroll" placeholder="Напр.: 2 400 000" min="0" step="1000">
+        </label>
+      </div>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="list">
+      <label class="row"><input type="checkbox" id="t1_cash"> Регулярно снимаем наличные без авансовых отчётов и чеков</label>
+      <label class="row"><input type="checkbox" id="t1_transit"> Часто есть транзит: «зачисление → мгновенное списание»</label>
+      <label class="row"><input type="checkbox" id="t1_okved"> ОКВЭД не совпадает с фактическими платежами/деятельностью</label>
+      <label class="row"><input type="checkbox" id="t1_foreign"> Есть валютные/зарубежные платежи без полного пакета документов</label>
+      <label class="row"><input type="checkbox" id="t1_split"> Есть признаки «дробления» (общий адрес/персонал/управление у нескольких ИП/ООО)</label>
+    </div>
+
+    <div class="right">
+      <button class="ghost" id="t1_reset">Сброс</button>
+      <button class="primary" id="t1_calc">Рассчитать</button>
+    </div>
+
+    <div class="kpi">
+      <div class="tile">
+        <b>Налоги / Оборот (ориентир ~0,9%+)</b>
+        <div class="score"><span class="dot" id="t1_dot_ratio"></span><span id="t1_ratio">—</span></div>
+        <div class="small">Ориентир не является нормой закона, это «сигнал» для банков.</div>
+      </div>
+      <div class="tile">
+        <b>ФОТ + НДФЛ + взносы</b>
+        <div class="score"><span class="dot" id="t1_dot_payroll"></span><span id="t1_payroll_eval">—</span></div>
+        <div class="small">Соразмерность ФОТ оборотам снижает риски.</div>
+      </div>
+      <div class="tile">
+        <b>Итоговый уровень риска</b>
+        <div class="score"><span class="dot" id="t1_dot_total"></span><span id="t1_total">—</span></div>
+        <div class="small">Учитывается совокупность признаков.</div>
+      </div>
+    </div>
+
+    <div class="mt12 alert" id="t1_advice" aria-live="polite">
+      Заполните поля и нажмите «Рассчитать» — появятся рекомендации.
+    </div>
+  </section>
+
+  <!-- ЗАДАЧА 2 -->
+  <section class="card" id="task2">
+    <h2>Задача 2. Классификация операций (Drag & Drop)</h2>
+    <p class="hint">Перетяните карточки операций в соответствующие зоны: <b>Норма</b>, <b>Требует пояснений</b>, <b>Высокий риск</b>. Затем нажмите «Проверить».</p>
+
+    <div class="flex">
+      <div style="flex:1;min-width:260px">
+        <div class="dz-title">Операции для классификации</div>
+        <div id="t2_pool" class="dropzone dz" aria-label="Источник карточек"></div>
+        <div class="small">Подсказка: ориентируйтесь на экономический смысл, документы и профиль деятельности.</div>
+      </div>
+
+      <div style="flex:1;min-width:260px">
+        <div class="dz-title">Норма</div>
+        <div id="t2_ok" class="dropzone dz" data-accept="ok" aria-label="Норма"></div>
+
+        <div class="dz-title mt12">Требует пояснений</div>
+        <div id="t2_explain" class="dropzone dz" data-accept="explain" aria-label="Требует пояснений"></div>
+
+        <div class="dz-title mt12">Высокий риск</div>
+        <div id="t2_risk" class="dropzone dz" data-accept="risk" aria-label="Высокий риск"></div>
+      </div>
+    </div>
+
+    <div class="right mt12">
+      <button class="ghost" id="t2_reset">Сброс</button>
+      <button class="primary" id="t2_check">Проверить</button>
+    </div>
+
+    <div class="mt12 alert" id="t2_feedback">Перетащите карточки и нажмите «Проверить».</div>
+  </section>
+
+  <!-- ЗАДАЧА 3 -->
+  <section class="card" id="task3">
+    <h2>Задача 3. Симулятор ответа банку (пакет документов + автогенерация пояснения)</h2>
+    <p class="hint">Соберите корректный пакет под запрос банка и сгенерируйте пояснение в деловом стиле.</p>
+
+    <div class="grid">
+      <div>
+        <label>Компания/ИП
+          <input type="text" id="t3_company" placeholder="ООО «Пример»">
+        </label>
+      </div>
+      <div>
+        <label>Контрагент
+          <input type="text" id="t3_counterparty" placeholder="ООО «Альфа»">
+        </label>
+      </div>
+      <div>
+        <label>Номер и дата договора
+          <input type="text" id="t3_contract" placeholder="Договор №15 от 12.08.2025">
+        </label>
+      </div>
+      <div>
+        <label>Назначение платежа / предмет сделки
+          <input type="text" id="t3_purpose" placeholder="Оплата аренды офиса за август 2025">
+        </label>
+      </div>
+      <div>
+        <label>Сумма, ₽
+          <input type="number" id="t3_amount" placeholder="650000" min="0" step="1000">
+        </label>
+      </div>
+      <div>
+        <label>Тип операции
+          <select id="t3_type">
+            <option value="domestic">Внутрироссийская (рубли)</option>
+            <option value="foreign">ВЭД / зарубежный перевод</option>
+            <option value="cash">Снятие наличных под хозрасходы</option>
+            <option value="services">Оплата услуг (маркетинг/консалтинг/IT)</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="grid">
+      <div>
+        <b>Выберите документы, которые приложите к ответу:</b>
+        <div class="list">
+          <label class="row"><input type="checkbox" class="t3_doc" value="contract"> Договор / допсоглашение</label>
+          <label class="row"><input type="checkbox" class="t3_doc" value="invoice"> Счёт / инвойс / спецификация</label>
+          <label class="row"><input type="checkbox" class="t3_doc" value="act"> Акт / накладная / UПД</label>
+          <label class="row"><input type="checkbox" class="t3_doc" value="kpi"> Отчёт/KPI по результату услуг</label>
+          <label class="row"><input type="checkbox" class="t3_doc" value="explain"> Пояснительная записка (экономическая логика)</label>
+          <label class="row"><input type="checkbox" class="t3_doc" value="ved"> ВЭД-пакет (контракт, инвойс, CMR/коносамент)</label>
+          <label class="row"><input type="checkbox" class="t3_doc" value="cash"> Авансовый отчёт + чеки (для наличных)</label>
+        </div>
+      </div>
+      <div>
+        <b>Авто-оценка комплекта:</b>
+        <div id="t3_eval" class="alert">Отметьте документы — появится оценка и рекомендации.</div>
+      </div>
+    </div>
+
+    <div class="right mt12">
+      <button class="ghost" id="t3_reset">Сброс</button>
+      <button class="primary" id="t3_generate">Сгенерировать пояснение</button>
+    </div>
+
+    <label class="mt12">Сформированный черновик пояснения банку
+      <textarea id="t3_output" placeholder="Здесь появится текст — вы сможете скопировать его в ответ банку."></textarea>
+    </label>
+    <div class="right mt8">
+      <button id="t3_copy">Скопировать текст</button>
+    </div>
+    <div class="small mt8">Тон: деловой, структурированный — факты → документы → экономическая логика → вывод.</div>
+  </section>
+</div>
+
+<script>
+/* ---------- ЗАДАЧА 1: КАЛЬКУЛЯТОР РИСКОВ ---------- */
+(function(){
+  const $ = sel => document.querySelector(sel);
+  const fmt = n => isFinite(n) ? n.toLocaleString('ru-RU') : '—';
+
+  function setDot(el, level){
+    el.className = 'dot';
+    if(level==='ok') el.classList.add('ok');
+    else if(level==='warn') el.classList.add('warn');
+    else if(level==='bad') el.classList.add('bad');
+  }
+
+  $('#t1_calc').addEventListener('click', ()=>{
+    const turnover = +$('#t1_turnover').value||0;
+    const taxes = +$('#t1_taxes').value||0;
+    const payroll = +$('#t1_payroll').value||0;
+
+    const ratio = turnover>0 ? (taxes/turnover*100) : 0; // %
+    $('#t1_ratio').textContent = turnover>0 ? ratio.toFixed(2)+' %' : '—';
+
+    // Оценка ratio относительно ориентир ~0.9%
+    let ratioLevel='warn';
+    if (ratio >= 0.9) ratioLevel='ok';
+    if (ratio < 0.4) ratioLevel='bad';
+    setDot($('#t1_dot_ratio'), ratioLevel);
+
+    // Оценка ФОТ к обороту: грубый ориентир 10–35% (очень грубо для разных отраслей)
+    const payrollShare = turnover>0 ? payroll/turnover*100 : 0;
+    let payrollLevel='warn';
+    if (payrollShare === 0) payrollLevel='bad';
+    else if (payrollShare >= 8 && payrollShare <= 40) payrollLevel='ok';
+    else payrollLevel='warn';
+    $('#t1_payroll_eval').textContent = turnover>0 ? payrollShare.toFixed(1)+' %' : '—';
+    setDot($('#t1_dot_payroll'), payrollLevel);
+
+    // Флаги рисков
+    const flags = [
+      $('#t1_cash').checked,
+      $('#t1_transit').checked,
+      $('#t1_okved').checked,
+      $('#t1_foreign').checked,
+      $('#t1_split').checked
+    ];
+    const flagsCount = flags.filter(Boolean).length;
+
+    // Итоговый уровень с учётом всего
+    let score=0;
+    score += (ratioLevel==='ok'?0:(ratioLevel==='warn'?1:2));
+    score += (payrollLevel==='ok'?0:(payrollLevel==='warn'?1:2));
+    score += flagsCount; // каждый флаг +1
+
+    let total='Низкий';
+    let level='ok';
+    if (score>=3 && score<=4){ total='Средний'; level='warn'; }
+    if (score>=5){ total='Высокий'; level='bad'; }
+    $('#t1_total').textContent = total + ' риск ('+score+' балл.)';
+    setDot($('#t1_dot_total'), level);
+
+    // Рекомендации
+    const tips=[];
+    if (ratioLevel!=='ok') tips.push('Повысить прозрачность налоговых платежей (ориентир «налоги/оборот» ≈ 0,9%+).');
+    if (payrollLevel!=='ok') tips.push('Проверить соразмерность ФОТ оборотам и регулярность НДФЛ/взносов.');
+    if ($('#t1_cash').checked) tips.push('Минимизировать наличные, оформлять авансовые отчёты и чеки.');
+    if ($('#t1_transit').checked) tips.push('Избегать транзита без экономического смысла; формализовать цепочки.');
+    if ($('#t1_okved').checked) tips.push('Синхронизировать ОКВЭД с фактической деятельностью.');
+    if ($('#t1_foreign').checked) tips.push('Собирать полный пакет ВЭД-документов (контракт, инвойс, транспортные).');
+    if ($('#t1_split').checked) tips.push('Устранить признаки «дробления»: разделить функции/персонал/адреса, исключить сквозные платежи.');
+
+    const box = $('#t1_advice');
+    box.className = 'alert ' + (level==='ok'?'ok':(level==='warn'?'warn':'bad'));
+    box.innerHTML = `
+      <b>Итог: ${total}.</b> <br>
+      ${tips.length ? '<ul>'+tips.map(t=>`<li>${t}</li>`).join('')+'</ul>' : 'Существенных сигналов риска не выявлено. Поддерживайте актуальные данные и документы.'}
+      <div class="small mt8">Оценки ориентировочные и зависят от отрасли, сезонности и модели бизнеса.</div>
+    `;
+  });
+
+  $('#t1_reset').addEventListener('click', ()=>{
+    ['#t1_turnover','#t1_taxes','#t1_payroll'].forEach(id=>$(id).value='');
+    ['#t1_cash','#t1_transit','#t1_okved','#t1_foreign','#t1_split'].forEach(id=>$(id).checked=false);
+    ['#t1_ratio','#t1_payroll_eval','#t1_total'].forEach(id=>$(id).textContent='—');
+    ['#t1_dot_ratio','#t1_dot_payroll','#t1_dot_total'].forEach(id=>{ $(id).className='dot'; });
+    const box=$('#t1_advice');
+    box.className='alert';
+    box.textContent='Заполните поля и нажмите «Рассчитать» — появятся рекомендации.';
+  });
+})();
+
+/* ---------- ЗАДАЧА 2: DRAG & DROP КЛАССИФИКАЦИЯ ---------- */
+(function(){
+  const pool = document.getElementById('t2_pool');
+  const zones = {
+    ok: document.getElementById('t2_ok'),
+    explain: document.getElementById('t2_explain'),
+    risk: document.getElementById('t2_risk')
+  };
+  const feedback = document.getElementById('t2_feedback');
+
+  const items = [
+    { id:'op1', text:'Оплата аренды офиса по договору, ежемесячно, есть акты', category:'ok' },
+    { id:'op2', text:'Серия переводов «зачисление → мгновенное списание» между связанными компаниями', category:'risk' },
+    { id:'op3', text:'Снятие наличных 600 000 ₽ без авансовых отчётов и чеков', category:'risk' },
+    { id:'op4', text:'Оплата маркетинговых услуг, есть договор и KPI-отчёт', category:'ok' },
+    { id:'op5', text:'Оплата IT-услуг при ОКВЭД «ремонт помещений», документы есть', category:'explain' },
+    { id:'op6', text:'ВЭД-платёж с контрактом и инвойсом, есть транспортные документы', category:'ok' },
+    { id:'op7', text:'Платёж контрагенту с массовым адресом, сайт/сотрудники не подтверждены', category:'explain' },
+    { id:'op8', text:'Регулярная выдача наличных под хозяйственные расходы с чеками', category:'explain' },
+  ];
+
+  function renderPool(){
+    pool.innerHTML='';
+    items.forEach(it=>{
+      const el = document.createElement('div');
+      el.className='chip';
+      el.textContent=it.text;
+      el.draggable=true;
+      el.id=it.id;
+      el.dataset.category = it.category;
+      el.addEventListener('dragstart',ev=>{
+        ev.dataTransfer.setData('text/plain', it.id);
+      });
+      pool.appendChild(el);
+    });
+  }
+
+  function enableDrop(area){
+    area.addEventListener('dragover',ev=>ev.preventDefault());
+    area.addEventListener('drop',ev=>{
+      ev.preventDefault();
+      const id = ev.dataTransfer.getData('text/plain');
+      const el = document.getElementById(id);
+      if(!el) return;
+      area.appendChild(el);
+    });
+  }
+
+  Object.values(zones).forEach(enableDrop);
+  enableDrop(pool);
+  renderPool();
+
+  document.getElementById('t2_check').addEventListener('click', ()=>{
+    // проверяем правильность: элемент должен лежать в зоне, чей data-accept == chip.dataset.category
+    let correct=0, total=items.length, mistakes=[];
+    function checkZone(zoneEl){
+      const expected = zoneEl.dataset.accept;
+      const chips = zoneEl.querySelectorAll('.chip');
+      chips.forEach(ch=>{
+        if(ch.dataset.category===expected) correct++;
+        else mistakes.push('«'+ch.textContent+'» — неверная зона');
+      });
+    }
+    Object.values(zones).forEach(checkZone);
+    const ratio = Math.round(correct/total*100);
+
+    if(mistakes.length===0){
+      feedback.className='alert ok';
+      feedback.innerHTML = `<b>Отлично!</b> Верных: ${correct}/${total} (${ratio}%). Продолжайте в том же духе.`;
+    }else{
+      feedback.className='alert warn';
+      feedback.innerHTML = `<b>Результат:</b> ${correct}/${total} (${ratio}%).<br><ul>` + mistakes.map(m=>`<li>${m}</li>`).join('') + `</ul>`;
+    }
+  });
+
+  document.getElementById('t2_reset').addEventListener('click', ()=>{
+    renderPool();
+    Object.values(zones).forEach(z=>z.innerHTML='');
+    feedback.className='alert';
+    feedback.textContent='Перетащите карточки и нажмите «Проверить».';
+  });
+})();
+
+/* ---------- ЗАДАЧА 3: СИМУЛЯТОР ОТВЕТА БАНКУ ---------- */
+(function(){
+  const $ = s => document.querySelector(s);
+  const allDocs = () => Array.from(document.querySelectorAll('.t3_doc')).filter(x=>x.checked).map(x=>x.value);
+
+  function evaluate(){
+    const type = $('#t3_type').value;
+    const docs = allDocs();
+    let ok = true, tips = [];
+
+    // Базовый минимум
+    if (!docs.includes('contract')) { ok=false; tips.push('Приложите договор/допсоглашение.'); }
+    if (!docs.includes('invoice')) { ok=false; tips.push('Добавьте счёт/инвойс/спецификацию.'); }
+    if (!docs.includes('act'))     { ok=false; tips.push('Приложите акт/накладную/UПД.'); }
+    if (!docs.includes('explain')) { ok=false; tips.push('Добавьте пояснительную записку с экономической логикой.'); }
+
+    // Специфика по типу
+    if (type==='foreign' && !docs.includes('ved')) { ok=false; tips.push('Для ВЭД нужен пакет: контракт, инвойс, транспортные документы.'); }
+    if (type==='cash' && !docs.includes('cash'))   { ok=false; tips.push('Для наличных нужен авансовый отчёт и подтверждающие чеки.'); }
+    if (type==='services' && !docs.includes('kpi')){ ok=false; tips.push('Для услуг критичен отчёт/KPI: результат, метрики, сроки.'); }
+
+    const box = $('#t3_eval');
+    if (ok){
+      box.className='alert ok';
+      box.innerHTML='<b>Комплект выглядит достаточным.</b> Проверьте корректность реквизитов и дат.';
+    }else{
+      box.className='alert warn';
+      box.innerHTML='<b>Нужно доукомплектовать:</b><ul>'+tips.map(t=>`<li>${t}</li>`).join('')+'</ul>';
+    }
+  }
+
+  document.querySelectorAll('.t3_doc').forEach(el=>el.addEventListener('change', evaluate));
+  $('#t3_type').addEventListener('change', evaluate);
+
+  $('#t3_generate').addEventListener('click', ()=>{
+    const company = $('#t3_company').value.trim() || 'Компания';
+    const cp = $('#t3_counterparty').value.trim() || 'Контрагент';
+    const contract = $('#t3_contract').value.trim() || 'Договор №… от …';
+    const purpose = $('#t3_purpose').value.trim() || 'Назначение платежа';
+    const amount = $('#t3_amount').value ? Number($('#t3_amount').value).toLocaleString('ru-RU')+' ₽' : 'сумма …';
+    const type = $('#t3_type').value;
+    const docs = allDocs();
+
+    const blocks = [];
+    blocks.push(`Уважаемая служба комплаенс банка!
+Сообщаем пояснения по операции: ${purpose} на ${amount}. Плательщик: ${company}. Получатель: ${cp}. Основание: ${contract}.`);
+
+    // Экономическая логика
+    let logic = 'Экономическая целесообразность: операция соответствует профилю деятельности, необходима для ведения бизнеса и связана с текущими договорными обязательствами.';
+    if(type==='services') logic = 'Экономическая целесообразность: услуги направлены на достижение измеримого результата (KPI), влияющего на продажи/охваты/лиды; расчёт стоимости и отчёты прилагаются.';
+    if(type==='cash') logic = 'Экономическая целесообразность: расходы наличными обусловлены хозяйственными нуждами (мелкие закупки/командировочные) при невозможности/нецелесообразности безналичной оплаты.';
+    if(type==='foreign') logic = 'Экономическая целесообразность: поставка/услуги по внешнеторговому контракту; условия оплаты и поставки согласованы, курс/цена обоснованы.';
+    blocks.push(logic);
+
+    // Перечень документов
+    const mapText = {
+      contract:'договор/допсоглашение',
+      invoice:'счёт/инвойс/спецификация',
+      act:'акт/накладная/UПД',
+      kpi:'отчёт/KPI по результату услуг',
+      explain:'пояснительная записка',
+      ved:'ВЭД-пакет (контракт, инвойс, транспортные документы)',
+      cash:'авансовый отчёт и чеки'
+    };
+    const docList = docs.length ? docs.map(d=>mapText[d]).join('; ') : 'документы будут предоставлены дополнительно';
+    blocks.push('Приложенные документы: ' + docList + '.');
+
+    // Заключение
+    blocks.push('Просим возобновить операции по счёту. Готовы предоставить любые дополнительные сведения в установленный срок.');
+
+    $('#t3_output').value = blocks.join('\n\n');
+    evaluate();
+  });
+
+  $('#t3_copy').addEventListener('click', async ()=>{
+    const txt = document.getElementById('t3_output').value;
+    if(!txt.trim()) return;
+    try{ await navigator.clipboard.writeText(txt); alert('Текст скопирован в буфер обмена.'); }
+    catch(e){ 
+      // fallback
+      const ta = document.getElementById('t3_output');
+      ta.select(); document.execCommand('copy');
+      alert('Текст скопирован (fallback).');
+    }
+  });
+
+  $('#t3_reset').addEventListener('click', ()=>{
+    ['#t3_company','#t3_counterparty','#t3_contract','#t3_purpose','#t3_amount'].forEach(id=>$(id).value='');
+    $('#t3_type').value='domestic';
+    document.querySelectorAll('.t3_doc').forEach(x=>x.checked=false);
+    $('#t3_output').value='';
+    const box=$('#t3_eval');
+    box.className='alert';
+    box.textContent='Отметьте документы — появится оценка и рекомендации.';
+  });
+})();
+</script>
+</body>
+</html>
