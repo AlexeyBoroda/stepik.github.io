@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Практическое задание — Выплаты и зарплаты · Финансовая дисциплина</title>
+<meta name="color-scheme" content="light dark" />
+<style>
+  /* ===== Design tokens ===== */
+  :root{
+    --bg:#0b1220; --bg-elev:#0f1629; --glass:rgba(255,255,255,.06);
+    --ink:#e9f0ff; --muted:#a7b2c7; --line:rgba(255,255,255,.12);
+    --accent:#ff355e; --accent-2:#4cc9f0;
+    --ok:#18c29c; --warn:#ffcc66; --bad:#ff6b6b;
+    --radius-xl:18px; --radius-lg:14px; --radius:12px;
+    --shadow-1:0 1px 0 0 rgba(255,255,255,.06) inset, 0 8px 30px -12px rgba(0,0,0,.6);
+    --shadow-2:0 12px 40px -14px rgba(0,0,0,.65);
+  }
+  @media (prefers-color-scheme:light){
+    :root{
+      --bg:#f6f8ff; --bg-elev:#ffffff; --glass:rgba(11,18,32,.04);
+      --ink:#0b1e39; --muted:#5b6b82; --line:#e6ebf4;
+      --accent:#e6293f; --accent-2:#2f7af8;
+      --ok:#0f9d58; --warn:#c07600; --bad:#b00020;
+      --shadow-1:0 1px 0 0 rgba(11,18,32,.04) inset, 0 8px 30px -12px rgba(11,18,32,.25);
+      --shadow-2:0 12px 40px -14px rgba(11,18,32,.25);
+    }
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font:16px/1.65 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Inter,Arial;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 800px at 10% -10%, rgba(76,201,240,.18), transparent 60%),
+      radial-gradient(1000px 700px at 110% 20%, rgba(255,53,94,.16), transparent 60%),
+      var(--bg);
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:28px 18px 80px}
+
+  /* Header */
+  .hero{
+    padding:24px;
+    border-radius:var(--radius-xl);
+    background:linear-gradient(120deg, rgba(255,53,94,.14), rgba(76,201,240,.10)), var(--bg-elev);
+    border:1px solid var(--line);
+    box-shadow:var(--shadow-2);
+  }
+  .kicker{font-size:.8rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:700}
+  h1{margin:.3rem 0 .6rem; font-size:clamp(1.4rem,2.4vw + 1rem,2.2rem); line-height:1.18}
+  .lead{color:var(--muted); margin:0}
+
+  /* Cards / sections */
+  section.module{
+    margin-top:16px; padding:18px;
+    border:1px solid var(--line); border-radius:16px; background:var(--bg-elev);
+    box-shadow:var(--shadow-1);
+  }
+  .mod-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2))}
+  .mod-title{font-weight:800}
+  .muted{color:var(--muted)}
+
+  /* Inputs */
+  .row{display:grid;grid-template-columns:1fr;gap:10px;margin:8px 0}
+  @media (min-width:740px){.row.two{grid-template-columns:1fr 1fr}.row.three{grid-template-columns:1fr 1fr 1fr}}
+  label{font-weight:600}
+  input, select, textarea{
+    width:100%; padding:10px 12px; border-radius:12px; border:1px solid var(--line);
+    background:var(--bg); color:var(--ink); outline:none;
+  }
+  textarea{min-height:84px; resize:vertical}
+  .inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+  /* Buttons */
+  .btn{
+    appearance:none; border:1px solid var(--line); background:var(--glass);
+    color:var(--ink); padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700;
+    transition:transform .08s ease, background .2s ease;
+    backdrop-filter: blur(6px);
+  }
+  .btn:hover{background:linear-gradient(0deg, transparent, rgba(255,255,255,.06))}
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#fff; border-color:transparent}
+  .btn.ghost{background:transparent}
+  .btn.warn{border-left:4px solid var(--warn)}
+  .btn.ok{border-left:4px solid var(--ok)}
+  .btn.bad{border-left:4px solid var(--bad)}
+
+  /* Feedback / badges */
+  .note{border:1px dashed var(--line); border-radius:12px; padding:10px 12px; background:linear-gradient(0deg, transparent, rgba(255,255,255,.02)); margin-top:8px}
+  .score{font-weight:800}
+  .badge{display:inline-flex;align-items:center;gap:.5rem;padding:.35rem .65rem;border:1px solid var(--line);border-radius:999px;background:var(--glass);backdrop-filter: blur(6px)}
+  .badge.ok{color:var(--ok); border-color:rgba(24,194,156,.35)}
+  .badge.warn{color:var(--warn); border-color:rgba(255,204,102,.35)}
+  .badge.bad{color:var(--bad); border-color:rgba(255,107,107,.35)}
+
+  /* Table-like helper */
+  .tbl{width:100%;border-collapse:collapse}
+  .tbl th,.tbl td{padding:8px 10px;border-bottom:1px solid var(--line)}
+  .tbl th{text-align:left;color:var(--muted)}
+  .tbl tr:last-child td{border-bottom:0}
+  .right{text-align:right}
+
+  /* Footer summary */
+  .summary{
+    margin-top:18px; padding:14px; border:1px solid var(--line); border-radius:16px; background:var(--bg-elev);
+  }
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="kicker">Курс · Как вести бизнес, чтобы не заблокировали счета в банке</div>
+      <h1>Практическое задание — Выплаты и зарплаты</h1>
+      <p class="lead">4 мини-симулятора: регулярность выплат, назначения платежей, анализ снятий наличных и соразмерность ФОТ. Проходите по порядку, получайте баллы, сохраняйте результат локально.</p>
+    </div>
+
+    <!-- Scoreboard -->
+    <section class="module" id="scoreBox">
+      <div class="mod-head"><span class="dot"></span><div class="mod-title">Итоговый прогресс</div></div>
+      <div class="inline">
+        <span class="badge"><strong>Баллы:</strong> <span class="score" id="score">0</span>/100</span>
+        <span class="badge" id="statusBadge">Статус: не начато</span>
+        <button class="btn ghost" id="btnResetAll">Сбросить всё</button>
+        <button class="btn" id="btnCopy">Скопировать отчёт</button>
+      </div>
+      <div class="note muted">Подсказка: результаты сохраняются в <span class="mono">localStorage</span> браузера.</div>
+    </section>
+
+    <!-- Module 1: Регулярность выплат -->
+    <section class="module" id="m1">
+      <div class="mod-head"><span class="dot"></span><div class="mod-title">1) Регулярность и предсказуемость выплат</div></div>
+      <p class="muted">Введите даты выплат за выбранный месяц (минимум две). Система проверит частоту и равномерность.</p>
+      <div class="row two">
+        <div>
+          <label for="m1-month">Месяц (YYYY-MM)</label>
+          <input id="m1-month" type="month" />
+        </div>
+        <div>
+          <label for="m1-dates">Даты выплат (через запятую)</label>
+          <input id="m1-dates" type="text" placeholder="Напр.: 05, 20 или 05, 19, 31" />
+        </div>
+      </div>
+      <div class="inline">
+        <button class="btn primary" id="m1-check">Проверить регулярность</button>
+        <button class="btn ghost" id="m1-show">Показать эталон</button>
+      </div>
+      <div id="m1-feedback" class="note"></div>
+    </section>
+
+    <!-- Module 2: Назначения платежей -->
+    <section class="module" id="m2">
+      <div class="mod-head"><span class="dot"></span><div class="mod-title">2) Назначение платежа: безопасные формулировки</div></div>
+      <p class="muted">Выберите корректные формулировки назначения платежа для разных типов выплат.</p>
+      <table class="tbl">
+        <thead><tr><th>Ситуация</th><th>Назначение (выберите)</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Ежемесячная зарплата</td>
+            <td>
+              <select id="m2-q1">
+                <option value="">— выберите —</option>
+                <option>Перевод Иванову</option>
+                <option>Заработная плата за август 2025 по трудовому договору №10</option>
+                <option>Оплата услуг</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>Отпускные</td>
+            <td>
+              <select id="m2-q2">
+                <option value="">— выберите —</option>
+                <option>Отпускные за период 05–25.08.2025 по ТД №10</option>
+                <option>Возврат долга</option>
+                <option>Перевод сотруднику</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>Премия</td>
+            <td>
+              <select id="m2-q3">
+                <option value="">— выберите —</option>
+                <option>Премия по положению о премировании от 01.01.2025, приказ №57</option>
+                <option>Служебный перевод</option>
+                <option>На личные нужды</option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="inline" style="margin-top:10px">
+        <button class="btn primary" id="m2-check">Проверить ответы</button>
+        <button class="btn ghost" id="m2-show">Показать эталон</button>
+      </div>
+      <div id="m2-feedback" class="note"></div>
+    </section>
+
+    <!-- Module 3: Анализ снятий наличных -->
+    <section class="module" id="m3">
+      <div class="mod-head"><span class="dot"></span><div class="mod-title">3) Снятия наличных: оценка риска</div></div>
+      <p class="muted">Опишите до трёх снятий наличных за месяц. Система оценит суммарный риск с точки зрения банка.</p>
+
+      <div class="row three">
+        <div>
+          <label>Снятие #1 (₽)</label>
+          <input id="m3-a1" type="number" min="0" placeholder="Напр.: 150000" />
+          <label class="muted">Документы есть?</label>
+          <select id="m3-d1"><option value="yes">Да</option><option value="no">Нет</option></select>
+        </div>
+        <div>
+          <label>Снятие #2 (₽)</label>
+          <input id="m3-a2" type="number" min="0" placeholder="Напр.: 600000" />
+          <label class="muted">Документы есть?</label>
+          <select id="m3-d2"><option value="yes">Да</option><option value="no">Нет</option></select>
+        </div>
+        <div>
+          <label>Снятие #3 (₽)</label>
+          <input id="m3-a3" type="number" min="0" placeholder="Напр.: 700000" />
+          <label class="muted">Документы есть?</label>
+          <select id="m3-d3"><option value="yes">Да</option><option value="no">Нет</option></select>
+        </div>
+      </div>
+      <div class="inline">
+        <button class="btn primary" id="m3-check">Оценить риск</button>
+        <button class="btn ghost" id="m3-show">Показать рекомендации</button>
+      </div>
+      <div id="m3-feedback" class="note"></div>
+    </section>
+
+    <!-- Module 4: Соразмерность ФОТ -->
+    <section class="module" id="m4">
+      <div class="mod-head"><span class="dot"></span><div class="mod-title">4) Соразмерность ФОТ оборотам</div></div>
+      <p class="muted">Введите выручку и ФОТ за месяц и выберите отрасль. Мы сравним с ориентиром и дадим рекомендации.</p>
+      <div class="row three">
+        <div>
+          <label for="m4-rev">Выручка за месяц (₽)</label>
+          <input id="m4-rev" type="number" min="0" placeholder="Напр.: 3000000" />
+        </div>
+        <div>
+          <label for="m4-fot">ФОТ за месяц (₽)</label>
+          <input id="m4-fot" type="number" min="0" placeholder="Напр.: 450000" />
+        </div>
+        <div>
+          <label for="m4-ind">Отрасль (ориентир)</label>
+          <select id="m4-ind">
+            <option value="">— выберите отрасль —</option>
+            <option value="consulting">Консалтинг (до 50–60%)</option>
+            <option value="hi_mfg">Наукоёмкое производство (30–40%)</option>
+            <option value="prod_trade">Произв.-торг. компании (18–21%)</option>
+            <option value="retail">Торговля (розница) (12–15%)</option>
+            <option value="services">Сфера услуг (7–15%)</option>
+          </select>
+        </div>
+      </div>
+      <div class="inline">
+        <button class="btn primary" id="m4-check">Сравнить с ориентиром</button>
+        <button class="btn ghost" id="m4-show">Показать пояснение</button>
+      </div>
+      <div id="m4-feedback" class="note"></div>
+    </section>
+
+    <!-- Summary -->
+    <section class="summary" id="reportBox">
+      <strong>Краткий отчёт</strong>
+      <pre class="mono" id="report" style="white-space:pre-wrap;margin:6px 0 0"></pre>
+    </section>
+  </div>
+
+<script>
+(function(){
+  const $ = (s)=>document.querySelector(s);
+
+  // ===== Persistence =====
+  const state = JSON.parse(localStorage.getItem("payroll_practice_state")||"{}");
+  let score = state.score||0;
+  const parts = state.parts||{m1:false,m2:false,m3:false,m4:false};
+  updateScore(0);
+
+  // ===== Utils =====
+  function updateScore(delta){
+    score = Math.max(0, Math.min(100, score + delta));
+    $("#score").textContent = score;
+    const doneCount = Object.values(parts).filter(Boolean).length;
+    const status = doneCount===0?"не начато":(doneCount<4?"в процессе":"завершено");
+    $("#statusBadge").textContent = "Статус: " + status;
+    save();
+    renderReport();
+  }
+  function save(){
+    localStorage.setItem("payroll_practice_state", JSON.stringify({score, parts, m1:state.m1||{}, m2:state.m2||{}, m3:state.m3||{}, m4:state.m4||{}}));
+  }
+  function clamp(n,min,max){return Math.max(min,Math.min(max,n))}
+  function percent(n){return (n*100).toFixed(1)+"%"}
+
+  function addPointsOnce(key, pts, okMsg){
+    if(!parts[key]){
+      parts[key]=true;
+      updateScore(pts);
+    }else{
+      // already counted; just refresh report
+      updateScore(0);
+    }
+    return okMsg + (parts[key] ? "" : "");
+  }
+
+  // ===== Module 1: Regularity =====
+  $("#m1-check").addEventListener("click", ()=>{
+    const month = $("#m1-month").value.trim();
+    const raw = $("#m1-dates").value.trim();
+    if(!month || !raw){ $("#m1-feedback").innerHTML = "Заполните месяц и даты выплат."; return; }
+
+    const days = raw.split(",").map(s=>parseInt(s.trim(),10)).filter(x=>!isNaN(x)).sort((a,b)=>a-b);
+    if(days.length<2){ $("#m1-feedback").innerHTML = badge("bad","Нужно минимум две выплаты в месяц."); return; }
+
+    // Check intervals
+    const intervals = [];
+    for(let i=1;i<days.length;i++){ intervals.push(days[i]-days[i-1]); }
+    const avg = intervals.reduce((a,b)=>a+b,0)/intervals.length;
+    const dev = Math.max(...intervals) - Math.min(...intervals);
+
+    let msg = "";
+    let pts = 0;
+    if(avg>=10 && dev<=10){
+      msg = badge("ok","График стабильный: выплаты распределены равномерно.") +
+            `<div class="muted">Средний интервал: <strong>${avg.toFixed(1)} дн.</strong> · Разброс: <strong>${dev} дн.</strong></div>`;
+      pts = 25;
+    } else if (avg>=8){
+      msg = badge("warn","В целом неплохо, но интервалы неравномерны — стоит выровнять даты.") +
+            `<div class="muted">Средний интервал: <strong>${avg.toFixed(1)} дн.</strong> · Разброс: <strong>${dev} дн.</strong></div>`;
+      pts = 18;
+    } else {
+      msg = badge("bad","Хаотичный график — повысит внимание банка. Выровняйте расписание выплат.");
+      pts = 10;
+    }
+    $("#m1-feedback").innerHTML = msg;
+    state.m1 = {month, days, avg, dev, pts};
+    addPointsOnce("m1", pts, "");
+  });
+
+  $("#m1-show").addEventListener("click", ()=>{
+    $("#m1-feedback").innerHTML =
+      `<div class="note">Эталон: <strong>2–3 выплаты в месяц</strong> в схеме «аванс + оклад» с интервалом ~<strong>15 дней</strong> (например, 5-е и 20-е). Важна <em>предсказуемость</em> дат и сопоставимость сумм.</div>`;
+  });
+
+  // ===== Module 2: Descriptions =====
+  $("#m2-check").addEventListener("click", ()=>{
+    const a = $("#m2-q1").value;
+    const b = $("#m2-q2").value;
+    const c = $("#m2-q3").value;
+    let good = 0;
+    if(a==="Заработная плата за август 2025 по трудовому договору №10") good++;
+    if(b==="Отпускные за период 05–25.08.2025 по ТД №10") good++;
+    if(c==="Премия по положению о премировании от 01.01.2025, приказ №57") good++;
+
+    const pts = [0,10,18,25][good];
+    let msg = "";
+    if(good===3) msg = badge("ok","Отлично! Все назначения корректны.");
+    else if(good===2) msg = badge("warn","Хорошо, но есть неточности — пересмотрите формулировки.");
+    else msg = badge("bad","Слабый результат. Назначения должны точно отражать вид выплаты и основание.");
+
+    $("#m2-feedback").innerHTML = msg + `<div class="muted">Правильных ответов: <strong>${good}/3</strong></div>`;
+    state.m2 = {a,b,c,good,pts};
+    addPointsOnce("m2", pts, "");
+  });
+
+  $("#m2-show").addEventListener("click", ()=>{
+    $("#m2-feedback").innerHTML =
+      `<div class="note"><strong>Эталонные формулировки:</strong>
+        <ul style="margin:.3rem 0 .2rem 1rem">
+          <li>Заработная плата за [месяц, год] по трудовому договору №…</li>
+          <li>Отпускные за период [даты] по ТД №…</li>
+          <li>Премия по положению о премировании от [дата], приказ №…</li>
+        </ul>
+      </div>`;
+  });
+
+  // ===== Module 3: Cash risk =====
+  $("#m3-check").addEventListener("click", ()=>{
+    const arr = [1,2,3].map(i=>{
+      const amt = parseFloat($("#m3-a"+i).value)||0;
+      const docs = $("#m3-d"+i).value==="yes";
+      return {amt, docs};
+    });
+    const total = arr.reduce((s,o)=>s+o.amt,0);
+    // Risk scoring: >600k each without docs -> heavy; >200k spikes; count of large ops
+    let risk = 0;
+    arr.forEach(o=>{
+      if(o.amt>0 && !o.docs) risk += 2;
+      if(o.amt>=600000) risk += 2;
+      else if(o.amt>=200000) risk += 1;
+    });
+    if(total>=1000000) risk += 1;
+    const noDocsCount = arr.filter(o=>o.amt>0 && !o.docs).length;
+    risk += Math.max(0,noDocsCount-1); // penalize multiple no-docs
+
+    let msg = "", badgeClass = "ok", pts = 0;
+    if(risk<=2){ msg="Низкий риск: объёмы умеренные, документы в порядке."; badgeClass="ok"; pts=25; }
+    else if(risk<=5){ msg="Умеренный риск: есть крупные снятия или пробелы в документах."; badgeClass="warn"; pts=18; }
+    else { msg="Высокий риск: крупные/множественные снятия и/или нет документов."; badgeClass="bad"; pts=10; }
+
+    $("#m3-feedback").innerHTML = badge(badgeClass, msg) +
+      `<div class="muted">Сумма за месяц: <strong>${formatRub(total)}</strong> · Снятий без документов: <strong>${noDocsCount}</strong></div>`;
+    state.m3 = {arr,total,risk,pts};
+    addPointsOnce("m3", pts, "");
+  });
+
+  $("#m3-show").addEventListener("click", ()=>{
+    $("#m3-feedback").innerHTML =
+      `<div class="note">
+        Рекомендации: минимизируйте наличные, держите ПКО/РКО, ведомости, авансовые отчёты и чеки. Избегайте всплесков и серии однотипных снятий без объяснимого повода.
+      </div>`;
+  });
+
+  // ===== Module 4: FOT ratio =====
+  const ranges = {
+    consulting:[0,0.60],
+    hi_mfg:[0.30,0.40],
+    prod_trade:[0.18,0.21],
+    retail:[0.12,0.15],
+    services:[0.07,0.15]
+  };
+
+  $("#m4-check").addEventListener("click", ()=>{
+    const rev = parseFloat($("#m4-rev").value)||0;
+    const fot = parseFloat($("#m4-fot").value)||0;
+    const ind = $("#m4-ind").value;
+    if(!rev || !fot || !ind){ $("#m4-feedback").innerHTML = "Заполните все поля."; return; }
+    const r = fot/rev;
+    const [lo,hi] = ranges[ind]||[0,1];
+
+    let msg="", badgeClass="ok", pts=0;
+    if(r>=lo && r<=hi){
+      msg = `ФОТ ${percent(r)} в пределах ориентира (${percent(lo)}–${percent(hi)}).`;
+      badgeClass="ok"; pts=25;
+    } else if (r>0 && (Math.abs(r-lo)<=0.03 || Math.abs(r-hi)<=0.03)){
+      msg = `ФОТ ${percent(r)} близок к ориентиру (${percent(lo)}–${percent(hi)}). Подготовьте объяснение отклонения.`;
+      badgeClass="warn"; pts=18;
+    } else {
+      msg = `ФОТ ${percent(r)} вне типичного диапазона (${percent(lo)}–${percent(hi)}). Готовьте аргументацию и документы.`;
+      badgeClass="bad"; pts=12;
+    }
+    $("#m4-feedback").innerHTML = badge(badgeClass, msg) +
+      `<div class="muted">Совет: отслеживайте динамику показателя по месяцам и связывайте с изменениями штата/модели оплаты.</div>`;
+    state.m4 = {rev,fot,ind,ratio:r,pts};
+    addPointsOnce("m4", pts, "");
+  });
+
+  $("#m4-show").addEventListener("click", ()=>{
+    $("#m4-feedback").innerHTML =
+      `<div class="note">
+        Ориентиры — это «маяки», а не нормы. Важнее динамика и объяснимость. Если показатель отклоняется — заранее подготовьте аргументацию (изменение численности, премии по результатам, сезонность и т. п.).
+      </div>`;
+  });
+
+  // ===== Report / Copy / Reset =====
+  function renderReport(){
+    const report = {
+      score,
+      completed: parts,
+      m1: state.m1||null,
+      m2: state.m2||null,
+      m3: state.m3||null,
+      m4: state.m4||null,
+      timestamp: new Date().toISOString()
+    };
+    $("#report").textContent = JSON.stringify(report, null, 2);
+  }
+  $("#btnCopy").addEventListener("click", async ()=>{
+    try{
+      await navigator.clipboard.writeText($("#report").textContent);
+      flash("#btnCopy","Скопировано!");
+    }catch(e){
+      alert("Не удалось скопировать. Выделите текст отчёта вручную (Ctrl/Cmd+C).");
+    }
+  });
+  $("#btnResetAll").addEventListener("click", ()=>{
+    if(!confirm("Сбросить результаты?")) return;
+    localStorage.removeItem("payroll_practice_state");
+    location.reload();
+  });
+
+  // ===== Helpers =====
+  function badge(kind, text){
+    const map = {ok:"ok", warn:"warn", bad:"bad"};
+    const label = {ok:"Низкий риск", warn:"Умеренный риск", bad:"Высокий риск"}[kind] || "";
+    return `<span class="badge ${map[kind]||""}" style="margin-right:6px">${label||"Инфо"}</span> ${text}`;
+  }
+  function formatRub(n){
+    return n.toLocaleString('ru-RU', {maximumFractionDigits:0})+" ₽";
+  }
+  function flash(sel, txt){
+    const btn = document.querySelector(sel);
+    const orig = btn.textContent;
+    btn.textContent = txt;
+    setTimeout(()=>btn.textContent=orig,1200);
+  }
+
+  // initial render
+  renderReport();
+})();
+</script>
+</body>
+</html>
