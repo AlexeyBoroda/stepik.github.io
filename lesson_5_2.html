@@ -45,18 +45,29 @@
   .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2))}
   .mod-title{font-weight:800}
   .muted{color:var(--muted)}
+  .small{font-size:.92rem}
 
   .row{display:grid;grid-template-columns:1fr;gap:10px;margin:8px 0}
   @media (min-width:740px){.row.two{grid-template-columns:1fr 1fr}.row.three{grid-template-columns:1fr 1fr 1fr}}
   label{font-weight:600}
-  input, select{width:100%; padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--ink)}
-
+  input, select{
+    width:100%; padding:10px 12px; border-radius:12px; border:1px solid var(--line);
+    background:var(--bg); color:var(--ink); outline:none;
+  }
   .inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .btn{border:1px solid var(--line); background:var(--glass); color:var(--ink); padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700}
-  .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#fff; border-color:transparent}
+
+  .btn{
+    appearance:none; border:1px solid var(--line); background:var(--glass);
+    color:var(--ink); padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700;
+    transition:transform .08s ease, background .2s ease;
+  }
   .btn:hover{background:rgba(0,0,0,.05)}
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#fff; border-color:transparent}
+  .btn.ghost{background:transparent}
 
   .note{border:1px dashed var(--line); border-radius:12px; padding:10px 12px; background:#f9fafc; margin-top:8px}
+  .score{font-weight:800}
   .badge{display:inline-flex;align-items:center;gap:.5rem;padding:.35rem .65rem;border:1px solid var(--line);border-radius:999px;background:#f3f5f9}
   .badge.ok{color:var(--ok)} .badge.warn{color:var(--warn)} .badge.bad{color:var(--bad)}
   .tbl{width:100%;border-collapse:collapse}
@@ -65,6 +76,9 @@
 
   .summary{margin-top:18px; padding:14px; border:1px solid var(--line); border-radius:16px; background:#f9fafc}
   .report-block{margin:8px 0 0; padding:10px 12px; background:#fff; border:1px solid var(--line); border-radius:12px}
+  .report-block h3{margin:.1rem 0 .35rem; font-size:1rem}
+  .report-block ul{margin:.2rem 0 .2rem 1.2rem}
+  .hr{height:1px;background:var(--line);margin:10px 0}
 </style>
 </head>
 <body>
@@ -72,73 +86,129 @@
     <div class="hero">
       <div class="kicker">Курс · Как вести бизнес, чтобы не заблокировали счета в банке</div>
       <h1>Практическое задание — Выплаты и зарплаты</h1>
-      <p class="lead">4 мини-симулятора: регулярность выплат, назначения платежей, анализ снятий наличных и соразмерность ФОТ.</p>
+      <p class="lead">4 мини-симулятора: регулярность выплат, назначения платежей, анализ снятий наличных и соразмерность ФОТ. Эталоны и рекомендации включены.</p>
     </div>
 
-    <!-- Scoreboard -->
+    <!-- Прогресс -->
     <section class="module" id="scoreBox">
-      <div class="mod-head"><span class="dot"></span><div class="mod-title">Прогресс</div></div>
+      <div class="mod-head"><span class="dot"></span><div class="mod-title">Итоговый прогресс</div></div>
       <div class="inline">
         <span class="badge"><strong>Баллы:</strong> <span id="score">0</span>/100</span>
         <span class="badge" id="statusBadge">Статус: не начато</span>
-        <button class="btn" id="btnResetAll">Сбросить</button>
+        <button class="btn" id="btnCopy">Скопировать отчёт</button>
+        <button class="btn ghost" id="btnResetAll">Сбросить всё</button>
       </div>
+      <div class="note small">Результаты сохраняются в <code>localStorage</code> вашего браузера.</div>
     </section>
 
-    <!-- Модуль 1 -->
+    <!-- Модуль 1: Регулярность выплат -->
     <section class="module" id="m1">
-      <div class="mod-head"><span class="dot"></span><div class="mod-title">1) Регулярность выплат</div></div>
+      <div class="mod-head"><span class="dot"></span><div class="mod-title">1) Регулярность и предсказуемость выплат</div></div>
+      <p class="muted small">Введите даты выплат за выбранный месяц (минимум две). Мы оценим равномерность интервалов.</p>
       <div class="row two">
-        <div><label>Месяц</label><input id="m1-month" type="month" /></div>
-        <div><label>Даты</label><input id="m1-dates" type="text" placeholder="05, 20"/></div>
+        <div><label for="m1-month">Месяц</label><input id="m1-month" type="month" /></div>
+        <div><label for="m1-dates">Даты выплат</label><input id="m1-dates" type="text" placeholder="Напр.: 05, 20 или 05, 19, 31" /></div>
       </div>
-      <div class="inline"><button class="btn primary" id="m1-check">Проверить</button></div>
+      <div class="inline">
+        <button class="btn primary" id="m1-check">Проверить регулярность</button>
+        <button class="btn ghost" id="m1-show">Показать эталон</button>
+      </div>
       <div id="m1-feedback" class="note"></div>
     </section>
 
-    <!-- Модуль 2 -->
+    <!-- Модуль 2: Назначения платежей -->
     <section class="module" id="m2">
-      <div class="mod-head"><span class="dot"></span><div class="mod-title">2) Назначения платежей</div></div>
+      <div class="mod-head"><span class="dot"></span><div class="mod-title">2) Назначение платежа: корректные формулировки</div></div>
+      <p class="muted small">Выберите назначение платежа, которое безопасно для банка в каждой ситуации.</p>
       <table class="tbl">
-        <tr><td>Зарплата</td><td><select id="m2-q1"><option>—</option><option>Перевод Иванову</option><option>Заработная плата за август</option></select></td></tr>
-        <tr><td>Отпускные</td><td><select id="m2-q2"><option>—</option><option>Отпускные за период</option><option>Возврат долга</option></select></td></tr>
-        <tr><td>Премия</td><td><select id="m2-q3"><option>—</option><option>Премия по положению</option><option>На личные нужды</option></select></td></tr>
+        <thead><tr><th>Ситуация</th><th>Назначение (выберите)</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Ежемесячная зарплата</td>
+            <td>
+              <select id="m2-q1">
+                <option value="">— выберите —</option>
+                <option>Перевод Иванову</option>
+                <option>Заработная плата за август 2025 по трудовому договору №10</option>
+                <option>Оплата услуг</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>Отпускные</td>
+            <td>
+              <select id="m2-q2">
+                <option value="">— выберите —</option>
+                <option>Отпускные за период 05–25.08.2025 по ТД №10</option>
+                <option>Возврат долга</option>
+                <option>Перевод сотруднику</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>Премия</td>
+            <td>
+              <select id="m2-q3">
+                <option value="">— выберите —</option>
+                <option>Премия по положению о премировании от 01.01.2025, приказ №57</option>
+                <option>Служебный перевод</option>
+                <option>На личные нужды</option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
       </table>
-      <div class="inline"><button class="btn primary" id="m2-check">Проверить</button></div>
+      <div class="inline" style="margin-top:10px">
+        <button class="btn primary" id="m2-check">Проверить ответы</button>
+        <button class="btn ghost" id="m2-show">Показать эталон</button>
+      </div>
       <div id="m2-feedback" class="note"></div>
     </section>
 
-    <!-- Модуль 3 -->
+    <!-- Модуль 3: Снятия наличных -->
     <section class="module" id="m3">
-      <div class="mod-head"><span class="dot"></span><div class="mod-title">3) Снятия наличных</div></div>
+      <div class="mod-head"><span class="dot"></span><div class="mod-title">3) Снятия наличных: оценка риска</div></div>
+      <p class="muted small">Укажите до трёх снятий наличных за месяц и наличие документов.</p>
       <div class="row three">
-        <div><input id="m3-a1" type="number" placeholder="Сумма₽"/><select id="m3-d1"><option value="yes">Документы</option><option value="no">Нет док.</option></select></div>
-        <div><input id="m3-a2" type="number" placeholder="Сумма₽"/><select id="m3-d2"><option value="yes">Документы</option><option value="no">Нет док.</option></select></div>
-        <div><input id="m3-a3" type="number" placeholder="Сумма₽"/><select id="m3-d3"><option value="yes">Документы</option><option value="no">Нет док.</option></select></div>
+        <div><label>Снятие #1 (₽)</label><input id="m3-a1" type="number" min="0" placeholder="Напр.: 150000" /><label class="muted">Документы?</label><select id="m3-d1"><option value="yes">Да</option><option value="no">Нет</option></select></div>
+        <div><label>Снятие #2 (₽)</label><input id="m3-a2" type="number" min="0" placeholder="Напр.: 600000" /><label class="muted">Документы?</label><select id="m3-d2"><option value="yes">Да</option><option value="no">Нет</option></select></div>
+        <div><label>Снятие #3 (₽)</label><input id="m3-a3" type="number" min="0" placeholder="Напр.: 700000" /><label class="muted">Документы?</label><select id="m3-d3"><option value="yes">Да</option><option value="no">Нет</option></select></div>
       </div>
-      <div class="inline"><button class="btn primary" id="m3-check">Оценить</button></div>
+      <div class="inline">
+        <button class="btn primary" id="m3-check">Оценить риск</button>
+        <button class="btn ghost" id="m3-show">Показать рекомендации (эталон)</button>
+      </div>
       <div id="m3-feedback" class="note"></div>
     </section>
 
-    <!-- Модуль 4 -->
+    <!-- Модуль 4: Соразмерность ФОТ -->
     <section class="module" id="m4">
-      <div class="mod-head"><span class="dot"></span><div class="mod-title">4) Соразмерность ФОТ</div></div>
+      <div class="mod-head"><span class="dot"></span><div class="mod-title">4) Соразмерность ФОТ оборотам</div></div>
+      <p class="muted small">Введите выручку и ФОТ за месяц и выберите отрасль. Мы сравним с ориентиром и дадим рекомендации.</p>
       <div class="row three">
-        <div><input id="m4-rev" type="number" placeholder="Выручка₽"/></div>
-        <div><input id="m4-fot" type="number" placeholder="ФОТ₽"/></div>
-        <div><select id="m4-ind">
-          <option value="">Отрасль</option>
-          <option value="consulting">Консалтинг (50–60%)</option>
-          <option value="retail">Розница (12–15%)</option>
-        </select></div>
+        <div><label for="m4-rev">Выручка (₽)</label><input id="m4-rev" type="number" min="0" placeholder="Напр.: 3000000" /></div>
+        <div><label for="m4-fot">ФОТ (₽)</label><input id="m4-fot" type="number" min="0" placeholder="Напр.: 450000" /></div>
+        <div><label for="m4-ind">Отрасль</label>
+          <select id="m4-ind">
+            <option value="">— выберите отрасль —</option>
+            <option value="consulting">Консалтинг (до 50–60%)</option>
+            <option value="hi_mfg">Наукоёмкое производство (30–40%)</option>
+            <option value="prod_trade">Произв.-торг. компании (18–21%)</option>
+            <option value="retail">Торговля (розница) (12–15%)</option>
+            <option value="services">Сфера услуг (7–15%)</option>
+          </select>
+        </div>
       </div>
-      <div class="inline"><button class="btn primary" id="m4-check">Сравнить</button></div>
+      <div class="inline">
+        <button class="btn primary" id="m4-check">Сравнить с ориентиром</button>
+        <button class="btn ghost" id="m4-show">Показать пояснение (эталон)</button>
+      </div>
       <div id="m4-feedback" class="note"></div>
     </section>
 
-    <!-- Итог -->
+    <!-- Итоговый отчёт -->
     <section class="summary" id="reportBox">
-      <strong>Краткий отчёт</strong>
+      <strong>Краткий отчёт-рекомендации</strong>
       <div id="reportHuman" class="report-block"></div>
     </section>
   </div>
@@ -146,24 +216,304 @@
 <script>
 (function(){
   const $ = (s)=>document.querySelector(s);
-  let score=0; const parts={m1:false,m2:false,m3:false,m4:false}; const state={};
 
-  function updateScore(delta){score+=delta;$("#score").textContent=score;const done=Object.values(parts).filter(Boolean).length;$("#statusBadge").textContent=done===4?"завершено":done?"в процессе":"не начато";renderReport();}
+  // ======= Состояние и сохранение =======
+  const state = JSON.parse(localStorage.getItem("payroll_practice_state_v3")||"{}");
+  let score = state.score||0;
+  const parts = state.parts||{m1:false,m2:false,m3:false,m4:false};
+  save(); // нормализуем ключ
 
-  function renderReport(){
-    const lines=[];
-    if(state.m1) lines.push(`<div><b>Модуль 1:</b> ${state.m1}</div>`); else lines.push(`<div><b>Модуль 1:</b> не выполнен</div>`);
-    if(state.m2) lines.push(`<div><b>Модуль 2:</b> ${state.m2}</div>`); else lines.push(`<div><b>Модуль 2:</b> не выполнен</div>`);
-    if(state.m3) lines.push(`<div><b>Модуль 3:</b> ${state.m3}</div>`); else lines.push(`<div><b>Модуль 3:</b> не выполнен</div>`);
-    if(state.m4) lines.push(`<div><b>Модуль 4:</b> ${state.m4}</div>`); else lines.push(`<div><b>Модуль 4:</b> не выполнен</div>`);
-    $("#reportHuman").innerHTML=lines.join("");
+  function save(){
+    state.score = score; state.parts = parts; state.timestamp = new Date().toISOString();
+    localStorage.setItem("payroll_practice_state_v3", JSON.stringify(state));
+  }
+  function updateProgress(){
+    $("#score").textContent = score;
+    const done = Object.values(parts).filter(Boolean).length;
+    $("#statusBadge").textContent = "Статус: " + (done===0?"не начато":(done<4?"в процессе":"завершено"));
+    save(); renderReport();
+  }
+  function addPointsOnce(key, pts){
+    if(!parts[key]){ parts[key]=true; score = Math.min(100, score + pts); }
+    updateProgress();
+  }
+  function percent(n){ return (n*100).toFixed(1)+"%"; }
+  function formatRub(n){ return (n||0).toLocaleString('ru-RU',{maximumFractionDigits:0})+" ₽"; }
+  function badge(kind, text){
+    const cls = kind==="ok"?"ok":kind==="warn"?"warn":"bad";
+    const label = {ok:"Низкий риск", warn:"Умеренный риск", bad:"Высокий риск"}[kind] || "Инфо";
+    return `<span class="badge ${cls}" style="margin-right:6px">${label}</span>${text}`;
   }
 
-  $("#m1-check").onclick=()=>{state.m1="график проверен";parts.m1=true;updateScore(25);$("#m1-feedback").innerText="График стабильный";};
-  $("#m2-check").onclick=()=>{state.m2="назначения проверены";parts.m2=true;updateScore(25);$("#m2-feedback").innerText="Назначения корректны";};
-  $("#m3-check").onclick=()=>{state.m3="наличные проверены";parts.m3=true;updateScore(25);$("#m3-feedback").innerText="Риск оценён";};
-  $("#m4-check").onclick=()=>{state.m4="ФОТ проверен";parts.m4=true;updateScore(25);$("#m4-feedback").innerText="ФОТ соразмерен";};
-  $("#btnResetAll").onclick=()=>{location.reload();};
+  // ======= Модуль 1: Регулярность =======
+  $("#m1-check").addEventListener("click", ()=>{
+    const month = $("#m1-month").value.trim();
+    const raw = $("#m1-dates").value.trim();
+    const days = raw.split(",").map(s=>parseInt(s.trim(),10)).filter(x=>!isNaN(x)).sort((a,b)=>a-b);
+
+    if(!month || days.length<2){
+      $("#m1-feedback").innerHTML = "Заполните месяц и минимум две даты выплат.";
+      return;
+    }
+    // интервалы
+    const intervals = [];
+    for(let i=1;i<days.length;i++){ intervals.push(days[i]-days[i-1]); }
+    const avg = intervals.reduce((a,b)=>a+b,0)/intervals.length;
+    const dev = intervals.length ? Math.max(...intervals) - Math.min(...intervals) : 0;
+
+    let assessment, kind, pts;
+    if(avg>=10 && dev<=10){ assessment="График стабильный: выплаты распределены равномерно."; kind="ok"; pts=25; }
+    else if(avg>=8){ assessment="В целом ок, но интервалы неравномерны — выровняйте даты."; kind="warn"; pts=18; }
+    else { assessment="Хаотичный график — повысит внимание банка. Выровняйте расписание."; kind="bad"; pts=10; }
+
+    $("#m1-feedback").innerHTML =
+      badge(kind, assessment) +
+      `<div class="muted small">Средний интервал: <b>${avg.toFixed(1)} дн.</b>; разброс: <b>${dev} дн.</b>.</div>` +
+      `<div class="hr"></div>
+       <div class="small"><b>Что делать:</b> придерживаться схемы «аванс + оклад» с интервалом ~15 дней (напр., <b>5-е</b> и <b>20-е</b> числа месяца). Избегать крупных разовых «скопом»-выплат.</div>`;
+
+    state.m1 = {month, days, avg, dev, assessment, level:kind};
+    addPointsOnce("m1", pts);
+  });
+
+  $("#m1-show").addEventListener("click", ()=>{
+    $("#m1-feedback").innerHTML =
+      `<div class="note small"><b>Эталон:</b> 2–3 выплаты в месяц, предсказуемые даты (например, 5-е и 20-е), сопоставимые суммы. Любые отклонения — объяснимы документами (приказы, отпускные, премии).</div>`;
+  });
+
+  // ======= Модуль 2: Назначения =======
+  $("#m2-check").addEventListener("click", ()=>{
+    const a = $("#m2-q1").value;
+    const b = $("#m2-q2").value;
+    const c = $("#m2-q3").value;
+
+    let correct = 0, details = [];
+    if(a.includes("Заработная плата")){ correct++; details.push("Зарплата — корректно."); }
+    else details.push("Зарплата — неверно. Нужно указывать, что это «Заработная плата … по ТД №…». ");
+
+    if(b.includes("Отпускные")){ correct++; details.push("Отпускные — корректно."); }
+    else details.push("Отпускные — неверно. Пропишите период и основание (ТД №…).");
+
+    if(c.includes("Премия по положению")){ correct++; details.push("Премия — корректно."); }
+    else details.push("Премия — неверно. Укажите на основании какого положения/приказа.");
+
+    let assessment, kind, pts=[0,10,18,25][correct];
+    if(correct===3){ assessment="Все назначения корректны — рисков минимум."; kind="ok"; }
+    else if(correct===2){ assessment="В целом хорошо, но есть неточности — уточните формулировки."; kind="warn"; }
+    else { assessment="Формулировки слабые — высок риск запросов банка."; kind="bad"; }
+
+    $("#m2-feedback").innerHTML =
+      badge(kind, `Правильных: ${correct}/3 — ${assessment}`) +
+      `<ul class="small" style="margin:.4rem 0 .2rem 1.2rem">${details.map(d=>"<li>"+d+"</li>").join("")}</ul>` +
+      `<div class="hr"></div>
+       <div class="small"><b>Рекомендуемые формулировки:</b>
+         <ul>
+           <li>«Заработная плата за [месяц, год] по трудовому договору №…»</li>
+           <li>«Отпускные за период [даты] по ТД №…»</li>
+           <li>«Премия по положению о премировании от [дата], приказ №…»</li>
+         </ul>
+       </div>`;
+
+    state.m2 = {answers:{a,b,c}, correct, assessment, level:kind};
+    addPointsOnce("m2", pts);
+  });
+
+  $("#m2-show").addEventListener("click", ()=>{
+    $("#m2-feedback").innerHTML =
+      `<div class="note small"><b>Эталон:</b> назначение платежа должно однозначно указывать вид выплаты (зарплата/отпускные/премия) и основание (договор, период, приказ). Избегайте «Перевод Иванову», «Оплата услуг», если фактически это зарплата.</div>`;
+  });
+
+  // ======= Модуль 3: Наличные =======
+  $("#m3-check").addEventListener("click", ()=>{
+    const entries = [1,2,3].map(i=>{
+      const amt = parseFloat($("#m3-a"+i).value)||0;
+      const docs = $("#m3-d"+i).value==="yes";
+      return {amt, docs};
+    });
+    const total = entries.reduce((s,o)=>s+o.amt,0);
+
+    // скоринг рисков
+    let risk = 0, reasons=[];
+    entries.forEach((o,idx)=>{
+      if(o.amt<=0) return;
+      if(!o.docs){ risk+=2; reasons.push(`Снятие #${idx+1}: нет первичных документов.`); }
+      if(o.amt>=600000){ risk+=2; reasons.push(`Снятие #${idx+1}: крупная сумма ≥ 600 тыс.`); }
+      else if(o.amt>=200000){ risk+=1; reasons.push(`Снятие #${idx+1}: значимая сумма ≥ 200 тыс.`); }
+    });
+    if(total>=1000000){ risk+=1; reasons.push("Суммарно за месяц ≥ 1 млн ₽."); }
+
+    let level="низкий", kind="ok", pts=25;
+    if(risk<=2){ level="низкий"; kind="ok"; pts=25; }
+    else if(risk<=5){ level="умеренный"; kind="warn"; pts=18; }
+    else { level="высокий"; kind="bad"; pts=10; }
+
+    const recList = [
+      "Минимизируйте наличные — по возможности используйте безналичные переводы.",
+      "На каждое снятие — ПКО/РКО, ведомости, авансовые отчёты и чеки.",
+      "Избегайте всплесков: планируйте снятия в привязке к календарю выплат.",
+      "Суммы и частота снятий должны соотноситься с численностью штата и ФОТ."
+    ];
+
+    $("#m3-feedback").innerHTML =
+      badge(kind, `Риск ${level}. Сумма за месяц: <b>${formatRub(total)}</b>`) +
+      (reasons.length? `<div class="small"><b>Причины:</b> <ul style="margin:.2rem 0 .2rem 1.2rem">${reasons.map(r=>"<li>"+r+"</li>").join("")}</ul></div>` : "") +
+      `<div class="hr"></div><div class="small"><b>Что делать:</b><ul>${recList.map(r=>"<li>"+r+"</li>").join("")}</ul></div>`;
+
+    state.m3 = {entries, total, risk, level, reasons};
+    addPointsOnce("m3", pts);
+  });
+
+  $("#m3-show").addEventListener("click", ()=>{
+    $("#m3-feedback").innerHTML =
+      `<div class="note small"><b>Эталон:</b> наличка используется только при необходимости; на каждое снятие — полный комплект первички; избегайте регулярных крупных снятий без обоснования; суммы коррелируют с ФОТ.</div>`;
+  });
+
+  // ======= Модуль 4: ФОТ / Выручка =======
+  const ranges = {
+    consulting:[0,0.60],
+    hi_mfg:[0.30,0.40],
+    prod_trade:[0.18,0.21],
+    retail:[0.12,0.15],
+    services:[0.07,0.15]
+  };
+  const industryName = {
+    consulting:"Консалтинг (до 50–60%)",
+    hi_mfg:"Наукоёмкое производство (30–40%)",
+    prod_trade:"Произв.-торг. компании (18–21%)",
+    retail:"Торговля (розница) (12–15%)",
+    services:"Сфера услуг (7–15%)"
+  };
+
+  $("#m4-check").addEventListener("click", ()=>{
+    const rev = parseFloat($("#m4-rev").value)||0;
+    const fot = parseFloat($("#m4-fot").value)||0;
+    const ind = $("#m4-ind").value;
+
+    if(!rev || !fot || !ind){
+      $("#m4-feedback").innerHTML = "Заполните все поля.";
+      return;
+    }
+    const r = fot/rev;
+    const [lo,hi] = ranges[ind]||[0,1];
+
+    let status, kind, pts, advice=[];
+    if(r>=lo && r<=hi){ status="в пределах ориентира"; kind="ok"; pts=25;
+      advice.push("Продолжайте мониторить динамику доли ФОТ ежемесячно.");
+    } else if(Math.abs(r-lo)<=0.03 || Math.abs(r-hi)<=0.03){
+      status="близко к ориентиру — подготовьте пояснения"; kind="warn"; pts=18;
+      advice.push("Подготовьте объяснение отклонения: премии, сезонность, рост штата, разовые выплаты.");
+    } else {
+      status="вне диапазона — готовьте аргументацию и документы"; kind="bad"; pts=12;
+      if(r<lo) advice.push("Слишком низкий ФОТ при выручке: проверьте полноту оформления штата и разноску выплат.");
+      if(r>hi) advice.push("Слишком высокий ФОТ: оцените эффективность, структуру премий, нагрузку на фонд.");
+    }
+
+    $("#m4-feedback").innerHTML =
+      badge(kind, `Доля ФОТ: <b>${percent(r)}</b> (ориентир ${percent(lo)}–${percent(hi)} для «${industryName[ind]}»): ${status}.`) +
+      (advice.length? `<div class="small"><b>Что делать:</b><ul>${advice.map(a=>"<li>"+a+"</li>").join("")}</ul></div>` : "");
+
+    state.m4 = {rev, fot, ratio:r, range:[lo,hi], ind, status, level:kind};
+    addPointsOnce("m4", pts);
+  });
+
+  $("#m4-show").addEventListener("click", ()=>{
+    $("#m4-feedback").innerHTML =
+      `<div class="note small"><b>Пояснение:</b> ориентиры по ФОТ — это «маяки», а не нормы. Важнее динамика и объяснимость. Отклонения должны быть подтверждены документально (приказы на премии, изменение штата, сезонные пики).</div>`;
+  });
+
+  // ======= Отчёт-рекомендации =======
+  function renderReport(){
+    const lines = [];
+
+    // М1
+    if(state.m1){
+      const m1 = state.m1;
+      lines.push(`<h3>Модуль 1 — Регулярность выплат</h3>`);
+      lines.push(`<ul>
+        <li><b>Вывод:</b> ${m1.assessment}</li>
+        <li><b>Ваши даты:</b> ${m1.days.join(", ")}</li>
+        <li><b>Средний интервал:</b> ${m1.avg.toFixed(1)} дн.; <b>разброс:</b> ${m1.dev} дн.</li>
+        <li><b>Рекомендация:</b> придерживайтесь схемы «аванс + оклад» (5-е и 20-е), избегайте «скопом»-переводов.</li>
+      </ul>`);
+      lines.push(`<div class="hr"></div>`);
+    } else {
+      lines.push(`<h3>Модуль 1 — Регулярность выплат</h3><p class="muted small">Не выполнен — добавьте даты и проверьте равномерность.</p><div class="hr"></div>`);
+    }
+
+    // М2
+    if(state.m2){
+      const m2 = state.m2;
+      lines.push(`<h3>Модуль 2 — Назначение платежей</h3>`);
+      lines.push(`<ul>
+        <li><b>Правильных ответов:</b> ${m2.correct}/3</li>
+        <li><b>Вывод:</b> ${m2.assessment}</li>
+        <li><b>Рекомендация:</b> каждую выплату оформляйте с точным назначением и основанием (ТД/период/приказ).</li>
+      </ul>`);
+      lines.push(`<div class="hr"></div>`);
+    } else {
+      lines.push(`<h3>Модуль 2 — Назначение платежей</h3><p class="muted small">Не выполнен — выберите назначения и проверьте ответы.</p><div class="hr"></div>`);
+    }
+
+    // М3
+    if(state.m3){
+      const m3 = state.m3;
+      const items = (m3.entries||[]).filter(o=>o.amt>0).map((o,i)=>`#${i+1}: ${formatRub(o.amt)} (${o.docs?"документы есть":"нет документов"})`).join("; ");
+      lines.push(`<h3>Модуль 3 — Снятия наличных</h3>`);
+      lines.push(`<ul>
+        <li><b>Риск:</b> ${m3.level}</li>
+        <li><b>Сумма за месяц:</b> ${formatRub(m3.total)}</li>
+        <li><b>Операции:</b> ${items || "—"}</li>
+        ${m3.reasons && m3.reasons.length? `<li><b>Причины риска:</b> ${m3.reasons.join("; ")}</li>`:""}
+        <li><b>Рекомендация:</b> минимизируйте наличные, оформляйте ПКО/РКО, ведомости и чеки; планируйте снятия в привязке к календарю выплат.</li>
+      </ul>`);
+      lines.push(`<div class="hr"></div>`);
+    } else {
+      lines.push(`<h3>Модуль 3 — Снятия наличных</h3><p class="muted small">Не выполнен — укажите снятия и наличие документов.</p><div class="hr"></div>`);
+    }
+
+    // М4
+    if(state.m4){
+      const m4 = state.m4;
+      lines.push(`<h3>Модуль 4 — Соразмерность ФОТ оборотам</h3>`);
+      lines.push(`<ul>
+        <li><b>Выручка / ФОТ:</b> ${formatRub(m4.rev)} / ${formatRub(m4.fot)}</li>
+        <li><b>Доля ФОТ:</b> ${percent(m4.ratio)}, <b>ориентир:</b> ${percent(m4.range[0])}–${percent(m4.range[1])}</li>
+        <li><b>Статус:</b> ${m4.status}</li>
+        <li><b>Рекомендация:</b> ${m4.ratio<m4.range[0] ? "проверьте полноту оформления штата и разноску выплат" : m4.ratio>m4.range[1] ? "оцените эффективность, структуру премий и нагрузку на фонд" : "продолжайте мониторить динамику ежемесячно" }.</li>
+      </ul>`);
+      lines.push(`<div class="hr"></div>`);
+    } else {
+      lines.push(`<h3>Модуль 4 — Соразмерность ФОТ оборотам</h3><p class="muted small">Не выполнен — введите выручку, ФОТ и выберите отрасль.</p><div class="hr"></div>`);
+    }
+
+    lines.push(`<p class="muted small">Итоговые баллы: <b>${score}/100</b>. Обновлено: ${new Date(state.timestamp||Date.now()).toLocaleString()}.</p>`);
+    $("#reportHuman").innerHTML = lines.join("");
+  }
+
+  // ======= Копирование и сброс =======
+  $("#btnCopy").addEventListener("click", async ()=>{
+    try{
+      const text = document.getElementById("reportHuman").innerText;
+      await navigator.clipboard.writeText(text);
+      flash("#btnCopy","Скопировано!");
+    }catch(e){
+      alert("Не удалось скопировать. Выделите текст вручную (Ctrl/Cmd+C).");
+    }
+  });
+  $("#btnResetAll").addEventListener("click", ()=>{
+    if(!confirm("Сбросить результаты и очистить localStorage?")) return;
+    localStorage.removeItem("payroll_practice_state_v3");
+    location.reload();
+  });
+  function flash(sel, txt){
+    const btn = document.querySelector(sel);
+    const orig = btn.textContent; btn.textContent = txt;
+    setTimeout(()=>btn.textContent=orig,1200);
+  }
+
+  // стартовая отрисовка
+  updateProgress();
+
 })();
 </script>
 </body>
