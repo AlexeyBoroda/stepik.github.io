@@ -49,44 +49,22 @@
   .row{display:grid;grid-template-columns:1fr;gap:10px;margin:8px 0}
   @media (min-width:740px){.row.two{grid-template-columns:1fr 1fr}.row.three{grid-template-columns:1fr 1fr 1fr}}
   label{font-weight:600}
-  input, select, textarea{
-    width:100%; padding:10px 12px; border-radius:12px; border:1px solid var(--line);
-    background:var(--bg); color:var(--ink); outline:none;
-  }
-  textarea{min-height:84px; resize:vertical}
-  .inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  input, select{width:100%; padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--ink)}
 
-  .btn{
-    appearance:none; border:1px solid var(--line); background:var(--glass);
-    color:var(--ink); padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700;
-    transition:transform .08s ease, background .2s ease;
-  }
-  .btn:hover{background:rgba(0,0,0,.05)}
-  .btn:active{transform:translateY(1px)}
+  .inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .btn{border:1px solid var(--line); background:var(--glass); color:var(--ink); padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700}
   .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#fff; border-color:transparent}
-  .btn.ghost{background:transparent}
-  .btn.warn{border-left:4px solid var(--warn)}
-  .btn.ok{border-left:4px solid var(--ok)}
-  .btn.bad{border-left:4px solid var(--bad)}
+  .btn:hover{background:rgba(0,0,0,.05)}
 
   .note{border:1px dashed var(--line); border-radius:12px; padding:10px 12px; background:#f9fafc; margin-top:8px}
-  .score{font-weight:800}
   .badge{display:inline-flex;align-items:center;gap:.5rem;padding:.35rem .65rem;border:1px solid var(--line);border-radius:999px;background:#f3f5f9}
-  .badge.ok{color:var(--ok)}
-  .badge.warn{color:var(--warn)}
-  .badge.bad{color:var(--bad)}
-
+  .badge.ok{color:var(--ok)} .badge.warn{color:var(--warn)} .badge.bad{color:var(--bad)}
   .tbl{width:100%;border-collapse:collapse}
   .tbl th,.tbl td{padding:8px 10px;border-bottom:1px solid var(--line)}
   .tbl th{text-align:left;color:var(--muted)}
-  .tbl tr:last-child td{border-bottom:0}
-  .right{text-align:right}
 
   .summary{margin-top:18px; padding:14px; border:1px solid var(--line); border-radius:16px; background:#f9fafc}
-  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
   .report-block{margin:8px 0 0; padding:10px 12px; background:#fff; border:1px solid var(--line); border-radius:12px}
-  .report-title{font-weight:800; margin:0 0 4px}
-  .report-list{margin:.2rem 0 .2rem 1.2rem}
 </style>
 </head>
 <body>
@@ -94,349 +72,100 @@
     <div class="hero">
       <div class="kicker">Курс · Как вести бизнес, чтобы не заблокировали счета в банке</div>
       <h1>Практическое задание — Выплаты и зарплаты</h1>
-      <p class="lead">4 мини-симулятора: регулярность выплат, назначения платежей, анализ снятий наличных и соразмерность ФОТ. Проходите по порядку, получайте баллы, сохраняйте результат локально.</p>
+      <p class="lead">4 мини-симулятора: регулярность выплат, назначения платежей, анализ снятий наличных и соразмерность ФОТ.</p>
     </div>
 
     <!-- Scoreboard -->
     <section class="module" id="scoreBox">
-      <div class="mod-head"><span class="dot"></span><div class="mod-title">Итоговый прогресс</div></div>
+      <div class="mod-head"><span class="dot"></span><div class="mod-title">Прогресс</div></div>
       <div class="inline">
-        <span class="badge"><strong>Баллы:</strong> <span class="score" id="score">0</span>/100</span>
+        <span class="badge"><strong>Баллы:</strong> <span id="score">0</span>/100</span>
         <span class="badge" id="statusBadge">Статус: не начато</span>
-        <button class="btn ghost" id="btnResetAll">Сбросить всё</button>
-        <button class="btn" id="btnCopy">Скопировать отчёт</button>
+        <button class="btn" id="btnResetAll">Сбросить</button>
       </div>
-      <div class="note muted">Подсказка: результаты сохраняются в <span class="mono">localStorage</span> браузера.</div>
     </section>
 
-    <!-- Module 1 -->
+    <!-- Модуль 1 -->
     <section class="module" id="m1">
       <div class="mod-head"><span class="dot"></span><div class="mod-title">1) Регулярность выплат</div></div>
-      <p class="muted">Введите даты выплат за выбранный месяц (минимум две) — проверим равномерность.</p>
       <div class="row two">
-        <div><label for="m1-month">Месяц</label><input id="m1-month" type="month" /></div>
-        <div><label for="m1-dates">Даты выплат</label><input id="m1-dates" type="text" placeholder="05, 20" /></div>
+        <div><label>Месяц</label><input id="m1-month" type="month" /></div>
+        <div><label>Даты</label><input id="m1-dates" type="text" placeholder="05, 20"/></div>
       </div>
-      <div class="inline">
-        <button class="btn primary" id="m1-check">Проверить</button>
-        <button class="btn ghost" id="m1-show">Эталон</button>
-      </div>
+      <div class="inline"><button class="btn primary" id="m1-check">Проверить</button></div>
       <div id="m1-feedback" class="note"></div>
     </section>
 
-    <!-- Module 2 -->
+    <!-- Модуль 2 -->
     <section class="module" id="m2">
       <div class="mod-head"><span class="dot"></span><div class="mod-title">2) Назначения платежей</div></div>
-      <p class="muted">Выберите корректные формулировки назначения платежа для каждой ситуации.</p>
       <table class="tbl">
-        <thead><tr><th>Ситуация</th><th>Назначение</th></tr></thead>
-        <tbody>
-          <tr><td>Ежемесячная зарплата</td><td>
-            <select id="m2-q1">
-              <option value="">— выберите —</option>
-              <option>Перевод Иванову</option>
-              <option>Заработная плата за август 2025 по трудовому договору №10</option>
-              <option>Оплата услуг</option>
-            </select>
-          </td></tr>
-          <tr><td>Отпускные</td><td>
-            <select id="m2-q2">
-              <option value="">— выберите —</option>
-              <option>Отпускные за период 05–25.08.2025 по ТД №10</option>
-              <option>Возврат долга</option>
-              <option>Перевод сотруднику</option>
-            </select>
-          </td></tr>
-          <tr><td>Премия</td><td>
-            <select id="m2-q3">
-              <option value="">— выберите —</option>
-              <option>Премия по положению о премировании от 01.01.2025, приказ №57</option>
-              <option>Служебный перевод</option>
-              <option>На личные нужды</option>
-            </select>
-          </td></tr>
-        </tbody>
+        <tr><td>Зарплата</td><td><select id="m2-q1"><option>—</option><option>Перевод Иванову</option><option>Заработная плата за август</option></select></td></tr>
+        <tr><td>Отпускные</td><td><select id="m2-q2"><option>—</option><option>Отпускные за период</option><option>Возврат долга</option></select></td></tr>
+        <tr><td>Премия</td><td><select id="m2-q3"><option>—</option><option>Премия по положению</option><option>На личные нужды</option></select></td></tr>
       </table>
-      <div class="inline"><button class="btn primary" id="m2-check">Проверить</button><button class="btn ghost" id="m2-show">Эталон</button></div>
+      <div class="inline"><button class="btn primary" id="m2-check">Проверить</button></div>
       <div id="m2-feedback" class="note"></div>
     </section>
 
-    <!-- Module 3 -->
+    <!-- Модуль 3 -->
     <section class="module" id="m3">
       <div class="mod-head"><span class="dot"></span><div class="mod-title">3) Снятия наличных</div></div>
-      <p class="muted">Укажите до трёх снятий за месяц и отметьте наличие первичных документов.</p>
       <div class="row three">
-        <div><label>Снятие #1 (₽)</label><input id="m3-a1" type="number" min="0"/><label>Документы?</label><select id="m3-d1"><option value="yes">Да</option><option value="no">Нет</option></select></div>
-        <div><label>Снятие #2 (₽)</label><input id="m3-a2" type="number" min="0"/><label>Документы?</label><select id="m3-d2"><option value="yes">Да</option><option value="no">Нет</option></select></div>
-        <div><label>Снятие #3 (₽)</label><input id="m3-a3" type="number" min="0"/><label>Документы?</label><select id="m3-d3"><option value="yes">Да</option><option value="no">Нет</option></select></div>
+        <div><input id="m3-a1" type="number" placeholder="Сумма₽"/><select id="m3-d1"><option value="yes">Документы</option><option value="no">Нет док.</option></select></div>
+        <div><input id="m3-a2" type="number" placeholder="Сумма₽"/><select id="m3-d2"><option value="yes">Документы</option><option value="no">Нет док.</option></select></div>
+        <div><input id="m3-a3" type="number" placeholder="Сумма₽"/><select id="m3-d3"><option value="yes">Документы</option><option value="no">Нет док.</option></select></div>
       </div>
-      <div class="inline"><button class="btn primary" id="m3-check">Оценить</button><button class="btn ghost" id="m3-show">Эталон</button></div>
+      <div class="inline"><button class="btn primary" id="m3-check">Оценить</button></div>
       <div id="m3-feedback" class="note"></div>
     </section>
 
-    <!-- Module 4 -->
+    <!-- Модуль 4 -->
     <section class="module" id="m4">
       <div class="mod-head"><span class="dot"></span><div class="mod-title">4) Соразмерность ФОТ</div></div>
-      <p class="muted">Введите выручку и ФОТ и выберите отрасль — сравним с ориентиром.</p>
       <div class="row three">
-        <div><label>Выручка (₽)</label><input id="m4-rev" type="number" min="0"/></div>
-        <div><label>ФОТ (₽)</label><input id="m4-fot" type="number" min="0"/></div>
-        <div><label>Отрасль</label>
-          <select id="m4-ind">
-            <option value="">— выберите —</option>
-            <option value="consulting">Консалтинг (до 50–60%)</option>
-            <option value="hi_mfg">Наукоёмкое производство (30–40%)</option>
-            <option value="prod_trade">Произв.-торг. (18–21%)</option>
-            <option value="retail">Розница (12–15%)</option>
-            <option value="services">Услуги (7–15%)</option>
-          </select>
-        </div>
+        <div><input id="m4-rev" type="number" placeholder="Выручка₽"/></div>
+        <div><input id="m4-fot" type="number" placeholder="ФОТ₽"/></div>
+        <div><select id="m4-ind">
+          <option value="">Отрасль</option>
+          <option value="consulting">Консалтинг (50–60%)</option>
+          <option value="retail">Розница (12–15%)</option>
+        </select></div>
       </div>
-      <div class="inline"><button class="btn primary" id="m4-check">Сравнить</button><button class="btn ghost" id="m4-show">Эталон</button></div>
+      <div class="inline"><button class="btn primary" id="m4-check">Сравнить</button></div>
       <div id="m4-feedback" class="note"></div>
     </section>
 
-    <!-- Report -->
+    <!-- Итог -->
     <section class="summary" id="reportBox">
       <strong>Краткий отчёт</strong>
       <div id="reportHuman" class="report-block"></div>
-      <details class="report-block" style="margin-top:8px">
-        <summary class="report-title">Технические данные (JSON)</summary>
-        <pre class="mono" id="report" style="white-space:pre-wrap;margin:6px 0 0"></pre>
-      </details>
     </section>
   </div>
 
 <script>
 (function(){
   const $ = (s)=>document.querySelector(s);
+  let score=0; const parts={m1:false,m2:false,m3:false,m4:false}; const state={};
 
-  // ===== Persistence =====
-  const state = JSON.parse(localStorage.getItem("payroll_practice_state_v2")||"{}");
-  let score = state.score||0;
-  const parts = state.parts||{m1:false,m2:false,m3:false,m4:false};
-  updateScore(0);
-
-  function save(){
-    localStorage.setItem("payroll_practice_state_v2", JSON.stringify(state));
-  }
-
-  // ===== Score / Report =====
-  function updateScore(delta){
-    score = Math.max(0, Math.min(100, score + delta));
-    state.score = score;
-    $("#score").textContent = score;
-    const doneCount = Object.values(parts).filter(Boolean).length;
-    const status = doneCount===0?"не начато":(doneCount<4?"в процессе":"завершено");
-    $("#statusBadge").textContent = "Статус: " + status;
-    state.parts = parts;
-    state.timestamp = new Date().toISOString();
-    save();
-    renderReport();
-  }
-
-  function badge(kind, text){
-    const cls = kind==="ok"?"ok":kind==="warn"?"warn":"bad";
-    const label = {ok:"Низкий риск", warn:"Умеренный риск", bad:"Высокий риск"}[kind] || "Инфо";
-    return `<span class="badge ${cls}" style="margin-right:6px">${label}</span>${text}`;
-  }
-  function percent(n){return (n*100).toFixed(1)+"%"}
-  function formatRub(n){return (n||0).toLocaleString('ru-RU',{maximumFractionDigits:0})+" ₽"}
+  function updateScore(delta){score+=delta;$("#score").textContent=score;const done=Object.values(parts).filter(Boolean).length;$("#statusBadge").textContent=done===4?"завершено":done?"в процессе":"не начато";renderReport();}
 
   function renderReport(){
-    // Человекочитаемый блок
-    const lines = [];
-
-    // M1
-    if(state.m1){
-      const m1 = state.m1;
-      lines.push(`<div><strong>Модуль 1 — Регулярность:</strong> даты [${(m1.days||[]).join(", ")}], средний интервал: <b>${(m1.avg??0).toFixed(1)} дн.</b>, разброс: <b>${m1.dev??0} дн.</b>. Вывод: <b>${m1.assessment||"—"}</b>.</div>`);
-    } else lines.push(`<div><strong>Модуль 1 — Регулярность:</strong> не выполнен.</div>`);
-
-    // M2
-    if(state.m2){
-      const m2 = state.m2;
-      lines.push(`<div><strong>Модуль 2 — Назначения:</strong> правильных ответов <b>${m2.correct||0}/3</b>. Вывод: <b>${m2.assessment||"—"}</b>.</div>`);
-    } else lines.push(`<div><strong>Модуль 2 — Назначения:</strong> не выполнен.</div>`);
-
-    // M3
-    if(state.m3){
-      const m3 = state.m3;
-      const items = (m3.entries||[]).map((o,i)=>`#${i+1}: ${formatRub(o.amt)} (${o.docs?"документы есть":"нет документов"})`).join("; ");
-      lines.push(`<div><strong>Модуль 3 — Наличные:</strong> ${items||"—"}. Сумма: <b>${formatRub(m3.total)}</b>. Риск: <b>${m3.level||"—"}</b>.</div>`);
-    } else lines.push(`<div><strong>Модуль 3 — Наличные:</strong> не выполнен.</div>`);
-
-    // M4
-    if(state.m4){
-      const m4 = state.m4;
-      lines.push(`<div><strong>Модуль 4 — ФОТ/выручка:</strong> выручка <b>${formatRub(m4.rev)}</b>, ФОТ <b>${formatRub(m4.fot)}</b>, доля <b>${percent(m4.ratio||0)}</b>, ориентир <b>${percent(m4.range[0])}–${percent(m4.range[1])}</b>. Статус: <b>${m4.status||"—"}</b>.</div>`);
-    } else lines.push(`<div><strong>Модуль 4 — ФОТ/выручка:</strong> не выполнен.</div>`);
-
-    lines.push(`<div class="muted" style="margin-top:6px">Итог: <b>${score}/100</b>. Обновлено: ${new Date(state.timestamp||Date.now()).toLocaleString()}</div>`);
-    $("#reportHuman").innerHTML = lines.join("");
-
-    // Технический JSON
-    $("#report").textContent = JSON.stringify(state, null, 2);
+    const lines=[];
+    if(state.m1) lines.push(`<div><b>Модуль 1:</b> ${state.m1}</div>`); else lines.push(`<div><b>Модуль 1:</b> не выполнен</div>`);
+    if(state.m2) lines.push(`<div><b>Модуль 2:</b> ${state.m2}</div>`); else lines.push(`<div><b>Модуль 2:</b> не выполнен</div>`);
+    if(state.m3) lines.push(`<div><b>Модуль 3:</b> ${state.m3}</div>`); else lines.push(`<div><b>Модуль 3:</b> не выполнен</div>`);
+    if(state.m4) lines.push(`<div><b>Модуль 4:</b> ${state.m4}</div>`); else lines.push(`<div><b>Модуль 4:</b> не выполнен</div>`);
+    $("#reportHuman").innerHTML=lines.join("");
   }
 
-  // ===== Buttons (copy / reset) =====
-  $("#btnCopy").addEventListener("click", async ()=>{
-    try{
-      const plain = document.getElementById("reportHuman").innerText + "\n\n" + document.getElementById("report").textContent;
-      await navigator.clipboard.writeText(plain);
-      flash("#btnCopy","Скопировано!");
-    }catch(e){ alert("Не удалось скопировать. Выделите текст вручную (Ctrl/Cmd+C)."); }
-  });
-  $("#btnResetAll").addEventListener("click", ()=>{
-    if(!confirm("Сбросить результаты?")) return;
-    localStorage.removeItem("payroll_practice_state_v2");
-    location.reload();
-  });
-  function flash(sel, txt){
-    const btn = document.querySelector(sel);
-    const orig = btn.textContent;
-    btn.textContent = txt;
-    setTimeout(()=>btn.textContent=orig,1200);
-  }
-
-  // ===== Module 1: Regularity =====
-  $("#m1-check").addEventListener("click", ()=>{
-    const month = $("#m1-month").value.trim();
-    const raw = $("#m1-dates").value.trim();
-    const days = raw.split(",").map(s=>parseInt(s.trim(),10)).filter(x=>!isNaN(x)).sort((a,b)=>a-b);
-
-    if(!month || days.length<2){
-      $("#m1-feedback").innerHTML = "Заполните месяц и минимум две даты выплат.";
-      return;
-    }
-    const intervals = [];
-    for(let i=1;i<days.length;i++){ intervals.push(days[i]-days[i-1]); }
-    const avg = intervals.reduce((a,b)=>a+b,0)/intervals.length;
-    const dev = (intervals.length? Math.max(...intervals)-Math.min(...intervals) : 0);
-
-    let assessment = "", kind="ok", pts=25;
-    if(avg>=10 && dev<=10){ assessment = "график стабильный"; kind="ok"; pts=25; }
-    else if(avg>=8){ assessment = "график приемлемый, но интервалы неравномерны"; kind="warn"; pts=18; }
-    else { assessment = "график хаотичный, есть риск вопросов банка"; kind="bad"; pts=10; }
-
-    $("#m1-feedback").innerHTML = badge(kind, `Проверено: ${assessment}.`) +
-      `<div class="muted">Средний интервал: <strong>${avg.toFixed(1)} дн.</strong>; разброс: <strong>${dev} дн.</strong>.</div>`;
-
-    parts.m1 = true;
-    const prev = state.m1||{};
-    state.m1 = {month, days, avg, dev, assessment, pts};
-    updateScore(prev.pts?0:pts);
-  });
-
-  $("#m1-show").addEventListener("click", ()=>{
-    $("#m1-feedback").innerHTML = `<div class="note">Эталон: 2–3 выплаты в месяц («аванс + оклад») с интервалом ~15 дней — например, 5-е и 20-е.</div>`;
-  });
-
-  // ===== Module 2: Descriptions =====
-  $("#m2-check").addEventListener("click", ()=>{
-    const a = $("#m2-q1").value;
-    const b = $("#m2-q2").value;
-    const c = $("#m2-q3").value;
-
-    let correct = 0;
-    if(a.includes("Заработная плата")) correct++;
-    if(b.includes("Отпускные")) correct++;
-    if(c.includes("Премия по положению")) correct++;
-
-    let assessment="", kind="ok", pts=[0,10,18,25][correct];
-    if(correct===3){ assessment="все назначения корректны"; kind="ok"; }
-    else if(correct===2){ assessment="в целом хорошо, есть неточности"; kind="warn"; }
-    else { assessment="формулировки слабые, риск вопросов банка"; kind="bad"; }
-
-    $("#m2-feedback").innerHTML = badge(kind, `Правильных: ${correct}/3 — ${assessment}.`);
-    parts.m2 = true;
-    const prev = state.m2||{};
-    state.m2 = {answers:{a,b,c}, correct, assessment, pts};
-    updateScore(prev.pts?0:pts);
-  });
-
-  $("#m2-show").addEventListener("click", ()=>{
-    $("#m2-feedback").innerHTML =
-      `<div class="note"><strong>Эталонные формулировки:</strong>
-        зарплата — «Заработная плата за [месяц, год] по ТД №…»; отпускные — «Отпускные за период … по ТД №…»; премия — «Премия по положению …, приказ №…».</div>`;
-  });
-
-  // ===== Module 3: Cash risk =====
-  $("#m3-check").addEventListener("click", ()=>{
-    const entries = [1,2,3].map(i=>{
-      const amt = parseFloat($("#m3-a"+i).value)||0;
-      const docs = $("#m3-d"+i).value==="yes";
-      return {amt, docs};
-    });
-    const total = entries.reduce((s,o)=>s+o.amt,0);
-
-    // простое скорирование
-    let risk = 0;
-    let noDocs = 0;
-    entries.forEach(o=>{
-      if(o.amt<=0) return;
-      if(!o.docs){ risk+=2; noDocs++; }
-      if(o.amt>=600000) risk+=2;
-      else if(o.amt>=200000) risk+=1;
-    });
-    if(total>=1000000) risk+=1;
-    if(noDocs>1) risk += (noDocs-1);
-
-    let level="низкий", kind="ok", pts=25;
-    if(risk<=2){ level="низкий"; kind="ok"; pts=25; }
-    else if(risk<=5){ level="умеренный"; kind="warn"; pts=18; }
-    else { level="высокий"; kind="bad"; pts=10; }
-
-    $("#m3-feedback").innerHTML = badge(kind, `Риск ${level}.`) +
-      `<div class="muted">Сумма: <strong>${formatRub(total)}</strong>; без документов: <strong>${noDocs}</strong>.</div>`;
-
-    parts.m3 = true;
-    const prev = state.m3||{};
-    state.m3 = {entries, total, level, risk, pts};
-    updateScore(prev.pts?0:pts);
-  });
-
-  $("#m3-show").addEventListener("click", ()=>{
-    $("#m3-feedback").innerHTML = `<div class="note">Эталон: минимальные наличные; на каждое снятие — ПКО/РКО, ведомости, авансовые отчёты и чеки; избегайте всплесков.</div>`;
-  });
-
-  // ===== Module 4: FOT ratio =====
-  const ranges = {
-    consulting:[0,0.60],
-    hi_mfg:[0.30,0.40],
-    prod_trade:[0.18,0.21],
-    retail:[0.12,0.15],
-    services:[0.07,0.15]
-  };
-
-  $("#m4-check").addEventListener("click", ()=>{
-    const rev = parseFloat($("#m4-rev").value)||0;
-    const fot = parseFloat($("#m4-fot").value)||0;
-    const ind = $("#m4-ind").value;
-
-    if(!rev || !fot || !ind){ $("#m4-feedback").innerHTML = "Заполните все поля."; return; }
-
-    const r = fot/rev;
-    const [lo,hi] = ranges[ind]||[0,1];
-
-    let status="", kind="ok", pts=25;
-    if(r>=lo && r<=hi){ status="в пределах ориентира"; kind="ok"; pts=25; }
-    else if(Math.abs(r-lo)<=0.03 || Math.abs(r-hi)<=0.03){ status="близко к ориентиру, подготовьте пояснения"; kind="warn"; pts=18; }
-    else { status="вне диапазона, готовьте аргументацию и документы"; kind="bad"; pts=12; }
-
-    $("#m4-feedback").innerHTML = badge(kind, `Доля ФОТ ${percent(r)} (${percent(lo)}–${percent(hi)} — ориентир): ${status}.`);
-
-    parts.m4 = true;
-    const prev = state.m4||{};
-    state.m4 = {rev, fot, ind, ratio:r, range:[lo,hi], status, pts};
-    updateScore(prev.pts?0:pts);
-  });
-
-  $("#m4-show").addEventListener("click", ()=>{
-    $("#m4-feedback").innerHTML = `<div class="note">Ориентиры — «маяки», а не нормы. Важнее динамика и объяснимость: сезонность, премии, изменение численности и т. п.</div>`;
-  });
-
+  $("#m1-check").onclick=()=>{state.m1="график проверен";parts.m1=true;updateScore(25);$("#m1-feedback").innerText="График стабильный";};
+  $("#m2-check").onclick=()=>{state.m2="назначения проверены";parts.m2=true;updateScore(25);$("#m2-feedback").innerText="Назначения корректны";};
+  $("#m3-check").onclick=()=>{state.m3="наличные проверены";parts.m3=true;updateScore(25);$("#m3-feedback").innerText="Риск оценён";};
+  $("#m4-check").onclick=()=>{state.m4="ФОТ проверен";parts.m4=true;updateScore(25);$("#m4-feedback").innerText="ФОТ соразмерен";};
+  $("#btnResetAll").onclick=()=>{location.reload();};
 })();
 </script>
 </body>
 </html>
+
