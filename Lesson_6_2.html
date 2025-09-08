@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Как снизить риски — теория и практики онлайн</title>
+<meta name="description" content="Курс: Как вести бизнес, чтобы не заблокировали счета в банке. Подтема: Как снизить риски. Теория и практики: калькулятор рисков, KYC-чеклист, конструктор документов, квизы и кейсы." />
+<style>
+  :root{
+    --bg:#ffffff; --text:#111827; --muted:#6b7280; --card:#f8fafc; --line:#e5e7eb;
+    --accent:#1f3a8a; --ok:#059669; --warn:#b45309; --danger:#dc2626; --info:#2563eb;
+    --shadow:0 10px 20px rgba(2,6,23,.05);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+    font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,"Noto Sans",sans-serif}
+  a{color:var(--info);text-decoration:none}
+  a:hover{text-decoration:underline}
+  html{scroll-behavior:smooth}
+
+  .wrap{max-width:1100px;margin:28px auto 100px;padding:0 16px}
+  header h1{margin:0 0 8px;font-size:30px;line-height:1.2}
+  header .lead{margin:0 0 16px;color:var(--muted)}
+  .badge{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--card);color:var(--accent);
+    border:1px solid var(--line);font-weight:600;font-size:12px;letter-spacing:.25px}
+
+  /* Top nav buttons (no hash) */
+  .nav{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 24px}
+  .btn{appearance:none;border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 12px;cursor:pointer}
+  .btn:hover{background:#f9fafb}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btn.ghost{background:var(--card)}
+  .btn.small{padding:6px 10px;font-size:14px}
+
+  /* Sections & cards */
+  section{margin:0 0 28px;padding:18px;border:1px solid var(--line);border-radius:16px;background:#fff;box-shadow:var(--shadow)}
+  section h2{margin:0 0 12px;font-size:24px}
+  section h3{margin:14px 0 8px;font-size:18px}
+  p{margin:6px 0 10px}
+  ul,ol{margin:8px 0 8px 20px}
+
+  .row{display:grid;gap:16px}
+  @media(min-width:900px){ .row.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))} .row.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}
+  .card h4{margin:0 0 6px;font-size:16px}
+  .muted{color:var(--muted)}
+  .tag{display:inline-block;font-size:12px;padding:2px 8px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);margin-right:6px}
+
+  .callout{border-left:4px solid var(--accent);background:var(--card);padding:12px 14px;border-radius:12px}
+  .callout.ok{border-left-color:var(--ok)}
+  .callout.warn{border-left-color:var(--warn)}
+  .callout.danger{border-left-color:var(--danger)}
+
+  /* Inputs */
+  input[type="text"], input[type="number"], textarea, select{
+    width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:#fff;
+  }
+  textarea{min-height:110px; resize:vertical}
+  .inline{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+  .field{display:grid; gap:6px; margin:8px 0}
+  .sep{height:1px;background:var(--line);margin:14px 0}
+  .right{display:flex;justify-content:flex-end;gap:8px}
+  .center{text-align:center}
+
+  /* Quiz */
+  .quiz-q{margin:12px 0; padding:12px; border:1px solid var(--line); border-radius:12px}
+  .quiz-q h4{margin:0 0 8px}
+  .option{display:flex;align-items:flex-start;gap:10px;margin:6px 0}
+  .pill{display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid var(--line); color:var(--muted)}
+  .result{margin-top:10px; font-weight:700}
+  .good{color:var(--ok)} .bad{color:var(--danger)} .warn-t{color:var(--warn)}
+
+  /* Modal */
+  .modal{position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(17,24,39,.4); z-index:50}
+  .modal.open{display:flex}
+  .modal .box{background:#fff; border-radius:16px; border:1px solid var(--line); width:min(880px,94vw); max-height:90vh; overflow:auto; padding:18px; box-shadow:var(--shadow)}
+  .modal .box h3{margin-top:0}
+  .close-x{position:sticky; top:0; display:flex; justify-content:flex-end; margin:-10px -10px 0 0}
+  .close-x button{border:none;background:transparent;font-size:22px;cursor:pointer}
+
+  /* Risk score */
+  .score{display:flex; align-items:center; gap:10px; font-size:18px}
+  .badge-score{display:inline-block; min-width:100px; text-align:center; padding:6px 10px; border-radius:999px; color:#fff; font-weight:700}
+  .s-low{background:var(--ok)} .s-med{background:var(--warn)} .s-high{background:var(--danger)}
+
+  /* Print */
+  @media print{
+    .nav, .btn, .modal{display:none !important}
+    a[href]::after{content:" (" attr(href) ")";font-size:12px;color:var(--muted)}
+    section{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="top">
+  <header>
+    <span class="badge">Модуль: Риски и запреты → Подтема: Как снизить риски</span>
+    <h1>Как снизить риски блокировки счёта и «заморозки» платежей</h1>
+    <p class="lead">Теория + интерактивные практики: калькулятор рисков, KYC-чеклист, конструктор «папки сделки», квизы и кейсы. Всё работает без внешних запросов; прогресс сохраняется локально.</p>
+  </header>
+
+  <!-- Internal nav without hash -->
+  <div class="nav" id="nav">
+    <button class="btn primary" data-jump="theory">Теория</button>
+    <button class="btn" data-jump="practice-kyc">Практика: KYC 5 минут</button>
+    <button class="btn" data-jump="practice-score">Калькулятор рисков</button>
+    <button class="btn" data-jump="practice-docs">Конструктор «папки сделки»</button>
+    <button class="btn" data-jump="quiz">Квизы</button>
+    <button class="btn" data-jump="cases">Кейсы</button>
+    <button class="btn ghost small" id="resetAll">Сбросить прогресс</button>
+  </div>
+
+  <!-- THEORY -->
+  <section id="theory">
+    <h2>Коротко об основе: что снижает риск</h2>
+    <div class="callout">
+      Прозрачность операций, актуальные сведения (адрес, ОКВЭД, участники), разумная доля налогов к обороту (~0,9%+ как ориентир практики), дисциплина с наличными, проверка контрагентов, внутренний контроль ПОД/ФТ и быстрая коммуникация с банком.
+    </div>
+    <div class="row cols-2">
+      <div class="card">
+        <h4>Прозрачность и документы</h4>
+        <ul>
+          <li>Договор + счет/инвойс + акт/накладная/УПД + подтверждения результата.</li>
+          <li>Краткое пояснение экономической логики (1 стр.): цель → результат → выгода.</li>
+          <li>Отдельные «папки сделок» по ключевым контрагентам.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Актуализация сведений</h4>
+        <ul>
+          <li>Раз в квартал: адрес, руководители/бенефициары, ОКВЭД.</li>
+          <li>Единообразие данных в ФНС, банке, договорах.</li>
+          <li>ОКВЭД добавлять до начала операций.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Налоги и ФОТ</h4>
+        <ul>
+          <li>Ориентир практики: налоги/оборот ≳ <b>0,9%</b> (не закон, но сигнал «нормальности»).</li>
+          <li>Регулярность ФОТ/НДФЛ/взносов.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Наличные и контрагенты</h4>
+        <ul>
+          <li>Минимизировать наличные, всё подтверждать документами.</li>
+          <li>KYC перед предоплатой: открытые источники + сохранение подтверждений.</li>
+        </ul>
+      </div>
+    </div>
+    <h3>Открытые источники (бесплатно)</h3>
+    <div class="row cols-3">
+      <div class="card">
+        <h4><a href="https://pb.nalog.ru/" target="_blank" rel="noopener">Прозрачный бизнес — ФНС</a></h4>
+        <p class="muted">Регистрационные данные, массовость адреса, статус, недостоверность сведений — быстрый базовый KYC.</p>
+      </div>
+      <div class="card">
+        <h4><a href="https://service.nalog.ru/" target="_blank" rel="noopener">Сервисы ФНС</a></h4>
+        <p class="muted">Проверка ИНН/адреса, аналитика по налоговой нагрузке и др. официальные сервисы.</p>
+      </div>
+      <div class="card">
+        <h4><a href="https://zsk.cbr.ru/" target="_blank" rel="noopener">«Знай своего клиента» — ЦБ</a></h4>
+        <p class="muted">Ориентиры добросовестности, разъяснения по рискам, полезно для регламента ПОД/ФТ.</p>
+      </div>
+      <div class="card">
+        <h4><a href="https://fedresurs.ru/" target="_blank" rel="noopener">Федресурс</a></h4>
+        <p class="muted">Публикации о банкротстве/ликвидации — «красный флажок» перед авансом.</p>
+      </div>
+      <div class="card">
+        <h4><a href="https://kad.arbitr.ru/" target="_blank" rel="noopener">КАД «Арбитр»</a></h4>
+        <p class="muted">Судебные споры и банкротные дела — оценка судебных рисков.</p>
+      </div>
+      <div class="card">
+        <h4><a href="https://fssp.gov.ru/iss/ip" target="_blank" rel="noopener">ФССП (ИП)</a></h4>
+        <p class="muted">Исполнительные производства — индикатор вероятности проблем с оплатой.</p>
+      </div>
+    </div>
+    <h3>Платные решения (как класс инструментов)</h3>
+    <p class="muted">Для крупных оборотов и множества контрагентов: СПАРК (Интерфакс), Контур-Фокус (СКБ Контур), СКРИН/Интерфакс и аналоги. Ускоряют и углубляют проверку, но не заменяют документы и экономическую логику операций.</p>
+  </section>
+
+  <!-- PRACTICE 1: KYC 5 minutes -->
+  <section id="practice-kyc">
+    <h2>Практика: KYC-проверка контрагента за 5 минут</h2>
+    <p>Отметьте пункты и добавьте короткие заметки. Результат сохранится локально, и вы сможете распечатать или скачать.</p>
+    <div class="row cols-2">
+      <div class="card">
+        <h4>Чек-лист (отметьте выполненное)</h4>
+        <div class="field"><label><input type="checkbox" class="kyc-check" data-k="pb"> ФНС «Прозрачный бизнес»: статус, адрес, руководители</label></div>
+        <div class="field"><label><input type="checkbox" class="kyc-check" data-k="fed"> Федресурс: банкротство/ликвидация</label></div>
+        <div class="field"><label><input type="checkbox" class="kyc-check" data-k="kad"> КАД «Арбитр»: судебные споры</label></div>
+        <div class="field"><label><input type="checkbox" class="kyc-check" data-k="fssp"> ФССП: исполнительные производства</label></div>
+        <div class="field"><label><input type="checkbox" class="kyc-check" data-k="addr"> Адрес не массовый; контакты проверены</label></div>
+        <div class="field"><label><input type="checkbox" class="kyc-check" data-k="age"> Возраст компании/ИП и активность приемлемые</label></div>
+        <div class="sep"></div>
+        <div class="field">
+          <label for="kyc-notes">Краткие заметки (что увидели):</label>
+          <textarea id="kyc-notes" placeholder="Например: адрес не массовый; споров нет; публикаций о банкротстве нет; телефон отвечает..."></textarea>
+        </div>
+        <div class="right">
+          <button class="btn small" id="kycSave">Сохранить</button>
+          <button class="btn small" id="kycClear">Очистить</button>
+        </div>
+      </div>
+      <div class="card">
+        <h4>Ссылки (откроются в новой вкладке)</h4>
+        <ul>
+          <li><a href="https://pb.nalog.ru/" target="_blank" rel="noopener">ФНС «Прозрачный бизнес»</a></li>
+          <li><a href="https://fedresurs.ru/" target="_blank" rel="noopener">Федресурс</a></li>
+          <li><a href="https://kad.arbitr.ru/" target="_blank" rel="noopener">КАД «Арбитр»</a></li>
+          <li><a href="https://fssp.gov.ru/iss/ip" target="_blank" rel="noopener">ФССП: исполнительные производства</a></li>
+          <li><a href="https://service.nalog.ru/" target="_blank" rel="noopener">Сервисы ФНС</a></li>
+          <li><a href="https://zsk.cbr.ru/" target="_blank" rel="noopener">«Знай своего клиента» — ЦБ</a></li>
+        </ul>
+        <div class="sep"></div>
+        <div class="callout ok">
+          Сохраните скриншоты/выписки из источников в «папку сделки» — это ускорит ответы на запросы банка.
+        </div>
+        <div class="sep"></div>
+        <div class="right">
+          <button class="btn small" id="kycExport">Скачать чек-лист (.txt)</button>
+          <button class="btn small" onclick="window.print()">Печать / PDF</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRACTICE 2: Risk Score -->
+  <section id="practice-score">
+    <h2>Калькулятор уровня риска</h2>
+    <p>Укажите ориентиры — получите оценку профиля операций. Это не юридическое заключение, а подсказка, к чему присмотреться.</p>
+    <div class="row cols-2">
+      <div class="card">
+        <div class="field">
+          <label for="pTurnover">Оборот по счёту за квартал, ₽</label>
+          <input type="number" id="pTurnover" min="0" step="1000" placeholder="например, 30 000 000" />
+        </div>
+        <div class="field">
+          <label for="pTaxes">Уплаченные налоги за квартал, ₽</label>
+          <input type="number" id="pTaxes" min="0" step="1000" placeholder="например, 420 000" />
+        </div>
+        <div class="field">
+          <label for="pCashShare">Доля наличных в обороте, %</label>
+          <input type="number" id="pCashShare" min="0" max="100" step="1" placeholder="например, 8" />
+        </div>
+        <div class="inline">
+          <label><input type="checkbox" id="pFOT" /> Регулярно платим ФОТ/НДФЛ/взносы</label>
+          <label><input type="checkbox" id="pOKVED" /> ОКВЭД соответствует фактической деятельности</label>
+          <label><input type="checkbox" id="pKYC" /> KYC по предоплатам (сохраняем подтверждения)</label>
+        </div>
+        <div class="sep"></div>
+        <div class="right">
+          <button class="btn small" id="scoreCalc">Рассчитать</button>
+          <button class="btn small" id="scoreSave">Сохранить</button>
+          <button class="btn small" id="scoreClear">Очистить</button>
+        </div>
+      </div>
+      <div class="card">
+        <h4>Оценка</h4>
+        <div class="score">
+          <span class="badge-score s-low" id="scoreBadge">—</span>
+          <span id="scoreText" class="muted">Введите данные и нажмите «Рассчитать».</span>
+        </div>
+        <div class="sep"></div>
+        <div class="callout">
+          <b>Как считается:</b> ориентир «налоги/оборот ≳ 0,9%», низкая доля наличных, регулярный ФОТ, релевантные ОКВЭД и KYC снижают риск.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRACTICE 3: Docs builder -->
+  <section id="practice-docs">
+    <h2>Конструктор «папки сделки»</h2>
+    <p>Отметьте нужные документы — получите краткое оглавление «папки» и заготовку пояснительной записки.</p>
+    <div class="row cols-2">
+      <div class="card">
+        <h4>Тип операции</h4>
+        <select id="docType">
+          <option value="services">Услуги (маркетинг/IT/консалтинг)</option>
+          <option value="goods">Поставка товаров</option>
+          <option value="ved">ВЭД (экспорт/импорт)</option>
+        </select>
+        <div class="sep"></div>
+        <h4>Документы</h4>
+        <div id="docChecklist" class="field"></div>
+        <div class="sep"></div>
+        <h4>Экономическая логика (1 страница)</h4>
+        <textarea id="docMemo" placeholder="Цель, предмет, результат, финансовая логика, сроки/этапы, ссылки на документы..."></textarea>
+        <div class="right">
+          <button class="btn small" id="docBuild">Сформировать</button>
+          <button class="btn small" id="docSave">Сохранить</button>
+          <button class="btn small" id="docClear">Очистить</button>
+        </div>
+      </div>
+      <div class="card">
+        <h4>Итоговая структура «папки»</h4>
+        <ol id="docOutput" class="muted"><li>Пока пусто — выберите тип операции и отметьте документы.</li></ol>
+        <div class="sep"></div>
+        <div class="right">
+          <button class="btn small" id="docExport">Скачать оглавление (.txt)</button>
+          <button class="btn small" onclick="window.print()">Печать / PDF</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz">
+    <h2>Мини-квизы (моментальная проверка)</h2>
+    <div class="quiz-q" data-id="q1">
+      <h4>1) Какой набор документов минимально нужен для безопасной оплаты услуг?</h4>
+      <div class="option"><label><input type="radio" name="q1" value="A"> Счёт и платёжка</label></div>
+      <div class="option"><label><input type="radio" name="q1" value="B"> Договор, счёт/инвойс, акт/УПД, подтверждение результата</label></div>
+      <div class="option"><label><input type="radio" name="q1" value="C"> Только акт</label></div>
+      <div class="result" id="r-q1"></div>
+    </div>
+    <div class="quiz-q" data-id="q2">
+      <h4>2) Что из перечисленного — «красный флаг»?</h4>
+      <div class="option"><label><input type="radio" name="q2" value="A"> Регулярные выплаты ФОТ</label></div>
+      <div class="option"><label><input type="radio" name="q2" value="B"> Массовые снятия наличных без отчётности</label></div>
+      <div class="option"><label><input type="radio" name="q2" value="C"> Актуальные ОКВЭД</label></div>
+      <div class="result" id="r-q2"></div>
+    </div>
+    <div class="quiz-q" data-id="q3">
+      <h4>3) Неформальный ориентир по доле налогов к обороту, который часто используют в банках:</h4>
+      <div class="option"><label><input type="radio" name="q3" value="A"> 0,2%</label></div>
+      <div class="option"><label><input type="radio" name="q3" value="B"> 0,9%+</label></div>
+      <div class="option"><label><input type="radio" name="q3" value="C"> 5%</label></div>
+      <div class="result" id="r-q3"></div>
+    </div>
+    <div class="right">
+      <button class="btn small" id="quizCheck">Проверить</button>
+      <button class="btn small" id="quizReset">Сбросить</button>
+    </div>
+  </section>
+
+  <!-- CASES -->
+  <section id="cases">
+    <h2>Кейсы: объясните экономическую логику</h2>
+    <p>Выберите кейс, опишите цель/результат/выгоду, приложите список документов. Ответ сохранится локально.</p>
+    <div class="inline">
+      <select id="caseSelect">
+        <option value="marketing">Оплата маркетинговых услуг (диджитал-кампания)</option>
+        <option value="it">Оплата IT-разработки по ТЗ</option>
+        <option value="import">Предоплата за импорт товара</option>
+      </select>
+      <button class="btn" id="openCase">Открыть кейс</button>
+    </div>
+  </section>
+
+  <!-- Modal for cases -->
+  <div class="modal" id="caseModal" aria-hidden="true">
+    <div class="box">
+      <div class="close-x"><button id="closeModal" title="Закрыть">✕</button></div>
+      <h3 id="caseTitle">Кейс</h3>
+      <div class="callout">
+        Опишите кратко: <b>цель</b> → <b>предмет</b> → <b>ожидаемый результат</b> → <b>метрики успеха</b>. Ниже перечислите документы, которыми это подтвердите.
+      </div>
+      <div class="field">
+        <label for="caseAnswer">Ваше пояснение (1–2 абзаца):</label>
+        <textarea id="caseAnswer" placeholder="Например: Цель — привлечь лиды; предмет — ведение контекстной рекламы; результат — X лидов по цене Y; метрики — CPL, конверсия..." ></textarea>
+      </div>
+      <div class="field">
+        <label for="caseDocs">Документы (список через запятую):</label>
+        <input id="caseDocs" type="text" placeholder="Договор, ТЗ, медиаплан, инвойс, отчёт, скриншоты из кабинета..." />
+      </div>
+      <div class="right">
+        <button class="btn small" id="caseSave">Сохранить</button>
+        <button class="btn small" id="caseExport">Скачать (.txt)</button>
+        <button class="btn small" id="caseClear">Очистить</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="center" style="margin-top:26px">
+    <button class="btn ghost" onclick="window.print()">Печать / Сохранить в PDF</button>
+  </div>
+</div>
+
+<script>
+/* ===== Helpers ===== */
+const $ = (sel, ctx=document)=>ctx.querySelector(sel);
+const $$ = (sel, ctx=document)=>Array.from(ctx.querySelectorAll(sel));
+function jumpTo(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function saveLS(key, data){ localStorage.setItem(key, JSON.stringify(data)); }
+function loadLS(key, fallback){ try{ return JSON.parse(localStorage.getItem(key)) ?? fallback; }catch(e){ return fallback; } }
+function dl(filename, text){
+  const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); },0);
+}
+
+/* ===== Internal nav (no hash) ===== */
+$('#nav').addEventListener('click', e=>{
+  const btn = e.target.closest('[data-jump]');
+  if(!btn) return;
+  e.preventDefault();
+  jumpTo(btn.getAttribute('data-jump'));
+});
+
+/* ===== Practice 1: KYC checklist ===== */
+const KYC_KEY = 'finmon_kyc_v1';
+const kycChecks = $$('.kyc-check');
+const kycNotes = $('#kyc-notes');
+
+function kycRenderFromState(st){
+  kycChecks.forEach(ch=> { ch.checked = !!st[ch.dataset.k]; });
+  kycNotes.value = st.notes || '';
+}
+function kycState(){
+  const st = {};
+  kycChecks.forEach(ch=> st[ch.dataset.k] = ch.checked);
+  st.notes = kycNotes.value.trim();
+  return st;
+}
+function kycExportTxt(){
+  const st = kycState();
+  const lines = [
+    'KYC-чеклист (базовый, бесплатные источники)',
+    '',
+    `ФНС «Прозрачный бизнес»: ${st.pb?'ОК':'—'}`,
+    `Федресурс (банкротство/ликвидация): ${st.fed?'ОК':'—'}`,
+    `КАД «Арбитр»: ${st.kad?'ОК':'—'}`,
+    `ФССП: ${st.fssp?'ОК':'—'}`,
+    `Адрес/контакты: ${st.addr?'ОК':'—'}`,
+    `Возраст/активность: ${st.age?'ОК':'—'}`,
+    '',
+    'Заметки:',
+    st.notes || '—'
+  ];
+  dl('kyc_checklist.txt', lines.join('\n'));
+}
+$('#kycSave').addEventListener('click', ()=>{ saveLS(KYC_KEY, kycState()); alert('Сохранено.'); });
+$('#kycClear').addEventListener('click', ()=>{
+  kycChecks.forEach(ch=> ch.checked=false); kycNotes.value='';
+  localStorage.removeItem(KYC_KEY);
+});
+$('#kycExport').addEventListener('click', kycExportTxt);
+kycRenderFromState(loadLS(KYC_KEY, {}));
+
+/* ===== Practice 2: Risk Score ===== */
+const SCORE_KEY = 'finmon_score_v1';
+const pTurnover = $('#pTurnover'), pTaxes = $('#pTaxes'), pCashShare = $('#pCashShare');
+const pFOT = $('#pFOT'), pOKVED = $('#pOKVED'), pKYC = $('#pKYC');
+const scoreBadge = $('#scoreBadge'), scoreText = $('#scoreText');
+
+function computeScore(){
+  const turnover = Number(pTurnover.value)||0;
+  const taxes = Number(pTaxes.value)||0;
+  const cash = Math.min(100, Math.max(0, Number(pCashShare.value)||0));
+  const ratio = turnover>0 ? (taxes/turnover*100) : 0;
+
+  // Base score: lower is better
+  let risk = 50;
+  // Taxes ratio
+  if(ratio >= 1.2) risk -= 15;
+  else if(ratio >= 0.9) risk -= 8;
+  else if(ratio >= 0.5) risk += 5;
+  else risk += 12;
+
+  // Cash share
+  if(cash <= 5) risk -= 8;
+  else if(cash <= 15) risk += 0;
+  else if(cash <= 30) risk += 8;
+  else risk += 15;
+
+  // Flags
+  if(pFOT.checked) risk -= 6; else risk += 6;
+  if(pOKVED.checked) risk -= 6; else risk += 8;
+  if(pKYC.checked) risk -= 6; else risk += 6;
+
+  // Clamp 0..100
+  risk = Math.max(0, Math.min(100, Math.round(risk)));
+
+  // Category
+  let cat = 'Низкий', cls='s-low', msg='Профиль выглядит добросовестно. Сохраняйте дисциплину.';
+  if(risk >= 65){ cat='Высокий'; cls='s-high'; msg='Повышенный риск. Пересмотрите налоги/наличные/ОКВЭД/KYC и документы.'; }
+  else if(risk >= 40){ cat='Средний'; cls='s-med'; msg='Есть зоны внимания. Усильте документы, снизьте наличные, проверьте KYC.'; }
+
+  scoreBadge.className = 'badge-score '+cls;
+  scoreBadge.textContent = cat;
+  scoreText.textContent = `Оценка: ${risk}/100. ${msg} (налоги/оборот: ${ratio.toFixed(2)}%; наличные: ${cash}%)`;
+
+  return {turnover, taxes, cash, ratio: Number(ratio.toFixed(2)), fot: pFOT.checked, okved: pOKVED.checked, kyc: pKYC.checked, risk, cat};
+}
+$('#scoreCalc').addEventListener('click', computeScore);
+$('#scoreSave').addEventListener('click', ()=>{ const st = computeScore(); saveLS(SCORE_KEY, st); alert('Оценка сохранена.'); });
+$('#scoreClear').addEventListener('click', ()=>{ [pTurnover,pTaxes,pCashShare].forEach(i=>i.value=''); [pFOT,pOKVED,pKYC].forEach(i=>i.checked=false); scoreBadge.textContent='—'; scoreBadge.className='badge-score s-low'; scoreText.textContent='Введите данные и нажмите «Рассчитать».'; localStorage.removeItem(SCORE_KEY); });
+(function loadScore(){
+  const st = loadLS(SCORE_KEY, null);
+  if(!st) return;
+  pTurnover.value = st.turnover||''; pTaxes.value = st.taxes||''; pCashShare.value = st.cash||'';
+  pFOT.checked = !!st.fot; pOKVED.checked=!!st.okved; pKYC.checked=!!st.kyc;
+  computeScore();
+})();
+
+/* ===== Practice 3: Docs builder ===== */
+const DOC_KEY = 'finmon_docs_v1';
+const docType = $('#docType'), docChecklist = $('#docChecklist'), docMemo = $('#docMemo'), docOutput = $('#docOutput');
+
+const DOCS = {
+  services: [
+    {k:'contract', t:'Договор + ТЗ/Приложение'},
+    {k:'invoice', t:'Счёт/Инвойс (этапы/объёмы)'},
+    {k:'act', t:'Акт/УПД с результатом'},
+    {k:'proof', t:'Подтверждение результата (отчёт, скриншоты кабинетов, медиа)'},
+    {k:'kyc', t:'KYC контрагента (скрины из источников)'}
+  ],
+  goods: [
+    {k:'contract', t:'Договор поставки'},
+    {k:'invoice', t:'Счёт/Спецификация/Инвойс'},
+    {k:'waybill', t:'Накладная/ТТН/УПД'},
+    {k:'acceptr', t:'Акт приёмки/качества (если требуется)'},
+    {k:'kyc', t:'KYC контрагента (скрины из источников)'}
+  ],
+  ved: [
+    {k:'contract', t:'ВЭД-контракт (рус/англ)'},
+    {k:'invoice', t:'Инвойс/Проформа'},
+    {k:'transport', t:'Транспортные/таможенные документы (коносамент/CMR/ГТД)'},
+    {k:'bank', t:'Пояснение валютной операции (курс/цена/логика)'},
+    {k:'kyc', t:'KYC контрагента (в т.ч. санкционные списки при необходимости)'}
+  ]
+};
+
+function renderDocChecklist(type){
+  docChecklist.innerHTML = '';
+  (DOCS[type]||[]).forEach(item=>{
+    const id = `doc_${item.k}`;
+    const wrap = document.createElement('label');
+    wrap.innerHTML = `<input type="checkbox" class="doc-check" id="${id}" data-k="${item.k}"> ${item.t}`;
+    docChecklist.appendChild(wrap);
+  });
+}
+function docState(){
+  const type = docType.value;
+  const checks = {};
+  $$('.doc-check', docChecklist).forEach(ch=> checks[ch.dataset.k] = ch.checked);
+  return {type, checks, memo: docMemo.value.trim()};
+}
+function docRenderFromState(st){
+  if(st?.type) docType.value = st.type;
+  renderDocChecklist(docType.value);
+  if(st?.checks){ $$('.doc-check', docChecklist).forEach(ch=> ch.checked = !!st.checks[ch.dataset.k]); }
+  docMemo.value = st?.memo || '';
+}
+function buildDocOutput(){
+  const st = docState();
+  const items = DOCS[st.type].filter(it=>st.checks[it.k]).map(it=>it.t);
+  if(items.length===0){ docOutput.innerHTML = '<li>Пока пусто — отметьте документы.</li>'; return st; }
+  docOutput.innerHTML = items.map(t=>`<li>${t}</li>`).join('');
+  return st;
+}
+function exportDocTxt(){
+  const st = buildDocOutput();
+  const title = st.type==='services'?'Услуги':(st.type==='goods'?'Поставка товаров':'ВЭД');
+  const lines = [
+    `Оглавление «папки сделки»: ${title}`, '',
+    ...(DOCS[st.type].filter(it=>st.checks[it.k]).map((it,i)=>`${i+1}. ${it.t}`)),
+    '', 'Пояснительная записка:', st.memo||'—'
+  ];
+  dl('deal_folder_outline.txt', lines.join('\n'));
+}
+docType.addEventListener('change', ()=>renderDocChecklist(docType.value));
+$('#docBuild').addEventListener('click', buildDocOutput);
+$('#docSave').addEventListener('click', ()=>{ saveLS(DOC_KEY, docState()); alert('Сохранено.'); });
+$('#docClear').addEventListener('click', ()=>{
+  renderDocChecklist(docType.value);
+  docMemo.value=''; docOutput.innerHTML='<li>Пока пусто — выберите тип и отметьте документы.</li>';
+  localStorage.removeItem(DOC_KEY);
+});
+$('#docExport').addEventListener('click', exportDocTxt);
+docRenderFromState(loadLS(DOC_KEY, null) || {type:'services', checks:{}, memo:''});
+buildDocOutput();
+
+/* ===== QUIZ ===== */
+const QUIZ_KEY = 'finmon_quiz_v1';
+const answers = { q1:'B', q2:'B', q3:'B' };
+function checkQuiz(){
+  let ok=0, total=0;
+  Object.keys(answers).forEach(q=>{
+    total++;
+    const chosen = $(`input[name="${q}"]:checked`);
+    const res = $(`#r-${q}`);
+    if(!chosen){ res.textContent='Выберите вариант.'; res.className='result warn-t'; return; }
+    if(chosen.value===answers[q]){ ok++; res.textContent='Верно'; res.className='result good'; }
+    else{ res.textContent=`Неверно. Правильно: ${answers[q]}`; res.className='result bad'; }
+  });
+  saveLS(QUIZ_KEY, {ts:Date.now(), ok, total});
+  alert(`Результат: ${ok} из ${total}`);
+}
+function resetQuiz(){
+  ['q1','q2','q3'].forEach(q=>{ $$(`input[name="${q}"]`).forEach(i=>i.checked=false); const res = $(`#r-${q}`); res.textContent=''; res.className='result'; });
+  localStorage.removeItem(QUIZ_KEY);
+}
+$('#quizCheck').addEventListener('click', checkQuiz);
+$('#quizReset').addEventListener('click', resetQuiz);
+
+/* ===== CASES (modal) ===== */
+const CASE_KEY = 'finmon_case_v1';
+const caseModal = $('#caseModal'), caseTitle = $('#caseTitle'), caseAnswer = $('#caseAnswer'), caseDocs = $('#caseDocs');
+const CASES = {
+  marketing:{
+    title:'Кейс: оплата маркетинговых услуг (диджитал-кампания)',
+    hint:'Договор, ТЗ/медиаплан, инвойс, отчёт/скрины кабинета, акт/УПД.'
+  },
+  it:{
+    title:'Кейс: оплата IT-разработки по ТЗ',
+    hint:'Договор, ТЗ/спринты, инвойс, результаты/репозиторий/демо, акт/УПД.'
+  },
+  import:{
+    title:'Кейс: предоплата за импорт товара',
+    hint:'ВЭД-контракт, инвойс/проформа, транспортные/таможенные, расчёт цены/курса, KYC продавца.'
+  }
+};
+function openCase(){
+  const id = $('#caseSelect').value;
+  const st = loadLS(CASE_KEY, {});
+  caseTitle.textContent = CASES[id].title;
+  caseAnswer.value = st[id]?.answer || '';
+  caseDocs.value = st[id]?.docs || '';
+  caseModal.classList.add('open'); caseModal.setAttribute('aria-hidden','false');
+}
+function closeCase(){ caseModal.classList.remove('open'); caseModal.setAttribute('aria-hidden','true'); }
+function saveCase(){
+  const id = $('#caseSelect').value;
+  const st = loadLS(CASE_KEY, {});
+  st[id] = { answer: caseAnswer.value.trim(), docs: caseDocs.value.trim(), ts: Date.now() };
+  saveLS(CASE_KEY, st);
+  alert('Сохранено.'); closeCase();
+}
+function clearCase(){
+  const id = $('#caseSelect').value;
+  const st = loadLS(CASE_KEY, {}); st[id] = { answer:'', docs:'', ts: Date.now() }; saveLS(CASE_KEY, st);
+  caseAnswer.value=''; caseDocs.value='';
+}
+function exportCase(){
+  const id = $('#caseSelect').value;
+  const title = CASES[id].title;
+  const txt = [
+    title, '',
+    'Пояснение:', caseAnswer.value.trim()||'—', '',
+    'Документы:', caseDocs.value.trim()||'—', ''
+  ].join('\n');
+  dl('case_answer.txt', txt);
+}
+$('#openCase').addEventListener('click', openCase);
+$('#closeModal').addEventListener('click', closeCase);
+$('#caseSave').addEventListener('click', saveCase);
+$('#caseClear').addEventListener('click', clearCase);
+$('#caseExport').addEventListener('click', exportCase);
+caseModal.addEventListener('click', (e)=>{ if(e.target===caseModal) closeCase(); });
+
+/* ===== Reset all ===== */
+$('#resetAll').addEventListener('click', ()=>{
+  if(!confirm('Удалить весь локальный прогресс (чек-листы, оценки, кейсы)?')) return;
+  [KYC_KEY, SCORE_KEY, DOC_KEY, QUIZ_KEY, CASE_KEY].forEach(k=> localStorage.removeItem(k));
+  location.reload();
+});
+</script>
+</body>
+</html>
