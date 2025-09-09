@@ -3,797 +3,366 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Итоговый практикум — ФинМон</title>
-  <meta name="description" content="Итоговый практикум по курсу: Due Diligence контрагентов и мониторинг операций. Single-file HTML+CSS+JS для GitHub Pages/Stepik." />
+  <title>Итоговый проект — «Безопасный бизнес / ПОД/ФТ» (единый кейс)</title>
   <style>
-    :root{
-      --bg: #0b1020;
-      --panel: #121b33;
-      --muted: #7a8aaa;
-      --text: #eaf0ff;
-      --accent: #6ee7b7;
-      --accent-2:#8ab4ff;
-      --warn: #ffd166;
-      --danger:#ff6b6b;
-      --ok:#34d399;
-      --border: #24304f;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Ubuntu, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      --radius: 16px;
+    :root {
+      --bg:#0b1020; --card:#121a33; --muted:#99a3c7; --accent:#5b8cfe; --good:#3ecf8e; --bad:#ff6584; --warn:#f7b955;
     }
     *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;background:linear-gradient(120deg,#0b1020,#0f1730);color:var(--text);font-family:var(--sans);}
-    a{color:var(--accent-2);text-decoration:none}
-    a:hover{text-decoration:underline}
-    header{
-      position:sticky;top:0;z-index:10;background:rgba(10,14,30,.7);backdrop-filter:saturate(140%) blur(10px);
-      border-bottom:1px solid var(--border);
-    }
-    .wrap{max-width:1200px;margin:0 auto;padding:16px}
-    .brand{display:flex;gap:12px;align-items:center}
-    .logo{width:32px;height:32px;border-radius:8px;background:radial-gradient( circle at 30% 30%, var(--accent), transparent 60%),
-      conic-gradient(from 210deg, #19213b, #1e2a4a 60%, #20335c );
-      box-shadow:0 0 0 1px var(--border), 0 8px 24px rgba(0,0,0,.35)}
-    .brand h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.3px}
-
-    nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-    .tab-btn{appearance:none;border:1px solid var(--border);background:linear-gradient(180deg,#121a33,#0f1730);
-      color:var(--text);padding:10px 14px;border-radius:12px;font-weight:600;cursor:pointer;transition:.2s}
-    .tab-btn[aria-selected="true"], .tab-btn:hover{border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(138,180,255,.12)}
-
-    main{padding:16px}
-    .grid{display:grid;gap:16px}
-    @media (min-width: 900px){
-      .grid-2{grid-template-columns:1.2fr .8fr}
-      .grid-3{grid-template-columns:repeat(3,1fr)}
-    }
-
-    .card{background:linear-gradient(180deg,#121b33,#10172c);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    html,body{margin:0;height:100%;background:var(--bg);color:#e6ecff;font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji","Segoe UI Emoji"}
+    a{color:var(--accent)}
+    .container{max-width:1100px;margin:0 auto;padding:24px}
+    h1{font-size:28px;margin:0 0 8px}
+    h2{font-size:22px;margin:24px 0 12px}
     .muted{color:var(--muted)}
-    h2,h3{margin:8px 0 12px}
-    h2{font-size:22px}
-    h3{font-size:18px}
-    p{line-height:1.6}
-
-    .kv{display:flex;flex-wrap:wrap;gap:10px}
-    .kv span{padding:4px 8px;border-radius:999px;border:1px solid var(--border);background:#0e1530;color:var(--muted);font:600 12px/1 var(--sans)}
-
-    .flex{display:flex;gap:12px;flex-wrap:wrap}
-    .right{margin-left:auto}
-
-    label{display:block;font-weight:600;margin:10px 0 6px}
-    input, select, textarea{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:#0c132a;color:var(--text);outline:none}
-    input:focus, select:focus, textarea:focus{border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(138,180,255,.12)}
-    textarea{min-height:120px;resize:vertical}
-    .btn{appearance:none;border:1px solid var(--border);background:linear-gradient(180deg,#111a33,#0d152b);color:var(--text);
-      padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;transition:.2s}
-    .btn:hover{border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(138,180,255,.12)}
-    .btn.ok{background:linear-gradient(180deg,#123223,#0f2620);border-color:#1f6d54}
-    .btn.warn{background:linear-gradient(180deg,#332b12,#261f0f);border-color:#6d5f1f}
-    .btn.danger{background:linear-gradient(180deg,#332022,#261416);border-color:#6d2b36}
-
-    table{width:100%;border-collapse:separate;border-spacing:0}
-    th,td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left}
-    th{position:sticky;top:0;background:#10172c;z-index:1}
-    tbody tr:hover{background:#0e1733}
-    .pill{display:inline-block;padding:4px 8px;border-radius:999px;font:600 12px/1 var(--sans);border:1px solid var(--border)}
-    .pill.ok{color:var(--ok);border-color:#1c3c2d;background:#0c1914}
-    .pill.warn{color:var(--warn);border-color:#5a4a1b;background:#1a1508}
-    .pill.danger{color:var(--danger);border-color:#6d2b36;background:#1d0f12}
-
-    .code{font-family:var(--mono);background:#0a1126;border:1px solid var(--border);padding:10px;border-radius:10px;overflow:auto}
-    .sep{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:8px 0 16px}
-    .footer{color:var(--muted);font-size:12px;text-align:center;margin:28px 0}
-    .sr-only{position:absolute !important;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden}
-
-    .scorebar{height:10px;background:#0f1a36;border-radius:999px;overflow:hidden;border:1px solid var(--border)}
-    .scorebar > b{display:block;height:100%;background:linear-gradient(90deg,#34d399,#ffd166,#ff6b6b)}
-
-    .notice{border-left:4px solid var(--accent-2);padding:12px;border-radius:10px;background:#0b1431}
-    .kbd{font-family:var(--mono);padding:0 8px;border:1px solid var(--border);border-bottom-width:3px;border-radius:6px;background:#0b1431}
-
-    .sticky-tools{position:sticky;top:76px;display:flex;gap:8px;flex-wrap:wrap}
+    .row{display:grid;grid-template-columns:1fr;gap:16px}
+    @media(min-width:900px){.row{grid-template-columns:1fr 1fr}}
+    .card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:16px}
+    .card h3{margin:0 0 8px;font-size:18px}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.06);font-size:12px}
+    textarea,input,button,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0d1430;color:#e6ecff}
+    textarea{min-height:110px;resize:vertical}
+    .buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    button{cursor:pointer}
+    .btn{background:#0f1a3c}
+    .btn-primary{background:var(--accent);border-color:transparent;color:#08122a}
+    .btn-ghost{background:transparent;border-color:rgba(255,255,255,.16)}
+    .result{margin-top:10px;font-weight:600}
+    .ok{color:var(--good)} .fail{color:var(--bad)} .warn{color:var(--warn)}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .progress{height:10px;background:#0d1430;border:1px solid rgba(255,255,255,.12);border-radius:999px;overflow:hidden}
+    .bar{height:100%;background:linear-gradient(90deg,var(--accent),#8cc9ff);width:0}
+    details{background:#0f1734;border:1px solid rgba(255,255,255,.08);padding:10px;border-radius:10px}
+    code.kwd{background:#0b1436;border:1px solid rgba(255,255,255,.12);padding:2px 6px;border-radius:8px}
+    table{width:100%;border-collapse:collapse}
+    th,td{border-bottom:1px solid rgba(255,255,255,.08);padding:8px;text-align:left}
+    .overall{position:sticky;top:0;background:linear-gradient(180deg,rgba(11,16,32,.96),rgba(11,16,32,.8));backdrop-filter: blur(10px);border-bottom:1px solid rgba(255,255,255,.06);z-index:10}
   </style>
 </head>
 <body>
-  <header>
-    <div class="wrap">
-      <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
-        <h1>Итоговый практикум «ФинМон» — Due Diligence & Мониторинг операций</h1>
+  <div class="overall">
+    <div class="container">
+      <h1>Итоговый проект (HTML+CSS+JS, единый файл)</h1>
+      <div class="muted">Кейс: как построить <em>прозрачные процессы</em> и избежать блокировки счетов (115‑ФЗ, риски/контроль, коммуникация с банком).</div>
+      <div class="row" style="margin:14px 0 8px">
+        <div class="card">
+          <div class="pill">Статус итоговой работы: <span id="overallStatus" style="margin-left:6px" class="warn">—</span></div>
+          <div style="display:grid;grid-template-columns:120px 1fr;gap:10px;align-items:center;margin-top:10px">
+            <div class="muted">Выполнено задач</div>
+            <div><div class="progress"><div id="overallBar" class="bar"></div></div></div>
+          </div>
+          <div class="muted" style="margin-top:6px">Порог прохождения: <strong>≥ 80%</strong> задач верно.</div>
+          <div class="buttons" style="margin-top:10px">
+            <button class="btn btn-primary" data-action="grade-all">Проверить всё</button>
+            <button class="btn btn-ghost" data-action="reset-all">Сбросить всё</button>
+            <button class="btn" data-action="run-tests">Запустить автотесты</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Единый кейс (введение)</h3>
+          <div class="muted">Вы генеральный директор компании «Альфа», оборот 120 млн ₽/год. Банк запросил пояснения по <em>транзитным платежам</em>, <em>низкой налоговой нагрузке</em> и частым <em>снятиям наличных</em>. Нужен комплект решений: оценка рисков, политика ПОД/ФТ, чек‑листы и алгоритм общения с банком. По каждому заданию впишите ответ — будет проверка по ключевым словам/расчётам.</div>
+        </div>
       </div>
-      <nav aria-label="Основные разделы">
-        <button class="tab-btn" aria-selected="true" data-tab="intro">Инструкция</button>
-        <button class="tab-btn" data-tab="dd">Симулятор Due Diligence</button>
-        <button class="tab-btn" data-tab="tm">Мониторинг операций</button>
-        <button class="tab-btn" data-tab="docs">Чек‑лист и документы</button>
-        <button class="tab-btn" data-tab="quiz">Тест</button>
-        <button class="tab-btn" data-tab="summary">Итоги/Экспорт</button>
-      </nav>
     </div>
-  </header>
+  </div>
 
-  <main class="wrap">
-    <!-- INTRO -->
-    <section id="intro" class="tab" data-active>
-      <div class="grid grid-2">
-        <div class="card">
-          <h2>Как работать с практикумом</h2>
-          <p>Этот одностраничный практикум моделирует реальные задачи комплаенса: проверка контрагентов (Due Diligence), выявление подозрительных операций, подготовка документов и сдача зачётного теста. Ничего не отправляется наружу — все данные и результаты хранятся <b>локально</b> в вашем браузере.</p>
-          <div class="kv" aria-label="Охватываемые темы">
-            <span>Проверка контрагентов</span><span>Показатели риска</span><span>П2Р/обнал/транзиты</span><span>Исп. документы</span><span>Авансирование импорта</span><span>Перестрахование</span><span>Коммуникация с банком</span>
-          </div>
-          <div class="sep"></div>
-          <p class="muted">Подсказка: переходите по вкладкам сверху. Выполненные шаги отмечаются автоматически.</p>
-          <div class="notice">
-            <b>Дисклеймер:</b> инструмент учебный. Алгоритмы оценки — упрощённые, но основаны на типичных признаках и кейсах, рассмотренных на курсе. Пороговые значения можно менять в настройках внутри кода.
-          </div>
-        </div>
-        <div class="card">
-          <h3>Быстрый старт</h3>
-          <ol>
-            <li>Во вкладке <b>Due Diligence</b> выберите или добавьте контрагента — получите риск‑оценку и список красных флагов.</li>
-            <li>Во вкладке <b>Мониторинг операций</b> отфильтруйте транзакции и отметьте подозрительные события.</li>
-            <li>Соберите <b>чек‑лист</b>, сформируйте шаблон «Пояснительной записки» и сохраните JSON отчёта.</li>
-            <li>Пройдите <b>тест</b> и посмотрите сводный результат во вкладке «Итоги/Экспорт».</li>
-          </ol>
-          <div class="sep"></div>
-          <div class="flex">
-            <button class="btn ok" id="btn-reset">Сбросить прогресс</button>
-            <button class="btn" id="btn-demo">Заполнить демо‑данными</button>
-            <span class="right muted">Состояние: <span id="state-label" class="pill ok">готово</span></span>
-          </div>
-        </div>
-      </div>
-      <div class="footer">Версия 1.0 • Single‑file HTML (для GitHub Pages/Stepik) • © Учебный проект «ФинМон»</div>
-    </section>
+  <div class="container">
+    <h2>Задания</h2>
+    <div class="row">
 
-    <!-- DUE DILIGENCE -->
-    <section id="dd" class="tab" hidden>
-      <div class="grid grid-2">
-        <div class="card">
-          <h2>Проверка контрагента</h2>
-          <form id="cp-form">
-            <div class="grid grid-3">
-              <div>
-                <label for="cp-inn">ИНН</label>
-                <input id="cp-inn" required pattern="\d{10}|\d{12}" placeholder="10 или 12 цифр" />
-              </div>
-              <div>
-                <label for="cp-name">Наименование</label>
-                <input id="cp-name" required placeholder="ООО «Пример»" />
-              </div>
-              <div>
-                <label for="cp-age">Возраст компании, мес.</label>
-                <input id="cp-age" type="number" min="0" step="1" value="24" />
-              </div>
-            </div>
-            <div class="grid grid-3">
-              <div>
-                <label for="cp-okved">ОКВЭД (основной)</label>
-                <input id="cp-okved" placeholder="62.01, 47.91 и т.п." />
-              </div>
-              <div>
-                <label for="cp-ops">Типовые операции</label>
-                <select id="cp-ops" multiple size="3" aria-describedby="ops-hint">
-                  <option>Оптовая торговля</option>
-                  <option>IT/Маркетинг</option>
-                  <option>Туризм/агентские</option>
-                  <option>Нефтегаз/металлолом</option>
-                  <option>Страхование/перестрахование</option>
-                </select>
-                <div id="ops-hint" class="muted">Выберите 1–3 направления</div>
-              </div>
-              <div>
-                <label for="cp-site">Сайт/следы в сети</label>
-                <select id="cp-site">
-                  <option value="yes">Есть сайт/активные контакты</option>
-                  <option value="weak">Минимальные следы</option>
-                  <option value="no">Нет сайта</option>
-                </select>
-              </div>
-            </div>
-            <div class="grid grid-3">
-              <div>
-                <label for="cp-staff">Численность сотрудников</label>
-                <input id="cp-staff" type="number" min="0" value="12" />
-              </div>
-              <div>
-                <label for="cp-rev">Оборот за год, млн ₽</label>
-                <input id="cp-rev" type="number" min="0" step="0.1" value="120" />
-              </div>
-              <div>
-                <label for="cp-tax">Уплаченные налоги, млн ₽</label>
-                <input id="cp-tax" type="number" min="0" step="0.01" value="1.6" />
-              </div>
-            </div>
-            <div class="grid grid-3">
-              <div>
-                <label for="cp-mass">Массовый адрес/рук-ль</label>
-                <select id="cp-mass">
-                  <option value="no">Нет признаков</option>
-                  <option value="maybe">Косвенные признаки</option>
-                  <option value="yes">Да, массовый</option>
-                </select>
-              </div>
-              <div>
-                <label for="cp-zsk">Оценка ЗСК (ЦБ)</label>
-                <select id="cp-zsk">
-                  <option value="low">Низкий</option>
-                  <option value="mid">Повышенный</option>
-                  <option value="high">Высокий</option>
-                </select>
-              </div>
-              <div>
-                <label for="cp-match">Соответствие ОКВЭД и платежей</label>
-                <select id="cp-match">
-                  <option value="ok">Соответствует</option>
-                  <option value="mixed">Частично</option>
-                  <option value="bad">Не соответствует</option>
-                </select>
-              </div>
-            </div>
-            <label for="cp-notes">Заметки</label>
-            <textarea id="cp-notes" placeholder="Краткий контекст, источники, особые обстоятельства"></textarea>
-            <div class="flex">
-              <button class="btn ok" type="submit">Оценить риск</button>
-              <button class="btn" type="button" id="cp-load">Загрузить из примеров</button>
-              <button class="btn" type="button" id="cp-save">Сохранить контрагента</button>
-            </div>
-          </form>
+      <!-- T1 -->
+      <section class="card" id="T1">
+        <h3>1) Риски блокировки: перечислите ключевые признаки из кейса</h3>
+        <div class="muted">Опишите минимум 6 признаков (ключевые слова допускают склонения).</div>
+        <textarea placeholder="Например: транзитные операции, обналичивание, низкая налоговая нагрузка, несоответствие ОКВЭД..." data-input="T1"></textarea>
+        <details style="margin-top:8px"><summary>Подсказки</summary>
+          <div>Ищем слова: <code class="kwd">транзит</code>, <code class="kwd">обнал</code>, <code class="kwd">налоговая нагруз</code>, <code class="kwd">ОКВЭД</code>, <code class="kwd">аномал</code>, <code class="kwd">P2P</code>, <code class="kwd">криптовалют</code>, <code class="kwd">исполнительн</code>, <code class="kwd">перестрахов</code>.</div>
+        </details>
+        <div class="buttons">
+          <button class="btn btn-primary" data-action="grade" data-task="T1">Проверить задание 1</button>
+          <button class="btn" data-action="reset" data-task="T1">Сброс</button>
         </div>
-        <div class="card" id="cp-result" aria-live="polite">
-          <h3>Результат оценки</h3>
-          <div class="scorebar" aria-hidden="true"><b id="cp-scorebar" style="width:0%"></b></div>
-          <p><b>Итоговый риск:</b> <span id="cp-score" class="pill ok">—</span></p>
-          <div id="cp-flags"></div>
-          <div class="sep"></div>
-          <h4>Что улучшить</h4>
-          <ul id="cp-actions" class="muted"><li>Заполните форму слева и нажмите «Оценить риск».</li></ul>
-          <div class="sep"></div>
-          <details>
-            <summary>Показатели и формулы</summary>
-            <div class="code" id="cp-math"></div>
-          </details>
-        </div>
-      </div>
-      <div class="card">
-        <h3>Сохранённые контрагенты</h3>
-        <div class="sticky-tools">
-          <button class="btn" id="cp-export">Экспорт JSON</button>
-          <label class="btn">
-            <input type="file" id="cp-import" accept="application/json" class="sr-only">Импорт JSON
-          </label>
-        </div>
-        <div class="sep"></div>
-        <div style="max-height:320px;overflow:auto">
-          <table id="cp-table" aria-describedby="cp-foot">
-            <thead><tr><th>ИНН</th><th>Название</th><th>Налог/оборот</th><th>ЗСК</th><th>Массовость</th><th>Итоговый риск</th><th></th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div id="cp-foot" class="muted">Подсказка: наведите на риск, чтобы увидеть детали.</div>
-      </div>
-    </section>
+        <div class="result" id="res-T1"></div>
+      </section>
 
-    <!-- TRANSACTION MONITORING -->
-    <section id="tm" class="tab" hidden>
-      <div class="card">
-        <h2>Мониторинг операций</h2>
-        <div class="flex">
-          <div class="flex" style="flex:1;gap:8px">
-            <label class="sr-only" for="tm-q">Поиск</label>
-            <input id="tm-q" placeholder="Поиск: ИНН, назначение, тип, сумма..." />
-            <select id="tm-type" title="Тип события">
-              <option value="">Все типы</option>
-              <option>Транзит</option>
-              <option>Обнал</option>
-              <option>P2P</option>
-              <option>Исп. документ</option>
-              <option>Кросс‑бордер</option>
-            </select>
-          </div>
-          <div class="right flex">
-            <button class="btn" id="tm-analyze">Запустить анализ</button>
-            <button class="btn" id="tm-demo">Загрузить демо‑транзакции</button>
-            <button class="btn" id="tm-clear">Очистить</button>
-          </div>
+      <!-- T2 -->
+      <section class="card" id="T2">
+        <h3>2) Чек‑лист проверки контрагента</h3>
+        <div class="muted">Перечислите пункты чек‑листа (мин. 6): регистраторы, сервисы, документы.</div>
+        <textarea placeholder="Например: ИНН, ОГРН, ЕГРЮЛ/ЕГРИП, Прозрачный бизнес (ФНС), Rusprofile, ОКВЭД, массовый адрес, задолженность..." data-input="T2"></textarea>
+        <details style="margin-top:8px"><summary>Подсказки</summary>
+          <div>Ключевые слова: <code class="kwd">ИНН</code>, <code class="kwd">ОГРН</code>, <code class="kwd">ЕГРЮЛ</code>, <code class="kwd">ФНС</code>, <code class="kwd">ОКВЭД</code>, <code class="kwd">долг</code>, <code class="kwd">Rusprofile</code>, <code class="kwd">массов</code>.</div>
+        </details>
+        <div class="buttons">
+          <button class="btn btn-primary" data-action="grade" data-task="T2">Проверить задание 2</button>
+          <button class="btn" data-action="reset" data-task="T2">Сброс</button>
         </div>
-        <div class="sep"></div>
-        <div style="max-height:420px;overflow:auto">
-          <table id="tm-table">
-            <thead>
-              <tr><th>Дата/время</th><th>Отправитель</th><th>Получатель</th><th>Сумма</th><th>Назначение</th><th>Метки</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-      <div class="grid grid-2">
-        <div class="card">
-          <h3>Сводка рисков</h3>
-          <ul id="tm-summary"></ul>
-        </div>
-        <div class="card">
-          <h3>Пояснительная записка (шаблон)</h3>
-          <textarea id="tm-memo" spellcheck="false"></textarea>
-          <div class="flex">
-            <button class="btn ok" id="tm-memo-generate">Сгенерировать по выбранным событиям</button>
-            <button class="btn" id="tm-memo-copy">Скопировать</button>
-          </div>
-        </div>
-      </div>
-    </section>
+        <div class="result" id="res-T2"></div>
+      </section>
 
-    <!-- DOCS & CHECKLIST -->
-    <section id="docs" class="tab" hidden>
-      <div class="grid grid-2">
-        <div class="card">
-          <h2>Чек‑лист прозрачности бизнеса</h2>
-          <p class="muted">Отметьте пункты — прогресс сохраняется локально.</p>
-          <ul id="clist"></ul>
-          <div class="sep"></div>
-          <div class="flex">
-            <button class="btn ok" id="cl-save">Сохранить</button>
-            <button class="btn" id="cl-reset">Сбросить</button>
+      <!-- T3 numeric -->
+      <section class="card" id="T3">
+        <h3>3) Расчёт доли налогов к обороту</h3>
+        <div class="muted">Введите оборот и сумму налогов (за период). Цель — проверить, что налоговая нагрузка ≥ 0,9%.</div>
+        <div class="grid-3">
+          <div>
+            <label class="muted">Оборот, ₽</label>
+            <input type="number" min="0" step="0.01" data-num="turnover" value="120000000" />
+          </div>
+          <div>
+            <label class="muted">Налоги, ₽</label>
+            <input type="number" min="0" step="0.01" data-num="taxes" value="1500000" />
+          </div>
+          <div>
+            <label class="muted">Результат, %</label>
+            <input type="text" data-num="ratioOut" readonly />
           </div>
         </div>
-        <div class="card">
-          <h3>Генераторы документов</h3>
-          <label for="doc-company">Компания</label>
-          <input id="doc-company" placeholder="ООО «…»" />
-          <label for="doc-context">Контекст операции</label>
-          <textarea id="doc-context" placeholder="Например: оплата маркетинговых услуг по договору №…"></textarea>
-          <div class="flex">
-            <button class="btn" id="doc-explain">Пояснительная записка</button>
-            <button class="btn" id="doc-letter">Письмо в банк</button>
-            <button class="btn" id="doc-print">Печать/в PDF</button>
-          </div>
-          <div class="sep"></div>
-          <h4>Предпросмотр</h4>
-          <div id="doc-preview" class="code" style="min-height:160px"></div>
+        <div class="buttons">
+          <button class="btn" data-action="calc" data-task="T3">Рассчитать</button>
+          <button class="btn btn-primary" data-action="grade" data-task="T3">Проверить задание 3</button>
+          <button class="btn" data-action="reset" data-task="T3">Сброс</button>
         </div>
-      </div>
-    </section>
+        <div class="result" id="res-T3"></div>
+      </section>
 
-    <!-- QUIZ -->
-    <section id="quiz" class="tab" hidden>
-      <div class="card">
-        <h2>Зачётный тест</h2>
-        <p class="muted">10 вопросов, проходной балл — 8/10. Вопросы рандомизируются. Ответы и результат сохраняются локально.</p>
-        <div id="quiz-box"></div>
-        <div class="sep"></div>
-        <div class="flex">
-          <button class="btn ok" id="quiz-submit">Проверить ответы</button>
-          <button class="btn" id="quiz-reset">Сбросить тест</button>
-          <span class="right">Результат: <b id="quiz-res">—</b></span>
+      <!-- T4 -->
+      <section class="card" id="T4">
+        <h3>4) Политика ПОД/ФТ: меры и процедуры</h3>
+        <div class="muted">Опишите минимум 6 элементов: идентификация, KYC, мониторинг, заморозка, внутренний контроль...</div>
+        <textarea data-input="T4" placeholder="Например: 115‑ФЗ, идентификация, изучение клиента (KYC), мониторинг операций, замораживание/блокирование, реестр рисков, обучение, ответственный сотрудник..."></textarea>
+        <details style="margin-top:8px"><summary>Подсказки</summary>
+          <div>Ключевые слова: <code class="kwd">115‑ФЗ</code>, <code class="kwd">идентификац</code>, <code class="kwd">KYC</code>, <code class="kwd">мониторинг</code>, <code class="kwd">замораж</code>, <code class="kwd">внутренний контроль</code>, <code class="kwd">РВК</code>, <code class="kwd">профиль риска</code>.</div>
+        </details>
+        <div class="buttons">
+          <button class="btn btn-primary" data-action="grade" data-task="T4">Проверить задание 4</button>
+          <button class="btn" data-action="reset" data-task="T4">Сброс</button>
         </div>
-      </div>
-    </section>
+        <div class="result" id="res-T4"></div>
+      </section>
 
-    <!-- SUMMARY/EXPORT -->
-    <section id="summary" class="tab" hidden>
-      <div class="grid grid-2">
-        <div class="card">
-          <h2>Итоги</h2>
-          <ul id="sum-list"></ul>
-          <div class="sep"></div>
-          <div class="flex">
-            <button class="btn" id="sum-download">Скачать отчёт (JSON)</button>
-            <button class="btn" id="sum-copy">Скопировать в буфер</button>
-          </div>
+      <!-- T5 -->
+      <section class="card" id="T5">
+        <h3>5) Алгоритм ответа банку на запрос</h3>
+        <div class="muted">Опишите шаги и пакет документов.</div>
+        <textarea data-input="T5" placeholder="Например: собрать договор, счёт, акт, пояснительную записку с экономическим смыслом, ответить в срок 5–7 дней, предупредить о нестандартной операции, при блокировке — обжалование в ЦБ..."></textarea>
+        <details style="margin-top:8px"><summary>Подсказки</summary>
+          <div>Ключевые слова: <code class="kwd">пояснен</code>, <code class="kwd">договор</code>, <code class="kwd">акт</code>, <code class="kwd">5–7</code>, <code class="kwd">экономическ</code>, <code class="kwd">обжал</code>.</div>
+        </details>
+        <div class="buttons">
+          <button class="btn btn-primary" data-action="grade" data-task="T5">Проверить задание 5</button>
+          <button class="btn" data-action="reset" data-task="T5">Сброс</button>
         </div>
-        <div class="card">
-          <h3>Встраивание (Stepik / GitHub Pages)</h3>
-          <p>Разместите файл на GitHub Pages. Пример iframe:</p>
-          <div class="code"><code>&lt;iframe src="https://&lt;ваш_аккаунт&gt;.github.io/finmon-practicum/index.html" width="100%" height="900" allow="clipboard-write *"&gt;&lt;/iframe&gt;</code></div>
-          <p class="muted">Все стили и скрипты внутри одного файла. Внешних подключений нет.</p>
+        <div class="result" id="res-T5"></div>
+      </section>
+
+      <!-- T6 -->
+      <section class="card" id="T6">
+        <h3>6) Политика наличных и снятий</h3>
+        <div class="muted">Опишите ограничения, документы и альтернативы (корпоративные карты, безнал).</div>
+        <textarea data-input="T6" placeholder="Например: минимизировать наличные, авансовые отчёты и чеки, лимиты, бизнес‑карты, избегать cash‑out по корпоративным картам, планирование платежей..."></textarea>
+        <details style="margin-top:8px"><summary>Подсказки</summary>
+          <div>Ключевые слова: <code class="kwd">минимиз</code>, <code class="kwd">авансов</code>, <code class="kwd">чеки</code>, <code class="kwd">лимит</code>, <code class="kwd">бизнес‑карта</code>, <code class="kwd">cash</code>, <code class="kwd">планир</code>.</div>
+        </details>
+        <div class="buttons">
+          <button class="btn btn-primary" data-action="grade" data-task="T6">Проверить задание 6</button>
+          <button class="btn" data-action="reset" data-task="T6">Сброс</button>
         </div>
-      </div>
-    </section>
-  </main>
+        <div class="result" id="res-T6"></div>
+      </section>
+
+      <!-- T7 -->
+      <section class="card" id="T7">
+        <h3>7) Ответственные и SLA коммуникаций</h3>
+        <div class="muted">Опишите роли, сроки реагирования, контроль задач.</div>
+        <textarea data-input="T7" placeholder="Например: назначить ответственного по ПОД/ФТ, сроки ответа банку, чек‑листы, контроль пакета документов, регламент эскалации..."></textarea>
+        <details style="margin-top:8px"><summary>Подсказки</summary>
+          <div>Ключевые слова: <code class="kwd">ответственн</code>, <code class="kwd">срок</code>, <code class="kwd">SLA</code>, <code class="kwd">пакет докум</code>, <code class="kwd">эскалац</code>, <code class="kwd">регламент</code>.</div>
+        </details>
+        <div class="buttons">
+          <button class="btn btn-primary" data-action="grade" data-task="T7">Проверить задание 7</button>
+          <button class="btn" data-action="reset" data-task="T7">Сброс</button>
+        </div>
+        <div class="result" id="res-T7"></div>
+      </section>
+
+      <!-- T8 -->
+      <section class="card" id="T8">
+        <h3>8) Высокорисковые P2P‑операции: признаки и меры</h3>
+        <div class="muted">Опишите признаки (дропперы, крипто, нелегальные казино) и контроли.</div>
+        <textarea data-input="T8" placeholder="Например: P2P, дропперы, криптовалюта, онлайн‑казино, мониторинг по картам, блокировка аномалий, требования к агентам..."></textarea>
+        <details style="margin-top:8px"><summary>Подсказки</summary>
+          <div>Ключевые слова: <code class="kwd">P2P</code>, <code class="kwd">дроппер</code>, <code class="kwd">крипто</code>, <code class="kwd">казино</code>, <code class="kwd">мониторинг</code>, <code class="kwd">агент</code>, <code class="kwd">блокиров</code>.</div>
+        </details>
+        <div class="buttons">
+          <button class="btn btn-primary" data-action="grade" data-task="T8">Проверить задание 8</button>
+          <button class="btn" data-action="reset" data-task="T8">Сброс</button>
+        </div>
+        <div class="result" id="res-T8"></div>
+      </section>
+
+    </div>
+
+    <h2 style="margin-top:26px">Автотесты</h2>
+    <div class="card">
+      <div class="muted">Мини‑проверки корректности функций оценивания. Результаты ниже.</div>
+      <div id="testsOut" class="result"></div>
+    </div>
+  </div>
 
   <script>
-  // ========== Storage helpers ==========
-  const store = {
-    get k(){ return 'finmon_v1'; },
-    load(){ try{ return JSON.parse(localStorage.getItem(this.k)) || {}; }catch{return {}} },
-    save(data){ localStorage.setItem(this.k, JSON.stringify(data)); },
-    clear(){ localStorage.removeItem(this.k); }
+  "use strict";
+  // ==== Модель заданий и ожиданий ====
+  const TASKS = {
+    T1: { type: "text", minHits: 6, kw: ["транзит","обнал","налоговая нагруз","оквэд","аномал","p2p","криптовалют","исполнительн","перестрахов"], sample:"транзитные операции; обналичивание; низкая налоговая нагрузка; несоответствие ОКВЭД; аномалии оборотов; P2P переводы; криптовалюта; исполнительные документы; перестрахование." },
+    T2: { type: "text", minHits: 6, kw: ["инн","огрн","егрюл","фнс","оквэд","долг","rusprofile","массов"], sample:"ИНН, ОГРН, ЕГРЮЛ/ЕГРИП, ФНС Прозрачный бизнес, Rusprofile, ОКВЭД, долги, массовый адрес" },
+    T3: { type: "numeric", threshold: 0.009 },
+    T4: { type: "text", minHits: 6, kw: ["115","идентификац","kyc","мониторинг","замораж","внутренний контроль","рвк","риск"], sample:"115‑ФЗ; идентификация; KYC; мониторинг; замораживание; правила внутреннего контроля; риск‑профилирование; обучение" },
+    T5: { type: "text", minHits: 5, kw: ["пояснен","договор","акт","5","экономическ","обжал"], sample:"Подготовить договор, акт, счета; пояснения с экономическим смыслом; ответить в срок 5–7 дней; при блокировке — обжаловать" },
+    T6: { type: "text", minHits: 5, kw: ["минимиз","авансов","чек","лимит","бизнес","cash","планир"], sample:"Минимизировать наличные; авансовые отчёты и чеки; лимиты; бизнес‑карты; избегать cash‑out; планирование платежей" },
+    T7: { type: "text", minHits: 5, kw: ["ответствен","срок","sla","пакет","эскалац","регламент"], sample:"Назначить ответственного; SLA по срокам; контроль пакета документов; регламент эскалации" },
+    T8: { type: "text", minHits: 5, kw: ["p2p","дроппер","крипт","казин","монитор","агент","блокиров"], sample:"P2P, дропперы, крипто, онлайн‑казино, мониторинг карт, контроль агентов, блокировка аномалий" }
   };
-  const state = Object.assign({
-    cps: [],
-    tm: { rows: [] },
-    cl: {},
-    quiz: {},
-    finished: false
-  }, store.load());
-  function persist(){ store.save(state); }
 
-  // ========== Tabs ==========
-  const tabs = document.querySelectorAll('.tab-btn');
-  tabs.forEach(btn=>btn.addEventListener('click',()=>selectTab(btn.dataset.tab)));
-  function selectTab(id){
-    document.querySelectorAll('.tab').forEach(s=>s.hidden=true);
-    document.getElementById(id).hidden=false;
-    tabs.forEach(b=>b.setAttribute('aria-selected', String(b.dataset.tab===id)));
-    if(id==='summary') renderSummary();
+  // ==== Утилиты ====
+  const byId = id => document.getElementById(id);
+  const norm = s => (s||"").toString().toLowerCase().replace(/[ё]/g,"е");
+
+  // Подсчёт совпадений по ключевым словам (по подстроке)
+  function countHits(text, keywords){
+    const t = norm(text);
+    let hits = 0; const matched = [];
+    for(const kw of keywords){
+      if(t.includes(norm(kw))){ hits++; matched.push(kw); }
+    }
+    return {hits, matched};
   }
 
-  // ========== Intro controls ==========
-  const stateLabel = document.getElementById('state-label');
-  document.getElementById('btn-reset').onclick=()=>{ if(confirm('Сбросить весь прогресс?')){ store.clear(); location.reload(); } };
-  document.getElementById('btn-demo').onclick=()=>{ loadDemo(); alert('Демо‑данные загружены. Перейдите во вкладки для просмотра.'); };
-
-  // ========== Demo datasets ==========
-  const DEMO_CPS = [
-    {inn:'7708123456', name:'ООО «МаркетСофт»', age:10, okved:'62.01', ops:['IT/Маркетинг'], site:'yes', staff:8, rev:24, tax:0.08, mass:'no', zsk:'low', match:'ok', notes:'Малый интегратор; рост стабильный.'},
-    {inn:'7731654321', name:'ООО «Вектор Сталь»', age:26, okved:'46.72', ops:['Оптовая торговля','Нефтегаз/металлолом'], site:'weak', staff:4, rev:310, tax:1.2, mass:'maybe', zsk:'mid', match:'mixed', notes:'Высокий долевой оборот по металлолому; дробление платежей.'},
-    {inn:'7812340099', name:'ООО «Спринт Лайн»', age:4, okved:'47.91', ops:['Оптовая торговля','IT/Маркетинг'], site:'no', staff:0, rev:95, tax:0.12, mass:'yes', zsk:'high', match:'bad', notes:'Признаки транзитности, массовый адрес.'}
-  ];
-  const DEMO_TX = [
-    // Транзитная цепочка: вход -> 40мин -> выход
-    {ts:'2025-05-12T10:03', from:'ООО «Спринт Лайн» (7812340099)', to:'ООО «БетаТрейд» (7708999111)', amt:12_500_000, desc:'Оплата по договору №BT-101', tags:[]},
-    {ts:'2025-05-12T10:45', from:'ООО «БетаТрейд» (7708999111)', to:'ИП Петров (350401234567)', amt:12_480_000, desc:'Перевод по договору займа', tags:[]},
-
-    // Обнал через корпоративную карту / снятия
-    {ts:'2025-06-03T14:11', from:'ООО «Вектор Сталь» (7731654321)', to:'Снятие наличных (corp card)', amt:690_000, desc:'Снятие на хоз. нужды', tags:[]},
-    {ts:'2025-06-03T15:40', from:'ООО «Вектор Сталь» (7731654321)', to:'Снятие наличных (corp card)', amt:720_000, desc:'Снятие на хоз. нужды', tags:[]},
-
-    // Высокорисковые P2P: много мелких переводов физлицам
-    {ts:'2025-04-21T18:22', from:'ИП СмартПэй (390601112233)', to:'ФЛ *А-01', amt:14_900, desc:'P2P перевод', tags:[]},
-    {ts:'2025-04-21T18:25', from:'ИП СмартПэй (390601112233)', to:'ФЛ *А-02', amt:15_300, desc:'P2P перевод', tags:[]},
-    {ts:'2025-04-21T18:28', from:'ИП СмартПэй (390601112233)', to:'ФЛ *А-03', amt:14_500, desc:'P2P перевод', tags:[]},
-    {ts:'2025-04-21T18:31', from:'ИП СмартПэй (390601112233)', to:'ФЛ *А-04', amt:14_700, desc:'P2P перевод', tags:[]},
-
-    // Исполнительный документ — потенциальная схема
-    {ts:'2025-07-08T09:02', from:'ООО «МаркетСофт» (7708123456)', to:'ФЛ Иванов И.И.', amt:1_950_000, desc:'Исполнительный лист №77-2025-0182', tags:[]},
-
-    // Кросс‑бордер: нематериальные услуги
-    {ts:'2025-03-18T11:00', from:'ООО «Спринт Лайн» (7812340099)', to:'Overseas Ltd (HK)', amt:7_800_000, desc:'Consulting services fee', tags:[]}
-  ];
-
-  function loadDemo(){
-    state.cps = DEMO_CPS.slice();
-    state.tm.rows = DEMO_TX.slice();
-    state.cl = defaultChecklist();
-    state.quiz = {};
-    persist();
-    renderCpTable();
-    renderTm();
-    renderChecklist();
+  // ==== Оценивание заданий ====
+  function gradeTextTask(taskId){
+    const cfg = TASKS[taskId];
+    const el = document.querySelector(`[data-input="${taskId}"]`);
+    const resEl = byId(`res-${taskId}`);
+    const {hits, matched} = countHits(el.value, cfg.kw);
+    const ok = hits >= cfg.minHits;
+    resEl.innerHTML = ok
+      ? `✅ Найдено совпадений: <b>${hits}</b> (минимум ${cfg.minHits}). <span class="ok">Задание зачтено.</span><br><span class="muted">Совпало: ${matched.join(', ')}</span>`
+      : `❌ Найдено совпадений: <b>${hits}</b> (нужно ≥ ${cfg.minHits}). <span class="fail">Доработайте ответ.</span>`;
+    resEl.dataset.passed = ok ? '1' : '0';
+    return ok;
   }
 
-  // ========== Due Diligence logic ==========
-  const fm = new Intl.NumberFormat('ru-RU');
-  const per = new Intl.NumberFormat('ru-RU',{style:'percent',minimumFractionDigits:2,maximumFractionDigits:2});
+  function gradeNumericT3(){
+    const t = Number(document.querySelector('[data-num="turnover"]').value||0);
+    const x = Number(document.querySelector('[data-num="taxes"]').value||0);
+    const out = document.querySelector('[data-num="ratioOut"]');
+    const ratio = t>0 ? (x/t) : 0;
+    out.value = (ratio*100).toFixed(3);
+    const resEl = byId('res-T3');
+    const ok = ratio >= TASKS.T3.threshold;
+    resEl.innerHTML = ok
+      ? `✅ Нагрузка ${(ratio*100).toFixed(3)}% ≥ ${(TASKS.T3.threshold*100).toFixed(2)}%. <span class="ok">Задание зачтено.</span>`
+      : `❌ Нагрузка ${(ratio*100).toFixed(3)}% &lt; ${(TASKS.T3.threshold*100).toFixed(2)}%. <span class="fail">Недостаточно — предложите меры.</span>`;
+    resEl.dataset.passed = ok ? '1' : '0';
+    return ok;
+  }
 
-  document.getElementById('cp-load').onclick = ()=>{ const s = DEMO_CPS[Math.floor(Math.random()*DEMO_CPS.length)]; fillCpForm(s); };
-  document.getElementById('cp-save').onclick = ()=>{ const d = readCpForm(); if(!d) return; const i = state.cps.findIndex(x=>x.inn===d.inn); if(i>-1) state.cps[i]=d; else state.cps.push(d); persist(); renderCpTable(); alert('Сохранено.'); };
-  document.getElementById('cp-export').onclick=()=>downloadJSON('counterparties.json', state.cps);
-  document.getElementById('cp-import').addEventListener('change', handleImportCps);
+  function calcT3(){
+    // вычисление без выставления результата
+    const t = Number(document.querySelector('[data-num="turnover"]').value||0);
+    const x = Number(document.querySelector('[data-num="taxes"]').value||0);
+    const out = document.querySelector('[data-num="ratioOut"]');
+    const ratio = t>0 ? (x/t) : 0; out.value = (ratio*100).toFixed(3);
+  }
 
-  document.getElementById('cp-form').addEventListener('submit', e=>{
-    e.preventDefault();
-    const data = readCpForm(); if(!data) return;
-    const res = cpScore(data);
-    showCpResult(res);
+  function grade(taskId){
+    if(!(taskId in TASKS)) return false;
+    if(TASKS[taskId].type === 'text') return gradeTextTask(taskId);
+    if(taskId === 'T3') return gradeNumericT3();
+    return false;
+  }
+
+  // Сброс одного задания
+  function resetTask(taskId){
+    const cfg = TASKS[taskId];
+    const resEl = byId(`res-${taskId}`);
+    if(cfg.type === 'text'){
+      const el = document.querySelector(`[data-input="${taskId}"]`);
+      el.value = '';
+    } else if(taskId === 'T3'){
+      document.querySelector('[data-num="turnover"]').value = '';
+      document.querySelector('[data-num="taxes"]').value = '';
+      document.querySelector('[data-num="ratioOut"]').value = '';
+    }
+    resEl.textContent = '';
+    delete resEl.dataset.passed;
+  }
+
+  function updateOverall(){
+    const results = Object.keys(TASKS).map(id => byId(`res-${id}`)?.dataset?.passed === '1');
+    const total = results.length;
+    const passed = results.filter(Boolean).length;
+    const pct = total? Math.round((passed/total)*100) : 0;
+    byId('overallBar').style.width = pct+'%';
+    const stEl = byId('overallStatus');
+    if(pct >= 80){ stEl.textContent = `Пройден (${pct}%)`; stEl.className = 'ok'; }
+    else if(pct>0){ stEl.textContent = `Промежуточно (${pct}%)`; stEl.className='warn'; }
+    else { stEl.textContent = '—'; stEl.className='warn'; }
+  }
+
+  // ==== Слушатели событий (без inline-обработчиков) ====
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    const action = btn.dataset.action;
+    const task = btn.dataset.task;
+    if(action === 'grade' && task){ grade(task); updateOverall(); }
+    if(action === 'calc' && task==='T3'){ calcT3(); }
+    if(action === 'reset' && task){ resetTask(task); updateOverall(); }
+    if(action === 'grade-all'){
+      for(const id of Object.keys(TASKS)) grade(id);
+      updateOverall();
+    }
+    if(action === 'reset-all'){
+      for(const id of Object.keys(TASKS)) resetTask(id);
+      updateOverall();
+    }
+    if(action === 'run-tests') runTests();
   });
 
-  function readCpForm(){
-    const get = id => document.getElementById(id).value.trim();
-    const opsSel = Array.from(document.getElementById('cp-ops').selectedOptions).map(o=>o.value);
-    const d = {
-      inn: get('cp-inn'),
-      name: get('cp-name'),
-      age: +get('cp-age')||0,
-      okved: get('cp-okved'),
-      ops: opsSel,
-      site: get('cp-site'),
-      staff: +get('cp-staff')||0,
-      rev: +get('cp-rev')||0,
-      tax: +get('cp-tax')||0,
-      mass: get('cp-mass'),
-      zsk: get('cp-zsk'),
-      match: get('cp-match'),
-      notes: get('cp-notes')
-    };
-    if(!d.inn || !d.name) { alert('Заполните ИНН и наименование'); return null; }
-    return d;
-  }
-  function fillCpForm(d){
-    document.getElementById('cp-inn').value=d.inn||'';
-    document.getElementById('cp-name').value=d.name||'';
-    document.getElementById('cp-age').value=d.age||0;
-    document.getElementById('cp-okved').value=d.okved||'';
-    const ops = document.getElementById('cp-ops');
-    Array.from(ops.options).forEach(o=>o.selected=d.ops?.includes(o.value));
-    document.getElementById('cp-site').value=d.site||'yes';
-    document.getElementById('cp-staff').value=d.staff||0;
-    document.getElementById('cp-rev').value=d.rev||0;
-    document.getElementById('cp-tax').value=d.tax||0;
-    document.getElementById('cp-mass').value=d.mass||'no';
-    document.getElementById('cp-zsk').value=d.zsk||'low';
-    document.getElementById('cp-match').value=d.match||'ok';
-    document.getElementById('cp-notes').value=d.notes||'';
+  // ==== Автотесты ====
+  function expect(name, cond){
+    return {name, ok: !!cond};
   }
 
-  function cpScore(d){
-    const flags=[]; let score=0;
-    const taxShare = d.rev>0? (d.tax/d.rev*100): 0; // %
-    if(taxShare < 0.9){ score+=2; flags.push(`Низкая доля налогов в обороте: ${taxShare.toFixed(2)}% (< 0.9%)`); }
-    if(d.mass==='yes'){ score+=2; flags.push('Массовый адрес/руководитель'); }
-    if(d.staff===0 && d.rev>10){ score+=2; flags.push('Нулевой штат при существенном обороте'); }
-    if(d.match==='bad'){ score+=1; flags.push('Несоответствие ОКВЭД и назначений платежей'); }
-    if(d.zsk==='high'){ score+=3; flags.push('Высокий уровень риска по ЗСК'); }
-    if(d.site==='no'){ score+=1; flags.push('Отсутствуют следы в сети/сайт'); }
-    if(d.age < 6){ score+=1; flags.push('Молодая компания (< 6 мес.)'); }
+  function runTests(){
+    const rows = [];
+    // T1: достаточно ключевых слов
+    rows.push(expect('T1: ≥6 ключевых слов', countHits(TASKS.T1.sample, TASKS.T1.kw).hits >= TASKS.T1.minHits));
+    // T2
+    rows.push(expect('T2: ≥6 ключевых слов', countHits(TASKS.T2.sample, TASKS.T2.kw).hits >= TASKS.T2.minHits));
+    // T3: расчёт порога 0.9%
+    { const turn=1_000_000, tax=20_000; const ok = (tax/turn) >= TASKS.T3.threshold; rows.push(expect('T3: 20k/1M >= 0.9%', ok)); }
+    { const turn=10_000_000, tax=10_000; const ok = (tax/turn) >= TASKS.T3.threshold; rows.push(expect('T3: 10k/10M < 0.9%', !ok)); }
+    // T4–T8: smoke
+    rows.push(expect('T4: ≥6 ключевых слов', countHits(TASKS.T4.sample, TASKS.T4.kw).hits >= TASKS.T4.minHits));
+    rows.push(expect('T5: ≥5 ключевых слов', countHits(TASKS.T5.sample, TASKS.T5.kw).hits >= TASKS.T5.minHits));
+    rows.push(expect('T6: ≥5 ключевых слов', countHits(TASKS.T6.sample, TASKS.T6.kw).hits >= TASKS.T6.minHits));
+    rows.push(expect('T7: ≥5 ключевых слов', countHits(TASKS.T7.sample, TASKS.T7.kw).hits >= TASKS.T7.minHits));
+    rows.push(expect('T8: ≥5 ключевых слов', countHits(TASKS.T8.sample, TASKS.T8.kw).hits >= TASKS.T8.minHits));
 
-    // Категоризация
-    let label='Низкий', pill='ok', pct=15;
-    if(score>=6){ label='Высокий'; pill='danger'; pct=90; }
-    else if(score>=3){ label='Повышенный'; pill='warn'; pct=60; }
-
-    const actions = [];
-    if(taxShare<0.9) actions.push('Сформируйте план корректировки налоговой нагрузки/раскрытий и пояснения причин отклонений.');
-    if(d.match!=='ok') actions.push('Проведите сверку ОКВЭД и фактических операций, добавьте коды/документы.');
-    if(d.mass!=='no') actions.push('Подтвердите «не массовость»: договор аренды, фото офиса, независимые контакты.');
-    if(d.zsk!=='low') actions.push('Проверьте контрагента в сервисе ЗСК и подготовьте расширенный пакет DD.');
-    if(d.site==='no') actions.push('Опубликуйте актуальные контакты/описание деятельности на сайте или профилях.');
-
-    return { score, label, pill, pct, flags, actions, taxShare };
+    const okCount = rows.filter(r=>r.ok).length; const total = rows.length;
+    let html = `<div>Пройдено тестов: <b>${okCount}/${total}</b></div>`;
+    html += '<table><thead><tr><th>Тест</th><th>Статус</th></tr></thead><tbody>';
+    for(const r of rows){ html += `<tr><td>${r.name}</td><td>${r.ok? '✅' : '❌'}</td></tr>`; }
+    html += '</tbody></table>';
+    byId('testsOut').innerHTML = html;
   }
 
-  function showCpResult(res){
-    document.getElementById('cp-scorebar').style.width = res.pct+'%';
-    const pill = document.getElementById('cp-score');
-    pill.className = 'pill ' + res.pill;
-    pill.textContent = `${res.label} (баллов: ${res.score})`;
-    document.getElementById('cp-flags').innerHTML = res.flags.length? ('<ul>'+res.flags.map(f=>`<li>${f}</li>`).join('')+'</ul>') : '<p class="muted">Красных флагов не выявлено.</p>';
-    document.getElementById('cp-actions').innerHTML = res.actions.length? res.actions.map(a=>`<li>${a}</li>`).join('') : '<li>Риск низкий — стандартные процедуры достаточно.</li>';
-    document.getElementById('cp-math').textContent = `Доля налогов к обороту: ${res.taxShare.toFixed(2)}% (порог 0.9%).\nСумма баллов по флагам => категория риска.`;
-  }
-
-  function renderCpTable(){
-    const tbody = document.querySelector('#cp-table tbody');
-    tbody.innerHTML='';
-    state.cps.forEach(cp=>{
-      const {label,pill,score} = cpScore(cp);
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${cp.inn}</td><td>${escapeHtml(cp.name)}</td><td>${(cp.rev>0? (cp.tax/cp.rev*100).toFixed(2):'0.00')}%</td><td>${cp.zsk}</td><td>${cp.mass}</td><td><span class="pill ${pill}" title="Баллы: ${score}">${label}</span></td><td><button class="btn" data-edit="${cp.inn}">Открыть</button></td>`;
-      tbody.appendChild(tr);
-    });
-    tbody.querySelectorAll('button[data-edit]').forEach(b=>b.onclick=()=>{
-      const cp = state.cps.find(x=>x.inn===b.dataset.edit); if(cp) { fillCpForm(cp); const r=cpScore(cp); showCpResult(r); selectTab('dd'); }
-    });
-  }
-
-  function handleImportCps(ev){
-    const file = ev.target.files?.[0]; if(!file) return;
-    const reader = new FileReader();
-    reader.onload = () => { try{ const arr = JSON.parse(reader.result); if(Array.isArray(arr)){ state.cps = arr; persist(); renderCpTable(); alert('Импортировано.'); } } catch(e){ alert('Ошибка импорта'); } };
-    reader.readAsText(file);
-  }
-
-  // ========== Transaction Monitoring ==========
-  function renderTm(){
-    const tbody = document.querySelector('#tm-table tbody');
-    tbody.innerHTML = '';
-    (state.tm.rows||[]).forEach((r,i)=>{
-      const tags = r.tags?.map(t=>`<span class="pill ${pillClass(t)}">${t}</span>`).join(' ')||'';
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${fmtTs(r.ts)}</td><td>${escapeHtml(r.from)}</td><td>${escapeHtml(r.to)}</td><td>${fm.format(r.amt)} ₽</td><td>${escapeHtml(r.desc)}</td><td>${tags}</td>`;
-      tbody.appendChild(tr);
-    });
-  }
-  function pillClass(tag){
-    return tag==='Транзит'?'warn' : tag==='Обнал'?'danger' : tag==='P2P'?'warn' : tag==='Исп. документ'?'warn' : tag==='Кросс‑бордер'?'warn' : 'ok';
-  }
-  function fmtTs(ts){ return new Date(ts).toLocaleString('ru-RU'); }
-
-  document.getElementById('tm-demo').onclick=()=>{ state.tm.rows = DEMO_TX.slice(); persist(); renderTm(); };
-  document.getElementById('tm-clear').onclick=()=>{ state.tm.rows=[]; persist(); renderTm(); updateTmSummary([]); };
-  document.getElementById('tm-analyze').onclick=()=>{
-    const out = analyzeTm(state.tm.rows);
-    state.tm.rows = out.rows; persist(); renderTm(); updateTmSummary(out.summary);
-    document.getElementById('tm-memo').value = generateMemo(out.summary);
-  };
-
-  function analyzeTm(rows){
-    const res = rows.map(r=>({...r, tags:[...new Set([...(r.tags||[]), ...detectTags(r, rows)])]}));
-    // summary
-    const cnt = (tag)=> res.filter(r=>r.tags.includes(tag)).length;
-    const summary = [
-      {tag:'Транзит', n:cnt('Транзит'), tip:'Зачисление → быстрый вывод (≤ 1 час), несоответствие смысла платежей.'},
-      {tag:'Обнал', n:cnt('Обнал'), tip:'Снятия наличных крупными суммами/сериями, cash-out с corp‑карт.'},
-      {tag:'P2P', n:cnt('P2P'), tip:'Много мелких переводов физлицам, «агрегаторские» паттерны.'},
-      {tag:'Исп. документ', n:cnt('Исп. документ'), tip:'Высокие суммы по исполнительным документам между связанными лицами.'},
-      {tag:'Кросс‑бордер', n:cnt('Кросс‑бордер'), tip:'Переводы нерезидентам за немат. услуги/авансы (без подтверждений).'}
-    ];
-    return { rows: res, summary };
-  }
-
-  function detectTags(r, all){
-    const tags=[];
-    // Транзит: ищем пару вход->выход с разницей ≤ 60 минут в цепочке
-    const t0 = new Date(r.ts).getTime();
-    const isOut = /договор|перевод|оплата|fee|услуг/i.test(r.desc);
-    const outs = all.filter(x=> new Date(x.ts).getTime()>=t0 && new Date(x.ts).getTime()-t0 <= 60*60*1000 && x.from.includes(r.to?.split('(')[0]?.trim()));
-    if(outs.length && isOut){ tags.push('Транзит'); }
-
-    // Обнал: снятие наличных крупными суммами (≥ 600k) или серия ≥ 2 за день
-    if(/Снятие наличных/.test(r.to) && r.amt>=600_000) tags.push('Обнал');
-    const sameDay = all.filter(x=> x.from===r.from && /Снятие наличных/.test(x.to) && x.ts.slice(0,10)===r.ts.slice(0,10));
-    if(sameDay.length>=2) tags.push('Обнал');
-
-    // P2P: множество мелких переводов физлицам из одного источника в короткий интервал
-    if(/P2P/.test(r.desc) || /ФЛ/.test(r.to)){
-      const window = all.filter(x=> x.from===r.from && /ФЛ|P2P/.test(x.to+x.desc));
-      if(window.length>=4) tags.push('P2P');
-    }
-
-    // Исполнительные документы
-    if(/Исполнительн(ый|ого) лист/i.test(r.desc)) tags.push('Исп. документ');
-
-    // Кросс‑бордер: нерезидент в получателе + немат. услуги/консалтинг
-    if(/\(|HK|Ltd|LLC|United|Overseas|BV|S.A.|AG|PLC|KZ|CN\)/i.test(r.to) && /consult|service|услу/i.test(r.desc)) tags.push('Кросс‑бордер');
-
-    return tags;
-  }
-
-  function updateTmSummary(list){
-    const ul = document.getElementById('tm-summary');
-    ul.innerHTML = list.length? list.map(x=>`<li><b>${x.tag}</b>: ${x.n} — <span class="muted">${x.tip}</span></li>`).join('') : '<li class="muted">Нажмите «Запустить анализ».</li>';
-  }
-
-  // Memo generator
-  document.getElementById('tm-memo-generate').onclick=()=>{
-    const tbody = document.querySelector('#tm-table tbody');
-    const tags = new Set();
-    Array.from(tbody.querySelectorAll('tr')).forEach(tr=>{
-      const last = tr.lastElementChild.textContent; (last.match(/Транзит|Обнал|P2P|Исп. документ|Кросс‑бордер/g)||[]).forEach(t=>tags.add(t));
-    });
-    document.getElementById('tm-memo').value = generateMemo(Array.from(tags).map(t=>({tag:t, n:'?'})));
-  };
-  document.getElementById('tm-memo-copy').onclick=()=>{ const t=document.getElementById('tm-memo'); t.select(); document.execCommand('copy'); };
-  function generateMemo(items){
-    const dt = new Date().toLocaleString('ru-RU');
-    return `Пояснительная записка\nДата: ${dt}\n\nВ ходе внутреннего мониторинга выявлены события: ${items.map(i=>i.tag).join(', ')}.\n\nПриняты меры:\n• Получение первичных документов и обоснований экономического смысла.\n• Усиление лимитов и дополнительных проверок по операциям с повышенным риском.\n• Направление сведений в соответствующие системы внутреннего контроля.\n\nПриложения: выписки, договоры, акты, переписка.`;
-  }
-
-  // ========== Checklist & Docs ==========
-  function defaultChecklist(){
-    return {
-      docs: false,
-      econ: false,
-      tax: false,
-      okved: false,
-      zsk: false,
-      kyc: false,
-      cash: false,
-      agent: false,
-      upd: false
-    };
-  }
-  const CL_ITEMS = [
-    ['docs','Папка‑архив документов по контрагентам (договор, счёт, акт, переписка)'],
-    ['econ','Пояснение экономического смысла каждой нестандартной операции'],
-    ['tax','Контроль доли налогов/ФОТ/НДФЛ к обороту (отчёты и графики)'],
-    ['okved','Сверка ОКВЭД ↔ фактические платежи, корректность назначений'],
-    ['zsk','Периодическая самопроверка и проверка контрагентов в ЗСК/реестрах'],
-    ['kyc','Назначен ответственный за ПОД/ФТ и взаимодействие с банком'],
-    ['cash','Минимизация наличных, авансовые отчёты и чеки в комплекте'],
-    ['agent','Контроль платёжных агентов/эквайринга (отсутствие нелегальной деятельн.)'],
-    ['upd','Актуальность реквизитов/ОКВЭД/бенефициаров в ФНС, обновление ежеквартально']
-  ];
-
-  function renderChecklist(){
-    const ul = document.getElementById('clist');
-    ul.innerHTML = '';
-    CL_ITEMS.forEach(([key, text])=>{
-      const id = 'cl-' + key;
-      const li = document.createElement('li');
-      li.innerHTML = `<label><input type="checkbox" id="${id}" ${state.cl[key]? 'checked':''}/> ${text}</label>`;
-      ul.appendChild(li);
-      document.getElementById(id).onchange = (e)=>{ state.cl[key] = e.target.checked; persist(); };
-    });
-  }
-  renderChecklist();
-  document.getElementById('cl-save').onclick=()=>{ persist(); alert('Сохранено.'); };
-  document.getElementById('cl-reset').onclick=()=>{ state.cl = defaultChecklist(); persist(); renderChecklist(); };
-
-  // Docs generators
-  function docExplain(company, context){
-    return `Пояснительная записка\n\nКомпания: ${company}\nКонтекст: ${context}\n\n1) Экономический смысл: ...\n2) Перечень документов: договор, счёт, акт, ТЗ, переписка.\n3) Ожидаемые результаты/эффект: ...\n4) Ответственные лица и сроки: ...`;
-  }
-  function docLetter(company, context){
-    return `Письмо в банк\n\nУважаемые коллеги!\n\nВ ответ на запрос по операции сообщаем следующее:\nКомпания: ${company}.\nКонтекст операции: ${context}.\nПрилагаем обосновывающие документы и подтверждаем реальность хозяйственной операции.\nГотовы предоставить дополнительные сведения.\n\nС уважением,\n___________________`;
-  }
-  function setPreview(text){ document.getElementById('doc-preview').textContent = text; }
-  document.getElementById('doc-explain').onclick=()=> setPreview(docExplain(document.getElementById('doc-company').value, document.getElementById('doc-context').value));
-  document.getElementById('doc-letter').onclick=()=> setPreview(docLetter(document.getElementById('doc-company').value, document.getElementById('doc-context').value));
-  document.getElementById('doc-print').onclick=()=> window.print();
-
-  // ========== Quiz ==========
-  const Q = [
-    {q:'Какой индикатор чаще всего вызывает вопросы у банка при больших оборотах?', a:['Доля налогов/ФОТ/НДФЛ к обороту','Количество сотрудников','Возраст компании'], c:0},
-    {q:'Что из нижеперечисленного укажет на «транзитный характер» операций?', a:['Зачисление и почти мгновенное списание средств','Раз в месяц платёж аренды','Крупный единичный платёж поставщику за оборудование'], c:0},
-    {q:'Какой набор мер уместен при риске «исполнительные документы»?', a:['Взаимодействие с ФССП/суд. приставами, углублённая проверка, информирование уполномоченного органа','Игнорирование — платежи по листам всегда легальны','Увеличение снятия наличных'], c:0},
-    {q:'Какая операция относится к повышенному риску при кросс‑бордер переводах?', a:['Оплата нематериальных услуг нерезиденту без прозрачной оценки стоимости','Оплата импортного станка с таможенным оформлением','Выплата пошлины'], c:0},
-    {q:'Что из списка — признак компании‑однодневки?', a:['Массовый адрес/руководитель','Высокая выручка при большом штате','Долгая история и аудированный отчёт'], c:0},
-    {q:'Как корректнее подготовить документы под нестандартную операцию?', a:['Пояснительная записка + договорная и первичная документация','Только платёжное поручение','Только письмо в банк без документов'], c:0},
-    {q:'P2P операции высокого риска часто используют:', a:['Карты/кошельки подставных лиц (дропперов)','Казначейские счета федеральных органов','Исключительно SWIFT‑переводы'], c:0},
-    {q:'Что делать при несоответствии ОКВЭД фактическим платежам?', a:['Сверить и обновить коды, приложить документы','Ничего, это неважно','Переименовать компанию'], c:0},
-    {q:'Какой лимит даёт сигнал по «обналу» в примере?', a:['Снятия ≥ 600 000 ₽ и/или серия снятий за день','Любая оплата аренды','Выплата страховой премии'], c:0},
-    {q:'Как поступить, если контрагент в ЗСК имеет высокий риск?', a:['Запросить расширенный пакет DD/документов или отказаться от сделки','Продолжить без изменений','Перевести оплату на физлицо'], c:0}
-  ];
-
-  function renderQuiz(){
-    const box = document.getElementById('quiz-box');
-    const idx = [...Q.keys()].sort(()=>Math.random()-.5).slice(0,10);
-    state.quiz.idx = idx; persist();
-    box.innerHTML = idx.map((i,n)=>{
-      const q = Q[i];
-      return `<fieldset class="card"><legend><b>${n+1}.</b> ${q.q}</legend>
-        ${q.a.map((opt,j)=>`<label><input type="radio" name="q${i}" value="${j}"> ${opt}</label>`).join('<br>')}
-      </fieldset>`;
-    }).join('');
-  }
-  renderQuiz();
-
-  document.getElementById('quiz-submit').onclick=()=>{
-    const ans = {}; state.quiz.idx.forEach(i=>{
-      const sel = document.querySelector(`input[name="q${i}"]:checked`);
-      ans[i] = sel? +sel.value : -1;
-    });
-    const score = Object.entries(ans).reduce((s,[i,v])=> s + (v===Q[i].c?1:0), 0);
-    state.quiz.ans = ans; state.quiz.score = score; persist();
-    document.getElementById('quiz-res').textContent = `${score}/10 (${score>=8? 'зачёт':'незачёт'})`;
-  };
-  document.getElementById('quiz-reset').onclick=()=>{ state.quiz={}; persist(); renderQuiz(); document.getElementById('quiz-res').textContent='—'; };
-
-  // ========== Summary ==========
-  function renderSummary(){
-    const ul = document.getElementById('sum-list');
-    const done = {
-      cps: state.cps.length,
-      tm: (state.tm.rows||[]).filter(r=>r.tags?.length).length,
-      cl: Object.values(state.cl||{}).filter(Boolean).length,
-      quiz: state.quiz?.score||0
-    };
-    ul.innerHTML = `
-      <li>Проверено контрагентов: <b>${done.cps}</b></li>
-      <li>Отмечено событий мониторинга: <b>${done.tm}</b></li>
-      <li>Чек‑лист выполнен: <b>${done.cl}/${CL_ITEMS.length}</b></li>
-      <li>Тест: <b>${done.quiz}/10</b></li>`;
-  }
-  document.getElementById('sum-download').onclick=()=>{
-    const report = {
-      generatedAt: new Date().toISOString(),
-      counterparties: state.cps,
-      monitoring: state.tm,
-      checklist: state.cl,
-      quiz: state.quiz
-    };
-    downloadJSON('finmon_report.json', report);
-  };
-  document.getElementById('sum-copy').onclick=()=>{
-    const txt = JSON.stringify({cps:state.cps, tm:state.tm, cl:state.cl, quiz:state.quiz}, null, 2);
-    copyText(txt); alert('Скопировано в буфер.');
-  };
-
-  // ========== Utils ==========
-  function escapeHtml(s=''){ return s.replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
-  function downloadJSON(name, data){ const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); URL.revokeObjectURL(a.href); }
-  function copyText(text){ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
-
-  // Initial renders
-  renderCpTable();
-  renderTm();
-  renderChecklist();
-  if(state.quiz?.score) document.getElementById('quiz-res').textContent = `${state.quiz.score}/10`;
-
+  // Инициализация
+  (function init(){
+    updateOverall();
+  })();
   </script>
 </body>
 </html>
