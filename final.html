@@ -1,540 +1,799 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Итоговый проект курса — Безопасный бизнес</title>
-<style>
-  :root{
-    --bg:#ffffff;
-    --fg:#0f172a; /* slate-900 */
-    --muted:#475569; /* slate-600 */
-    --accent:#2563eb; /* blue-600 */
-    --accent-2:#10b981; /* emerald-500 */
-    --warn:#ef4444; /* red-500 */
-    --card:#f8fafc; /* slate-50 */
-    --border:#e2e8f0; /* slate-200 */
-    --chip:#e0e7ff; /* indigo-100 */
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{margin:0;font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Noto Sans",Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";color:var(--fg);background:var(--bg)}
-  a{color:var(--accent);text-decoration:none}
-  .container{max-width:1100px;margin:0 auto;padding:24px}
-  header{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.9);backdrop-filter:saturate(180%) blur(8px);border-bottom:1px solid var(--border)}
-  .title{display:flex;gap:16px;align-items:center}
-  .badge{font-size:12px;background:var(--chip);color:#3730a3;border:1px solid #c7d2fe;padding:4px 8px;border-radius:999px}
-  .grid{display:grid;gap:18px}
-  .grid.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
-  @media(max-width:900px){.grid.cols-2{grid-template-columns:1fr}}
-  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:0 1px 0 rgba(15,23,42,.04)}
-  .h1{font-size:28px;margin:8px 0 6px}
-  .h2{font-size:20px;margin:0 0 10px}
-  .muted{color:var(--muted)}
-  .pill{display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #c7d2fe;padding:4px 10px;border-radius:999px;font-size:12px}
-  .kpi{display:flex;gap:16px;flex-wrap:wrap}
-  .kpi .item{background:white;border:1px solid var(--border);border-radius:12px;padding:10px 12px;min-width:160px}
-  .progress{height:10px;background:#e2e8f0;border-radius:999px;overflow:hidden}
-  .progress > span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%}
-  .btn{appearance:none;border:0;border-radius:12px;padding:10px 14px;background:var(--accent);color:#fff;font-weight:600;cursor:pointer;box-shadow:0 2px 0 rgba(37,99,235,.2)}
-  .btn.secondary{background:#111827;color:#F9FAFB}
-  .btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
-  .btn:disabled{opacity:.6;cursor:not-allowed}
-  .actions{display:flex;gap:10px;flex-wrap:wrap}
-  .ok{color:var(--accent-2);font-weight:600}
-  .bad{color:var(--warn);font-weight:600}
-  .status{display:flex;gap:8px;align-items:center}
-  .status .dot{width:10px;height:10px;border-radius:999px;background:#94a3b8;border:1px solid var(--border)}
-  .status.pass .dot{background:var(--accent-2)}
-  .status.fail .dot{background:var(--warn)}
-  .hint{font-size:13px;color:var(--muted)}
-  .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;background:#111827;color:#f9fafb;border-radius:6px;padding:1px 6px;font-size:12px}
-  .tbl{width:100%;border-collapse:collapse}
-  .tbl th,.tbl td{border:1px solid var(--border);padding:8px;background:#fff}
-  .chips{display:flex;gap:6px;flex-wrap:wrap}
-  .chip{background:#f1f5f9;border:1px solid var(--border);padding:6px 10px;border-radius:999px;font-size:12px}
-  .chip.ok{background:#ecfdf5;border:1px solid #86efac}
-  textarea,input[type="text"],input[type="number"],select{width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:#fff}
-  .task{counter-increment:task}
-  .task .h2::before{content:"Задание " counter(task) ". ";color:#1f2937}
-  .tag{font-size:11px;padding:2px 8px;border:1px solid var(--border);border-radius:999px;background:#fff}
-  .score{font-weight:700}
-  .footer-note{font-size:12px;color:#64748b}
-  .pass-banner{display:none;margin:8px 0 0;padding:10px 12px;border:1px dashed var(--accent-2);border-radius:12px;background:#ecfdf5}
-  .pass-banner strong{color:#065f46}
-  .confetti{position:fixed;inset:0;pointer-events:none;z-index:999}
-  .tests{background:#fff;border:1px dashed var(--border);border-radius:12px;padding:12px}
-  pre{white-space:pre-wrap;background:#0b1020;color:#e5e7eb;padding:12px;border-radius:10px;max-height:260px;overflow:auto}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Итоговый практикум — ФинМон</title>
+  <meta name="description" content="Итоговый практикум по курсу: Due Diligence контрагентов и мониторинг операций. Single-file HTML+CSS+JS для GitHub Pages/Stepik." />
+  <style>
+    :root{
+      --bg: #0b1020;
+      --panel: #121b33;
+      --muted: #7a8aaa;
+      --text: #eaf0ff;
+      --accent: #6ee7b7;
+      --accent-2:#8ab4ff;
+      --warn: #ffd166;
+      --danger:#ff6b6b;
+      --ok:#34d399;
+      --border: #24304f;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Ubuntu, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      --radius: 16px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:linear-gradient(120deg,#0b1020,#0f1730);color:var(--text);font-family:var(--sans);}
+    a{color:var(--accent-2);text-decoration:none}
+    a:hover{text-decoration:underline}
+    header{
+      position:sticky;top:0;z-index:10;background:rgba(10,14,30,.7);backdrop-filter:saturate(140%) blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:16px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:32px;height:32px;border-radius:8px;background:radial-gradient( circle at 30% 30%, var(--accent), transparent 60%),
+      conic-gradient(from 210deg, #19213b, #1e2a4a 60%, #20335c );
+      box-shadow:0 0 0 1px var(--border), 0 8px 24px rgba(0,0,0,.35)}
+    .brand h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.3px}
+
+    nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+    .tab-btn{appearance:none;border:1px solid var(--border);background:linear-gradient(180deg,#121a33,#0f1730);
+      color:var(--text);padding:10px 14px;border-radius:12px;font-weight:600;cursor:pointer;transition:.2s}
+    .tab-btn[aria-selected="true"], .tab-btn:hover{border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(138,180,255,.12)}
+
+    main{padding:16px}
+    .grid{display:grid;gap:16px}
+    @media (min-width: 900px){
+      .grid-2{grid-template-columns:1.2fr .8fr}
+      .grid-3{grid-template-columns:repeat(3,1fr)}
+    }
+
+    .card{background:linear-gradient(180deg,#121b33,#10172c);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .muted{color:var(--muted)}
+    h2,h3{margin:8px 0 12px}
+    h2{font-size:22px}
+    h3{font-size:18px}
+    p{line-height:1.6}
+
+    .kv{display:flex;flex-wrap:wrap;gap:10px}
+    .kv span{padding:4px 8px;border-radius:999px;border:1px solid var(--border);background:#0e1530;color:var(--muted);font:600 12px/1 var(--sans)}
+
+    .flex{display:flex;gap:12px;flex-wrap:wrap}
+    .right{margin-left:auto}
+
+    label{display:block;font-weight:600;margin:10px 0 6px}
+    input, select, textarea{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:#0c132a;color:var(--text);outline:none}
+    input:focus, select:focus, textarea:focus{border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(138,180,255,.12)}
+    textarea{min-height:120px;resize:vertical}
+    .btn{appearance:none;border:1px solid var(--border);background:linear-gradient(180deg,#111a33,#0d152b);color:var(--text);
+      padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;transition:.2s}
+    .btn:hover{border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(138,180,255,.12)}
+    .btn.ok{background:linear-gradient(180deg,#123223,#0f2620);border-color:#1f6d54}
+    .btn.warn{background:linear-gradient(180deg,#332b12,#261f0f);border-color:#6d5f1f}
+    .btn.danger{background:linear-gradient(180deg,#332022,#261416);border-color:#6d2b36}
+
+    table{width:100%;border-collapse:separate;border-spacing:0}
+    th,td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left}
+    th{position:sticky;top:0;background:#10172c;z-index:1}
+    tbody tr:hover{background:#0e1733}
+    .pill{display:inline-block;padding:4px 8px;border-radius:999px;font:600 12px/1 var(--sans);border:1px solid var(--border)}
+    .pill.ok{color:var(--ok);border-color:#1c3c2d;background:#0c1914}
+    .pill.warn{color:var(--warn);border-color:#5a4a1b;background:#1a1508}
+    .pill.danger{color:var(--danger);border-color:#6d2b36;background:#1d0f12}
+
+    .code{font-family:var(--mono);background:#0a1126;border:1px solid var(--border);padding:10px;border-radius:10px;overflow:auto}
+    .sep{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:8px 0 16px}
+    .footer{color:var(--muted);font-size:12px;text-align:center;margin:28px 0}
+    .sr-only{position:absolute !important;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden}
+
+    .scorebar{height:10px;background:#0f1a36;border-radius:999px;overflow:hidden;border:1px solid var(--border)}
+    .scorebar > b{display:block;height:100%;background:linear-gradient(90deg,#34d399,#ffd166,#ff6b6b)}
+
+    .notice{border-left:4px solid var(--accent-2);padding:12px;border-radius:10px;background:#0b1431}
+    .kbd{font-family:var(--mono);padding:0 8px;border:1px solid var(--border);border-bottom-width:3px;border-radius:6px;background:#0b1431}
+
+    .sticky-tools{position:sticky;top:76px;display:flex;gap:8px;flex-wrap:wrap}
+  </style>
 </head>
 <body>
   <header>
-    <div class="container">
-      <div class="title">
-        <div>
-          <div class="badge">Итоговый проект (продвинутый уровень)</div>
-          <h1 class="h1">Безопасный бизнес: как работать с банком без блокировок</h1>
-          <div class="muted">Единый кейс • HTML+CSS+JS • Автопроверка по ключевым словам • Достаточно 80% для статуса <span class="kbd">Пройден</span></div>
-        </div>
+    <div class="wrap">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <h1>Итоговый практикум «ФинМон» — Due Diligence & Мониторинг операций</h1>
       </div>
+      <nav aria-label="Основные разделы">
+        <button class="tab-btn" aria-selected="true" data-tab="intro">Инструкция</button>
+        <button class="tab-btn" data-tab="dd">Симулятор Due Diligence</button>
+        <button class="tab-btn" data-tab="tm">Мониторинг операций</button>
+        <button class="tab-btn" data-tab="docs">Чек‑лист и документы</button>
+        <button class="tab-btn" data-tab="quiz">Тест</button>
+        <button class="tab-btn" data-tab="summary">Итоги/Экспорт</button>
+      </nav>
     </div>
   </header>
 
-  <main class="container">
-    <section class="card">
-      <h2 class="h2">Кейс: «Маркет‑Решения» и приостановление операций по счёту</h2>
-      <p><strong>Ситуация.</strong> У ООО «Маркет‑Решения» банк приостановил операции по счёту и направил запрос пояснений по ряду платежей. Банк указал на возможные признаки сомнительных операций: транзиты, низкая доля налогов к обороту, несоответствие назначения платежей ОКВЭД, а также вопросы к одному из контрагентов. Ваша задача — подготовить полный пакет аналитики и коммуникации, чтобы снять блокировку и укрепить систему комплаенса.</p>
-      <div class="kpi">
-        <div class="item"><div class="muted">Минимальный порог для зачёта</div><div class="score">80%</div></div>
-        <div class="item"><div class="muted">Ваш результат</div><div class="score" id="totalScore">0%</div><div class="progress" aria-label="Прогресс"><span id="progressBar"></span></div><div id="passBanner" class="pass-banner">✅ <strong>Пройден.</strong> Вы набрали ≥ 80%.</div></div>
-        <div class="item"><div class="muted">Статус</div><div id="statusBox" class="status"><span class="dot"></span><span class="muted">Ожидает выполнения</span></div></div>
-      </div>
-      <div class="actions" style="margin-top:10px">
-        <button class="btn" id="checkAll">Проверить всё</button>
-        <button class="btn ghost" id="save">Сохранить прогресс</button>
-        <button class="btn ghost" id="reset">Сбросить всё</button>
-      </div>
-      <p class="hint">Примечание: промежуточный прогресс сохраняется в <span class="kbd">localStorage</span> (если доступно).</p>
-    </section>
-
-    <!-- Задание 1 -->
-    <section class="card task" id="t1">
-      <h3 class="h2">Выявление красных флагов в операциях</h3>
-      <p>Проанализируйте фрагмент реестра операций за 3 недели. Отметьте операции, которые потенциально являются риск‑факторами (транзит, обналичивание, дробление, несоответствие профилю, аномалии).</p>
-      <div class="grid cols-2">
-        <div>
-          <table class="tbl" aria-describedby="t1">
-            <thead>
-              <tr><th>Дата</th><th>Сумма, ₽</th><th>Назначение</th><th>Примечание</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>03.06</td><td>1 980 000</td><td>Поступление от ООО «Delta»</td><td>Счёт‑фактура №145</td></tr>
-              <tr><td>03.06</td><td>1 970 000</td><td>Перевод ООО «Gamma‑Снаб»</td><td>Оплата услуг маркетинга</td></tr>
-              <tr><td>05.06</td><td>680 000</td><td>Снятие наличных</td><td>Выдача под отчёт</td></tr>
-              <tr><td>06.06</td><td>15 000</td><td>Платёж физлицу</td><td>Перевод Иванову И.И.</td></tr>
-              <tr><td>10.06</td><td>2 400 000</td><td>Поступление от ИП Петров</td><td>Аванс</td></tr>
-              <tr><td>10.06</td><td>2 380 000</td><td>Перевод ИП Петров</td><td>Возврат аванса</td></tr>
-              <tr><td>12.06</td><td>97 000</td><td>Налоги (КБК)</td><td>Срок уплаты</td></tr>
-              <tr><td>14.06</td><td>1 250 000</td><td>Оплата аренды</td><td>Договор А‑2024</td></tr>
-              <tr><td>17.06</td><td>37 000</td><td>НДФЛ</td><td>З/п май</td></tr>
-              <tr><td>17.06</td><td>520 000</td><td>Переводы сотрудникам</td><td>З/п май</td></tr>
-              <tr><td>19.06</td><td>1 150 000</td><td>Услуги IT</td><td>ООО «Cloud‑Team», акт №512</td></tr>
-              <tr><td>19.06</td><td>1 140 000</td><td>Поступление от ООО «Cloud‑Team»</td><td>Оплата за рекламу</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div>
-          <div class="chips">
-            <label class="chip"><input type="checkbox" data-t1="1"/> 03.06 → 03.06 (почти равные суммы) — возможный транзит</label>
-            <label class="chip"><input type="checkbox" data-t1="2"/> 05.06 снятие 680 000 ₽ — риск обналичивания</label>
-            <label class="chip"><input type="checkbox" data-t1="3"/> 06.06 перевод физлицу — вне профиля</label>
-            <label class="chip"><input type="checkbox" data-t1="4"/> 10.06 аванс → возврат — аномалия/цикличность</label>
-            <label class="chip"><input type="checkbox" data-t1="5"/> 17.06 НДФЛ + з/п — свидетельство дисциплины (НЕ флаг)</label>
-            <label class="chip"><input type="checkbox" data-t1="6"/> 19.06 взаимные платежи с «Cloud‑Team» — потенциальный транзит</label>
-            <label class="chip"><input type="checkbox" data-t1="7"/> 12.06 налоги к обороту низкие — риск</label>
+  <main class="wrap">
+    <!-- INTRO -->
+    <section id="intro" class="tab" data-active>
+      <div class="grid grid-2">
+        <div class="card">
+          <h2>Как работать с практикумом</h2>
+          <p>Этот одностраничный практикум моделирует реальные задачи комплаенса: проверка контрагентов (Due Diligence), выявление подозрительных операций, подготовка документов и сдача зачётного теста. Ничего не отправляется наружу — все данные и результаты хранятся <b>локально</b> в вашем браузере.</p>
+          <div class="kv" aria-label="Охватываемые темы">
+            <span>Проверка контрагентов</span><span>Показатели риска</span><span>П2Р/обнал/транзиты</span><span>Исп. документы</span><span>Авансирование импорта</span><span>Перестрахование</span><span>Коммуникация с банком</span>
           </div>
-          <div class="actions" style="margin-top:10px"><button class="btn" onclick="gradeT1()">Проверить задание 1</button> <span id="r1"></span></div>
-          <div class="hint">Подсказка: не все пункты — флаги. Учтите контекст.</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Задание 2 -->
-    <section class="card task" id="t2">
-      <h3 class="h2">Расчёт налоговой нагрузки к обороту</h3>
-      <p>Вычислите две метрики за квартал: (A) только налоги к обороту; (B) налоги + НДФЛ + страховые взносы к обороту. Введите результаты в процентах с точностью до десятых.</p>
-      <div class="grid cols-2">
-        <div>
-          <table class="tbl">
-            <thead><tr><th>Месяц</th><th>Оборот по счёту, ₽</th><th>Налоги (КБК), ₽</th><th>НДФЛ, ₽</th><th>Взносы, ₽</th></tr></thead>
-            <tbody>
-              <tr><td>М1</td><td data-ob="8500000">8 500 000</td><td data-tax="20000">20 000</td><td data-ndfl="0">0</td><td data-vzn="0">0</td></tr>
-              <tr><td>М2</td><td data-ob="9700000">9 700 000</td><td data-tax="150000">150 000</td><td data-ndfl="230000">230 000</td><td data-vzn="350000">350 000</td></tr>
-              <tr><td>М3</td><td data-ob="6500000">6 500 000</td><td data-tax="40000">40 000</td><td data-ndfl="190000">190 000</td><td data-vzn="280000">280 000</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div>
-          <label>Метрика A — только налоги, % <input type="number" step="0.1" id="t2a" placeholder="например, 0.8"/></label>
-          <label style="margin-top:8px;display:block">Метрика B — налоги+НДФЛ+взносы, % <input type="number" step="0.1" id="t2b" placeholder="например, 5.1"/></label>
-          <div class="actions" style="margin-top:10px"><button class="btn" onclick="gradeT2()">Проверить задание 2</button> <span id="r2"></span></div>
-          <p class="hint">Окно допуска ±0,1 п.п. Итоговую интерпретацию дайте в Задании 5 (пояснение банку).</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Задание 3 -->
-    <section class="card task" id="t3">
-      <h3 class="h2">Проверка контрагента «ООО Альфа‑Маркет»</h3>
-      <p><strong>Данные из открытых источников (условные):</strong> юрадрес — Москва, ул. Прудная, 7 (в реестре массовый); уставный капитал — 10 000 ₽; директор — значится руководителем в 24 компаниях; штат — 1 сотрудник; сайт/офис отсутствуют; отчётность — нулевая за прошлый год; участие в ЭДО — нет; налоговая задолженность — 0 ₽.</p>
-      <div class="grid cols-2">
-        <div>
-          <p><strong>Отметьте признаки риска:</strong></p>
-          <div class="chips">
-            <label class="chip"><input type="checkbox" data-t3="1"/> Массовый адрес</label>
-            <label class="chip"><input type="checkbox" data-t3="2"/> Минимальный уставный капитал</label>
-            <label class="chip"><input type="checkbox" data-t3="3"/> Директор в десятках фирм</label>
-            <label class="chip"><input type="checkbox" data-t3="4"/> Отсутствие сайта/офиса</label>
-            <label class="chip"><input type="checkbox" data-t3="5"/> Нулевая отчётность</label>
-            <label class="chip"><input type="checkbox" data-t3="6"/> Наличие налоговой задолженности</label>
-            <label class="chip"><input type="checkbox" data-t3="7"/> Нет участия в ЭДО</label>
+          <div class="sep"></div>
+          <p class="muted">Подсказка: переходите по вкладкам сверху. Выполненные шаги отмечаются автоматически.</p>
+          <div class="notice">
+            <b>Дисклеймер:</b> инструмент учебный. Алгоритмы оценки — упрощённые, но основаны на типичных признаках и кейсах, рассмотренных на курсе. Пороговые значения можно менять в настройках внутри кода.
           </div>
         </div>
-        <div>
-          <label>Кратко опишите 3 ключевых риска (через запятую)
-            <input type="text" id="t3text" placeholder="например: массовый адрес, нулевая отчётность, директор в 24 компаниях"/>
+        <div class="card">
+          <h3>Быстрый старт</h3>
+          <ol>
+            <li>Во вкладке <b>Due Diligence</b> выберите или добавьте контрагента — получите риск‑оценку и список красных флагов.</li>
+            <li>Во вкладке <b>Мониторинг операций</b> отфильтруйте транзакции и отметьте подозрительные события.</li>
+            <li>Соберите <b>чек‑лист</b>, сформируйте шаблон «Пояснительной записки» и сохраните JSON отчёта.</li>
+            <li>Пройдите <b>тест</b> и посмотрите сводный результат во вкладке «Итоги/Экспорт».</li>
+          </ol>
+          <div class="sep"></div>
+          <div class="flex">
+            <button class="btn ok" id="btn-reset">Сбросить прогресс</button>
+            <button class="btn" id="btn-demo">Заполнить демо‑данными</button>
+            <span class="right muted">Состояние: <span id="state-label" class="pill ok">готово</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="footer">Версия 1.0 • Single‑file HTML (для GitHub Pages/Stepik) • © Учебный проект «ФинМон»</div>
+    </section>
+
+    <!-- DUE DILIGENCE -->
+    <section id="dd" class="tab" hidden>
+      <div class="grid grid-2">
+        <div class="card">
+          <h2>Проверка контрагента</h2>
+          <form id="cp-form">
+            <div class="grid grid-3">
+              <div>
+                <label for="cp-inn">ИНН</label>
+                <input id="cp-inn" required pattern="\d{10}|\d{12}" placeholder="10 или 12 цифр" />
+              </div>
+              <div>
+                <label for="cp-name">Наименование</label>
+                <input id="cp-name" required placeholder="ООО «Пример»" />
+              </div>
+              <div>
+                <label for="cp-age">Возраст компании, мес.</label>
+                <input id="cp-age" type="number" min="0" step="1" value="24" />
+              </div>
+            </div>
+            <div class="grid grid-3">
+              <div>
+                <label for="cp-okved">ОКВЭД (основной)</label>
+                <input id="cp-okved" placeholder="62.01, 47.91 и т.п." />
+              </div>
+              <div>
+                <label for="cp-ops">Типовые операции</label>
+                <select id="cp-ops" multiple size="3" aria-describedby="ops-hint">
+                  <option>Оптовая торговля</option>
+                  <option>IT/Маркетинг</option>
+                  <option>Туризм/агентские</option>
+                  <option>Нефтегаз/металлолом</option>
+                  <option>Страхование/перестрахование</option>
+                </select>
+                <div id="ops-hint" class="muted">Выберите 1–3 направления</div>
+              </div>
+              <div>
+                <label for="cp-site">Сайт/следы в сети</label>
+                <select id="cp-site">
+                  <option value="yes">Есть сайт/активные контакты</option>
+                  <option value="weak">Минимальные следы</option>
+                  <option value="no">Нет сайта</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid grid-3">
+              <div>
+                <label for="cp-staff">Численность сотрудников</label>
+                <input id="cp-staff" type="number" min="0" value="12" />
+              </div>
+              <div>
+                <label for="cp-rev">Оборот за год, млн ₽</label>
+                <input id="cp-rev" type="number" min="0" step="0.1" value="120" />
+              </div>
+              <div>
+                <label for="cp-tax">Уплаченные налоги, млн ₽</label>
+                <input id="cp-tax" type="number" min="0" step="0.01" value="1.6" />
+              </div>
+            </div>
+            <div class="grid grid-3">
+              <div>
+                <label for="cp-mass">Массовый адрес/рук-ль</label>
+                <select id="cp-mass">
+                  <option value="no">Нет признаков</option>
+                  <option value="maybe">Косвенные признаки</option>
+                  <option value="yes">Да, массовый</option>
+                </select>
+              </div>
+              <div>
+                <label for="cp-zsk">Оценка ЗСК (ЦБ)</label>
+                <select id="cp-zsk">
+                  <option value="low">Низкий</option>
+                  <option value="mid">Повышенный</option>
+                  <option value="high">Высокий</option>
+                </select>
+              </div>
+              <div>
+                <label for="cp-match">Соответствие ОКВЭД и платежей</label>
+                <select id="cp-match">
+                  <option value="ok">Соответствует</option>
+                  <option value="mixed">Частично</option>
+                  <option value="bad">Не соответствует</option>
+                </select>
+              </div>
+            </div>
+            <label for="cp-notes">Заметки</label>
+            <textarea id="cp-notes" placeholder="Краткий контекст, источники, особые обстоятельства"></textarea>
+            <div class="flex">
+              <button class="btn ok" type="submit">Оценить риск</button>
+              <button class="btn" type="button" id="cp-load">Загрузить из примеров</button>
+              <button class="btn" type="button" id="cp-save">Сохранить контрагента</button>
+            </div>
+          </form>
+        </div>
+        <div class="card" id="cp-result" aria-live="polite">
+          <h3>Результат оценки</h3>
+          <div class="scorebar" aria-hidden="true"><b id="cp-scorebar" style="width:0%"></b></div>
+          <p><b>Итоговый риск:</b> <span id="cp-score" class="pill ok">—</span></p>
+          <div id="cp-flags"></div>
+          <div class="sep"></div>
+          <h4>Что улучшить</h4>
+          <ul id="cp-actions" class="muted"><li>Заполните форму слева и нажмите «Оценить риск».</li></ul>
+          <div class="sep"></div>
+          <details>
+            <summary>Показатели и формулы</summary>
+            <div class="code" id="cp-math"></div>
+          </details>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Сохранённые контрагенты</h3>
+        <div class="sticky-tools">
+          <button class="btn" id="cp-export">Экспорт JSON</button>
+          <label class="btn">
+            <input type="file" id="cp-import" accept="application/json" class="sr-only">Импорт JSON
           </label>
-          <div class="actions" style="margin-top:10px"><button class="btn" onclick="gradeT3()">Проверить задание 3</button> <span id="r3"></span></div>
-          <p class="hint">Проверка текста — по ключевым словам/основам слов (массов, нулев, директор, офиса, ЭДО и т.п.).</p>
         </div>
-      </div>
-    </section>
-
-    <!-- Задание 4 -->
-    <section class="card task" id="t4">
-      <h3 class="h2">Комплект документов для банка</h3>
-      <p>Сформируйте пакет для подтверждения реальности сделки с «ООО Альфа‑Маркет» на услуги маркетинга.</p>
-      <div class="chips">
-        <label class="chip"><input type="checkbox" data-t4="d1"/> Договор и спецификация</label>
-        <label class="chip"><input type="checkbox" data-t4="d2"/> Счёт/счёт‑фактура</label>
-        <label class="chip"><input type="checkbox" data-t4="d3"/> Акт выполненных работ</label>
-        <label class="chip"><input type="checkbox" data-t4="d4"/> Бриф/ТЗ/переписка</label>
-        <label class="chip"><input type="checkbox" data-t4="d5"/> Пояснительная записка (экономический смысл)</label>
-        <label class="chip"><input type="checkbox" data-t4="d6"/> Сканы без подписей и печатей</label>
-        <label class="chip"><input type="checkbox" data-t4="d7"/> Выписки/платёжные поручения</label>
-        <label class="chip"><input type="checkbox" data-t4="d8"/> Фото офиса контрагента</label>
-      </div>
-      <div class="actions" style="margin-top:10px"><button class="btn" onclick="gradeT4()">Проверить задание 4</button> <span id="r4"></span></div>
-      <p class="hint">Нужны деловые документы по сделке, а не случайные подтверждения.</p>
-    </section>
-
-    <!-- Задание 5 -->
-    <section class="card task" id="t5">
-      <h3 class="h2">Пояснение в банк (draft)</h3>
-      <p>Напишите черновик пояснения в банк (5–10 предложений), обосновывающий экономический смысл операций и устранение рисков. Упомяните метрики из Задания 2.</p>
-      <textarea id="t5text" rows="7" placeholder="Структура: цель письма → описание операций → экономический смысл → ссылка на договор/акт → ОКВЭД → назначение платежа → метрики налоговой нагрузки → меры усиления контроля → перечень приложений"></textarea>
-      <div class="actions" style="margin-top:10px"><button class="btn" onclick="gradeT5()">Проверить задание 5</button> <span id="r5"></span></div>
-      <p class="hint">Автопроверка ищет ключевые основы слов: договор, акт, экономическ, оквэд, назначени, контрагент, налог, НДФЛ/взнос, процен, прилож, реальн и др.</p>
-    </section>
-
-    <!-- Задание 6 -->
-    <section class="card task" id="t6">
-      <h3 class="h2">Черновик обращения в Банк России</h3>
-      <p>Если блокировка не снята — составьте текст обращения в Банк России (<a href="https://cbr.ru/Reception/Message/Register?messageType=Complaint" target="_blank" rel="noopener">сервис приёма обращений</a>). Кратко, по сути (5–8 пунктов), перечислите приложенные доказательства.</p>
-      <textarea id="t6text" rows="6" placeholder="Укажите: 115-ФЗ, просьбу провести проверку действий банка, описание ситуации, ссылки на документы, перечень приложений, контактные данные, ожидаемые сроки ответа"></textarea>
-      <div class="actions" style="margin-top:10px"><button class="btn" onclick="gradeT6()">Проверить задание 6</button> <span id="r6"></span></div>
-      <p class="hint">Ключевые основы: 115‑ФЗ, проверк, разблок, обращени/жалоб, приложен, срок, доказат.</p>
-    </section>
-
-    <!-- Задание 7 -->
-    <section class="card task" id="t7">
-      <h3 class="h2">Квартальный план самопроверки (комплаенс)</h3>
-      <p>Выберите мероприятия, которые войдут в регламент ежеквартальной проверки.</p>
-      <div class="chips">
-        <label class="chip"><input type="checkbox" data-t7="1"/> Проверка доли налогов к обороту</label>
-        <label class="chip"><input type="checkbox" data-t7="2"/> Пересмотр ОКВЭД и актуализация сведений</label>
-        <label class="chip"><input type="checkbox" data-t7="3"/> Выбор поставщиков по самой низкой цене без проверки</label>
-        <label class="chip"><input type="checkbox" data-t7="4"/> Репроцедура KYC контрагентов</label>
-        <label class="chip"><input type="checkbox" data-t7="5"/> Тренировка ответов на запросы банка</label>
-        <label class="chip"><input type="checkbox" data-t7="6"/> Увеличение доли наличных расчётов</label>
-        <label class="chip"><input type="checkbox" data-t7="7"/> Аудит документов (договор‑акт‑счёт‑фактура)</label>
-      </div>
-      <div class="actions" style="margin-top:10px"><button class="btn" onclick="gradeT7()">Проверить задание 7</button> <span id="r7"></span></div>
-    </section>
-
-    <!-- Задание 8 -->
-    <section class="card task" id="t8">
-      <h3 class="h2">Соответствие ОКВЭД: сопоставьте платежи</h3>
-      <p>Для каждого платежа отметьте соответствие профилю деятельности (маркетинговые услуги и разработка ПО указаны в ОКВЭД).</p>
-      <div class="grid cols-2">
-        <div>
-          <table class="tbl">
-            <thead><tr><th>#</th><th>Платёж</th><th>Ваш выбор</th></tr></thead>
-            <tbody>
-              <tr><td>1</td><td>Оплата аренды офиса</td><td>
-                <select data-t8="1"><option value="">—</option><option>Соответствует</option><option>Не соответствует</option></select>
-              </td></tr>
-              <tr><td>2</td><td>Разработка лендинга</td><td>
-                <select data-t8="2"><option value="">—</option><option>Соответствует</option><option>Не соответствует</option></select>
-              </td></tr>
-              <tr><td>3</td><td>Покупка бытовой техники для дома директора</td><td>
-                <select data-t8="3"><option value="">—</option><option>Соответствует</option><option>Не соответствует</option></select>
-              </td></tr>
-              <tr><td>4</td><td>Реклама в соцсетях</td><td>
-                <select data-t8="4"><option value="">—</option><option>Соответствует</option><option>Не соответствует</option></select>
-              </td></tr>
-              <tr><td>5</td><td>Оплата услуг фитнес‑клуба для сотрудников</td><td>
-                <select data-t8="5"><option value="">—</option><option>Соответствует</option><option>Не соответствует</option></select>
-              </td></tr>
-              <tr><td>6</td><td>Приобретение серверов для облачного хостинга</td><td>
-                <select data-t8="6"><option value="">—</option><option>Соответствует</option><option>Не соответствует</option></select>
-              </td></tr>
-            </tbody>
+        <div class="sep"></div>
+        <div style="max-height:320px;overflow:auto">
+          <table id="cp-table" aria-describedby="cp-foot">
+            <thead><tr><th>ИНН</th><th>Название</th><th>Налог/оборот</th><th>ЗСК</th><th>Массовость</th><th>Итоговый риск</th><th></th></tr></thead>
+            <tbody></tbody>
           </table>
         </div>
-        <div>
-          <div class="actions" style="margin-top:10px"><button class="btn" onclick="gradeT8()">Проверить задание 8</button> <span id="r8"></span></div>
-          <p class="hint">Думайте как комплаенс: аренда и серверы — ок при наличии договоров; личные расходы — нет; соцпакет зависит от политики и договора.</p>
+        <div id="cp-foot" class="muted">Подсказка: наведите на риск, чтобы увидеть детали.</div>
+      </div>
+    </section>
+
+    <!-- TRANSACTION MONITORING -->
+    <section id="tm" class="tab" hidden>
+      <div class="card">
+        <h2>Мониторинг операций</h2>
+        <div class="flex">
+          <div class="flex" style="flex:1;gap:8px">
+            <label class="sr-only" for="tm-q">Поиск</label>
+            <input id="tm-q" placeholder="Поиск: ИНН, назначение, тип, сумма..." />
+            <select id="tm-type" title="Тип события">
+              <option value="">Все типы</option>
+              <option>Транзит</option>
+              <option>Обнал</option>
+              <option>P2P</option>
+              <option>Исп. документ</option>
+              <option>Кросс‑бордер</option>
+            </select>
+          </div>
+          <div class="right flex">
+            <button class="btn" id="tm-analyze">Запустить анализ</button>
+            <button class="btn" id="tm-demo">Загрузить демо‑транзакции</button>
+            <button class="btn" id="tm-clear">Очистить</button>
+          </div>
+        </div>
+        <div class="sep"></div>
+        <div style="max-height:420px;overflow:auto">
+          <table id="tm-table">
+            <thead>
+              <tr><th>Дата/время</th><th>Отправитель</th><th>Получатель</th><th>Сумма</th><th>Назначение</th><th>Метки</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Сводка рисков</h3>
+          <ul id="tm-summary"></ul>
+        </div>
+        <div class="card">
+          <h3>Пояснительная записка (шаблон)</h3>
+          <textarea id="tm-memo" spellcheck="false"></textarea>
+          <div class="flex">
+            <button class="btn ok" id="tm-memo-generate">Сгенерировать по выбранным событиям</button>
+            <button class="btn" id="tm-memo-copy">Скопировать</button>
+          </div>
         </div>
       </div>
     </section>
 
-
-    <!-- Автотесты (для разработчика и проверки на Stepik/GitHub Pages) -->
-    <section class="card tests">
-      <h3 class="h2">Автотесты</h3>
-      <p class="hint">Эти тесты помогают быстро убедиться, что проверки работают и функции определены. Они <strong>не меняют</strong> ваши ответы.</p>
-      <div class="actions"><button id="runTests" class="btn ghost">Прогнать автотесты</button></div>
-      <pre id="testLog">Готов к запуску…</pre>
+    <!-- DOCS & CHECKLIST -->
+    <section id="docs" class="tab" hidden>
+      <div class="grid grid-2">
+        <div class="card">
+          <h2>Чек‑лист прозрачности бизнеса</h2>
+          <p class="muted">Отметьте пункты — прогресс сохраняется локально.</p>
+          <ul id="clist"></ul>
+          <div class="sep"></div>
+          <div class="flex">
+            <button class="btn ok" id="cl-save">Сохранить</button>
+            <button class="btn" id="cl-reset">Сбросить</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Генераторы документов</h3>
+          <label for="doc-company">Компания</label>
+          <input id="doc-company" placeholder="ООО «…»" />
+          <label for="doc-context">Контекст операции</label>
+          <textarea id="doc-context" placeholder="Например: оплата маркетинговых услуг по договору №…"></textarea>
+          <div class="flex">
+            <button class="btn" id="doc-explain">Пояснительная записка</button>
+            <button class="btn" id="doc-letter">Письмо в банк</button>
+            <button class="btn" id="doc-print">Печать/в PDF</button>
+          </div>
+          <div class="sep"></div>
+          <h4>Предпросмотр</h4>
+          <div id="doc-preview" class="code" style="min-height:160px"></div>
+        </div>
+      </div>
     </section>
 
-    <section class="card">
-      <h3 class="h2">Итоги</h3>
-      <p>Нажмите «Проверить всё», чтобы рассчитать общий балл. При результате ≥ 80% статус изменится на <span class="ok">Пройден</span>. Вы можете сохранить прогресс и вернуться к доработке позже.</p>
-      <div class="actions"><button class="btn secondary" id="checkAllBottom">Проверить всё</button></div>
-      <p class="footer-note">© Проект «Безопасный бизнес». Для публикации в Stepik через GitHub Pages/iframe. Контакты: borodulin.expert</p>
+    <!-- QUIZ -->
+    <section id="quiz" class="tab" hidden>
+      <div class="card">
+        <h2>Зачётный тест</h2>
+        <p class="muted">10 вопросов, проходной балл — 8/10. Вопросы рандомизируются. Ответы и результат сохраняются локально.</p>
+        <div id="quiz-box"></div>
+        <div class="sep"></div>
+        <div class="flex">
+          <button class="btn ok" id="quiz-submit">Проверить ответы</button>
+          <button class="btn" id="quiz-reset">Сбросить тест</button>
+          <span class="right">Результат: <b id="quiz-res">—</b></span>
+        </div>
+      </div>
     </section>
 
-    <canvas id="confetti" class="confetti" width="0" height="0" aria-hidden="true"></canvas>
+    <!-- SUMMARY/EXPORT -->
+    <section id="summary" class="tab" hidden>
+      <div class="grid grid-2">
+        <div class="card">
+          <h2>Итоги</h2>
+          <ul id="sum-list"></ul>
+          <div class="sep"></div>
+          <div class="flex">
+            <button class="btn" id="sum-download">Скачать отчёт (JSON)</button>
+            <button class="btn" id="sum-copy">Скопировать в буфер</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Встраивание (Stepik / GitHub Pages)</h3>
+          <p>Разместите файл на GitHub Pages. Пример iframe:</p>
+          <div class="code"><code>&lt;iframe src="https://&lt;ваш_аккаунт&gt;.github.io/finmon-practicum/index.html" width="100%" height="900" allow="clipboard-write *"&gt;&lt;/iframe&gt;</code></div>
+          <p class="muted">Все стили и скрипты внутри одного файла. Внешних подключений нет.</p>
+        </div>
+      </div>
+    </section>
   </main>
 
-<script>
-(function(){
-  // ====== Utility ======
-  const $ = (sel, root=document) => root.querySelector(sel);
-  const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
-  const toPct = v => Math.max(0, Math.min(100, Math.round(v)));
-  const storeKey = 'final_project_safe_business_v1';
+  <script>
+  // ========== Storage helpers ==========
+  const store = {
+    get k(){ return 'finmon_v1'; },
+    load(){ try{ return JSON.parse(localStorage.getItem(this.k)) || {}; }catch{return {}} },
+    save(data){ localStorage.setItem(this.k, JSON.stringify(data)); },
+    clear(){ localStorage.removeItem(this.k); }
+  };
+  const state = Object.assign({
+    cps: [],
+    tm: { rows: [] },
+    cl: {},
+    quiz: {},
+    finished: false
+  }, store.load());
+  function persist(){ store.save(state); }
 
-  function saveState(){
-    const state = {
-      t1: $$('[data-t1]').map(cb=>cb.checked),
-      t2a: $('#t2a').value, t2b: $('#t2b').value,
-      t3: $$('[data-t3]').map(cb=>cb.checked), t3text: $('#t3text').value,
-      t4: $$('[data-t4]').map(cb=>cb.checked),
-      t5: $('#t5text').value,
-      t6: $('#t6text').value,
-      t7: $$('[data-t7]').map(cb=>cb.checked),
-      t8: $$('[data-t8]').map(s=>s.value)
+  // ========== Tabs ==========
+  const tabs = document.querySelectorAll('.tab-btn');
+  tabs.forEach(btn=>btn.addEventListener('click',()=>selectTab(btn.dataset.tab)));
+  function selectTab(id){
+    document.querySelectorAll('.tab').forEach(s=>s.hidden=true);
+    document.getElementById(id).hidden=false;
+    tabs.forEach(b=>b.setAttribute('aria-selected', String(b.dataset.tab===id)));
+    if(id==='summary') renderSummary();
+  }
+
+  // ========== Intro controls ==========
+  const stateLabel = document.getElementById('state-label');
+  document.getElementById('btn-reset').onclick=()=>{ if(confirm('Сбросить весь прогресс?')){ store.clear(); location.reload(); } };
+  document.getElementById('btn-demo').onclick=()=>{ loadDemo(); alert('Демо‑данные загружены. Перейдите во вкладки для просмотра.'); };
+
+  // ========== Demo datasets ==========
+  const DEMO_CPS = [
+    {inn:'7708123456', name:'ООО «МаркетСофт»', age:10, okved:'62.01', ops:['IT/Маркетинг'], site:'yes', staff:8, rev:24, tax:0.08, mass:'no', zsk:'low', match:'ok', notes:'Малый интегратор; рост стабильный.'},
+    {inn:'7731654321', name:'ООО «Вектор Сталь»', age:26, okved:'46.72', ops:['Оптовая торговля','Нефтегаз/металлолом'], site:'weak', staff:4, rev:310, tax:1.2, mass:'maybe', zsk:'mid', match:'mixed', notes:'Высокий долевой оборот по металлолому; дробление платежей.'},
+    {inn:'7812340099', name:'ООО «Спринт Лайн»', age:4, okved:'47.91', ops:['Оптовая торговля','IT/Маркетинг'], site:'no', staff:0, rev:95, tax:0.12, mass:'yes', zsk:'high', match:'bad', notes:'Признаки транзитности, массовый адрес.'}
+  ];
+  const DEMO_TX = [
+    // Транзитная цепочка: вход -> 40мин -> выход
+    {ts:'2025-05-12T10:03', from:'ООО «Спринт Лайн» (7812340099)', to:'ООО «БетаТрейд» (7708999111)', amt:12_500_000, desc:'Оплата по договору №BT-101', tags:[]},
+    {ts:'2025-05-12T10:45', from:'ООО «БетаТрейд» (7708999111)', to:'ИП Петров (350401234567)', amt:12_480_000, desc:'Перевод по договору займа', tags:[]},
+
+    // Обнал через корпоративную карту / снятия
+    {ts:'2025-06-03T14:11', from:'ООО «Вектор Сталь» (7731654321)', to:'Снятие наличных (corp card)', amt:690_000, desc:'Снятие на хоз. нужды', tags:[]},
+    {ts:'2025-06-03T15:40', from:'ООО «Вектор Сталь» (7731654321)', to:'Снятие наличных (corp card)', amt:720_000, desc:'Снятие на хоз. нужды', tags:[]},
+
+    // Высокорисковые P2P: много мелких переводов физлицам
+    {ts:'2025-04-21T18:22', from:'ИП СмартПэй (390601112233)', to:'ФЛ *А-01', amt:14_900, desc:'P2P перевод', tags:[]},
+    {ts:'2025-04-21T18:25', from:'ИП СмартПэй (390601112233)', to:'ФЛ *А-02', amt:15_300, desc:'P2P перевод', tags:[]},
+    {ts:'2025-04-21T18:28', from:'ИП СмартПэй (390601112233)', to:'ФЛ *А-03', amt:14_500, desc:'P2P перевод', tags:[]},
+    {ts:'2025-04-21T18:31', from:'ИП СмартПэй (390601112233)', to:'ФЛ *А-04', amt:14_700, desc:'P2P перевод', tags:[]},
+
+    // Исполнительный документ — потенциальная схема
+    {ts:'2025-07-08T09:02', from:'ООО «МаркетСофт» (7708123456)', to:'ФЛ Иванов И.И.', amt:1_950_000, desc:'Исполнительный лист №77-2025-0182', tags:[]},
+
+    // Кросс‑бордер: нематериальные услуги
+    {ts:'2025-03-18T11:00', from:'ООО «Спринт Лайн» (7812340099)', to:'Overseas Ltd (HK)', amt:7_800_000, desc:'Consulting services fee', tags:[]}
+  ];
+
+  function loadDemo(){
+    state.cps = DEMO_CPS.slice();
+    state.tm.rows = DEMO_TX.slice();
+    state.cl = defaultChecklist();
+    state.quiz = {};
+    persist();
+    renderCpTable();
+    renderTm();
+    renderChecklist();
+  }
+
+  // ========== Due Diligence logic ==========
+  const fm = new Intl.NumberFormat('ru-RU');
+  const per = new Intl.NumberFormat('ru-RU',{style:'percent',minimumFractionDigits:2,maximumFractionDigits:2});
+
+  document.getElementById('cp-load').onclick = ()=>{ const s = DEMO_CPS[Math.floor(Math.random()*DEMO_CPS.length)]; fillCpForm(s); };
+  document.getElementById('cp-save').onclick = ()=>{ const d = readCpForm(); if(!d) return; const i = state.cps.findIndex(x=>x.inn===d.inn); if(i>-1) state.cps[i]=d; else state.cps.push(d); persist(); renderCpTable(); alert('Сохранено.'); };
+  document.getElementById('cp-export').onclick=()=>downloadJSON('counterparties.json', state.cps);
+  document.getElementById('cp-import').addEventListener('change', handleImportCps);
+
+  document.getElementById('cp-form').addEventListener('submit', e=>{
+    e.preventDefault();
+    const data = readCpForm(); if(!data) return;
+    const res = cpScore(data);
+    showCpResult(res);
+  });
+
+  function readCpForm(){
+    const get = id => document.getElementById(id).value.trim();
+    const opsSel = Array.from(document.getElementById('cp-ops').selectedOptions).map(o=>o.value);
+    const d = {
+      inn: get('cp-inn'),
+      name: get('cp-name'),
+      age: +get('cp-age')||0,
+      okved: get('cp-okved'),
+      ops: opsSel,
+      site: get('cp-site'),
+      staff: +get('cp-staff')||0,
+      rev: +get('cp-rev')||0,
+      tax: +get('cp-tax')||0,
+      mass: get('cp-mass'),
+      zsk: get('cp-zsk'),
+      match: get('cp-match'),
+      notes: get('cp-notes')
     };
-    try{localStorage.setItem(storeKey, JSON.stringify(state));}catch(e){}
+    if(!d.inn || !d.name) { alert('Заполните ИНН и наименование'); return null; }
+    return d;
   }
-    try{localStorage.setItem(storeKey, JSON.stringify(state));}catch(e){}
-  }
-  function loadState(){
-    try{
-      const raw = localStorage.getItem(storeKey);
-      if(!raw) return;
-      const s = JSON.parse(raw);
-      if(s.t1){$$('[data-t1]').forEach((cb,i)=>cb.checked=!!s.t1[i]);}
-      if(s.t2a!=null) $('#t2a').value = s.t2a;
-      if(s.t2b!=null) $('#t2b').value = s.t2b;
-      if(s.t3){$$('[data-t3]').forEach((cb,i)=>cb.checked=!!s.t3[i]);}
-      if(s.t3text!=null) $('#t3text').value = s.t3text;
-      if(s.t4){$$('[data-t4]').forEach((cb,i)=>cb.checked=!!s.t4[i]);}
-      if(s.t5!=null) $('#t5text').value = s.t5;
-      if(s.t6!=null) $('#t6text').value = s.t6;
-      if(s.t7){$$('[data-t7]').forEach((cb,i)=>cb.checked=!!s.t7[i]);}
-      if(s.t8){$$('[data-t8]').forEach((sel,i)=> sel.value = s.t8[i]||'');}
-    }catch(e){}
-  }
-      if(s.t2a!=null) $('#t2a').value = s.t2a;
-      if(s.t2b!=null) $('#t2b').value = s.t2b;
-      if(s.t3){$$('[data-t3]').forEach((cb,i)=>cb.checked=!!s.t3[i]);}
-      if(s.t3text!=null) $('#t3text').value = s.t3text;
-      if(s.t4){$$('[data-t4]').forEach((cb,i)=>cb.checked=!!s.t4[i]);}
-      if(s.t5!=null) $('#t5text').value = s.t5;
-      if(s.t6!=null) $('#t6text').value = s.t6;
-      if(s.t7){$$('[data-t7]').forEach((cb,i)=>cb.checked=!!s.t7[i]);}
-      if(s.t8){$$('[data-t8]').forEach((sel,i)=> sel.value = s.t8[i]||'');}
-      if(s.t9!=null) $('#t9text').value = s.t9;
-      if(s.t10!=null) $('#t10text').value = s.t10;
-    }catch(e){}
+  function fillCpForm(d){
+    document.getElementById('cp-inn').value=d.inn||'';
+    document.getElementById('cp-name').value=d.name||'';
+    document.getElementById('cp-age').value=d.age||0;
+    document.getElementById('cp-okved').value=d.okved||'';
+    const ops = document.getElementById('cp-ops');
+    Array.from(ops.options).forEach(o=>o.selected=d.ops?.includes(o.value));
+    document.getElementById('cp-site').value=d.site||'yes';
+    document.getElementById('cp-staff').value=d.staff||0;
+    document.getElementById('cp-rev').value=d.rev||0;
+    document.getElementById('cp-tax').value=d.tax||0;
+    document.getElementById('cp-mass').value=d.mass||'no';
+    document.getElementById('cp-zsk').value=d.zsk||'low';
+    document.getElementById('cp-match').value=d.match||'ok';
+    document.getElementById('cp-notes').value=d.notes||'';
   }
 
-  // ====== Keyword scoring (Russian basics) ======
-  function countKeywordHits(text, stems){
-    const t = (text||'').toLowerCase().replace(/[ё]/g,'е');
-    let hits = 0;
-    const matched = new Set();
-    for(const s of stems){
-      const re = new RegExp(s, 'i');
-      if(re.test(t)){ hits++; matched.add(s); }
-    }
-    return {hits, matched: Array.from(matched)};
+  function cpScore(d){
+    const flags=[]; let score=0;
+    const taxShare = d.rev>0? (d.tax/d.rev*100): 0; // %
+    if(taxShare < 0.9){ score+=2; flags.push(`Низкая доля налогов в обороте: ${taxShare.toFixed(2)}% (< 0.9%)`); }
+    if(d.mass==='yes'){ score+=2; flags.push('Массовый адрес/руководитель'); }
+    if(d.staff===0 && d.rev>10){ score+=2; flags.push('Нулевой штат при существенном обороте'); }
+    if(d.match==='bad'){ score+=1; flags.push('Несоответствие ОКВЭД и назначений платежей'); }
+    if(d.zsk==='high'){ score+=3; flags.push('Высокий уровень риска по ЗСК'); }
+    if(d.site==='no'){ score+=1; flags.push('Отсутствуют следы в сети/сайт'); }
+    if(d.age < 6){ score+=1; flags.push('Молодая компания (< 6 мес.)'); }
+
+    // Категоризация
+    let label='Низкий', pill='ok', pct=15;
+    if(score>=6){ label='Высокий'; pill='danger'; pct=90; }
+    else if(score>=3){ label='Повышенный'; pill='warn'; pct=60; }
+
+    const actions = [];
+    if(taxShare<0.9) actions.push('Сформируйте план корректировки налоговой нагрузки/раскрытий и пояснения причин отклонений.');
+    if(d.match!=='ok') actions.push('Проведите сверку ОКВЭД и фактических операций, добавьте коды/документы.');
+    if(d.mass!=='no') actions.push('Подтвердите «не массовость»: договор аренды, фото офиса, независимые контакты.');
+    if(d.zsk!=='low') actions.push('Проверьте контрагента в сервисе ЗСК и подготовьте расширенный пакет DD.');
+    if(d.site==='no') actions.push('Опубликуйте актуальные контакты/описание деятельности на сайте или профилях.');
+
+    return { score, label, pill, pct, flags, actions, taxShare };
   }
 
-  // ====== Graders ======
-  const results = {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0};
-
-  // Task 1
-  window.gradeT1 = function(){
-    // Correct: 1,2,4,6,7 are risk flags; 3 is context-dependent but считаем флаг; 5 is NOT a flag
-    const correct = new Set([1,2,3,4,6,7]);
-    const chosen = $$('[data-t1]').map((cb,i)=> cb.checked ? (i+1) : null).filter(Boolean);
-    let tp=0, fp=0, fn=0;
-    for(const idx of chosen){ if(correct.has(idx)) tp++; else fp++; }
-    for(const idx of correct){ if(!chosen.includes(idx)) fn++; }
-    const precision = tp / Math.max(1, (tp+fp));
-    const recall = tp / Math.max(1, (tp+fn));
-    const score = Math.round(10 * ((precision + recall) / 2)); // 0..10 points
-    results[1] = score;
-    $('#r1').innerHTML = score>=8 ? `<span class="ok">${score}/10</span>` : `<span class="bad">${score}/10</span>`;
-    saveState();
-    updateTotal();
+  function showCpResult(res){
+    document.getElementById('cp-scorebar').style.width = res.pct+'%';
+    const pill = document.getElementById('cp-score');
+    pill.className = 'pill ' + res.pill;
+    pill.textContent = `${res.label} (баллов: ${res.score})`;
+    document.getElementById('cp-flags').innerHTML = res.flags.length? ('<ul>'+res.flags.map(f=>`<li>${f}</li>`).join('')+'</ul>') : '<p class="muted">Красных флагов не выявлено.</p>';
+    document.getElementById('cp-actions').innerHTML = res.actions.length? res.actions.map(a=>`<li>${a}</li>`).join('') : '<li>Риск низкий — стандартные процедуры достаточно.</li>';
+    document.getElementById('cp-math').textContent = `Доля налогов к обороту: ${res.taxShare.toFixed(2)}% (порог 0.9%).\nСумма баллов по флагам => категория риска.`;
   }
 
-  // Task 2
-  window.gradeT2 = function(){
-    const rows = $$('#t2 tbody tr');
-    let ob=0,tax=0,ndfl=0,vzn=0;
-    rows.forEach(tr=>{
-      ob += +tr.querySelector('[data-ob]').dataset.ob;
-      tax += +tr.querySelector('[data-tax]').dataset.tax;
-      ndfl += +tr.querySelector('[data-ndfl]').dataset.ndfl;
-      vzn += +tr.querySelector('[data-vzn]').dataset.vzn;
+  function renderCpTable(){
+    const tbody = document.querySelector('#cp-table tbody');
+    tbody.innerHTML='';
+    state.cps.forEach(cp=>{
+      const {label,pill,score} = cpScore(cp);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${cp.inn}</td><td>${escapeHtml(cp.name)}</td><td>${(cp.rev>0? (cp.tax/cp.rev*100).toFixed(2):'0.00')}%</td><td>${cp.zsk}</td><td>${cp.mass}</td><td><span class="pill ${pill}" title="Баллы: ${score}">${label}</span></td><td><button class="btn" data-edit="${cp.inn}">Открыть</button></td>`;
+      tbody.appendChild(tr);
     });
-    const A = (tax/ob)*100; // only taxes
-    const B = ((tax+ndfl+vzn)/ob)*100; // broad metric
-    const a = parseFloat($('#t2a').value);
-    const b = parseFloat($('#t2b').value);
-    let score=0, msg=[];
-    const within = (x,y,eps) => Math.abs(x-y) <= eps;
-    if(Number.isFinite(a) && within(a,A,0.1)) { score+=5; msg.push('A ок'); } else { msg.push(`A мимо (ожидалось ~${A.toFixed(1)}%)`); }
-    if(Number.isFinite(b) && within(b,B,0.1)) { score+=5; msg.push('B ок'); } else { msg.push(`B мимо (ожидалось ~${B.toFixed(1)}%)`); }
-    results[2] = score;
-    $('#r2').innerHTML = score>=8 ? `<span class="ok">${score}/10</span> • ${msg.join(' · ')}` : `<span class="bad">${score}/10</span> • ${msg.join(' · ')}`;
-    saveState();
-    updateTotal();
+    tbody.querySelectorAll('button[data-edit]').forEach(b=>b.onclick=()=>{
+      const cp = state.cps.find(x=>x.inn===b.dataset.edit); if(cp) { fillCpForm(cp); const r=cpScore(cp); showCpResult(r); selectTab('dd'); }
+    });
   }
 
-  // Task 3
-  window.gradeT3 = function(){
-    const correct = new Set([1,2,3,4,5,7]); // 6 (налоговая задолженность) не отмечаем как риск по данным
-    const chosen = $$('[data-t3]').map((cb,i)=> cb.checked ? (i+1) : null).filter(Boolean);
-    let tp=0, fp=0, fn=0;
-    for(const idx of chosen){ if(correct.has(idx)) tp++; else fp++; }
-    for(const idx of correct){ if(!chosen.includes(idx)) fn++; }
-    const precision = tp / Math.max(1, (tp+fp));
-    const recall = tp / Math.max(1, (tp+fn));
-    let score = Math.round(7 * ((precision + recall) / 2)); // 7 points for checkboxes
-
-    // Text keywords (3 points)
-    const stems = ['массов','нулев','директор','офис','сайт','эдо','уставн','1 сотруд','минималь'];
-    const {hits} = countKeywordHits($('#t3text').value, stems);
-    const textScore = Math.min(3, hits);
-    score += textScore;
-
-    results[3] = score;
-    $('#r3').innerHTML = score>=8 ? `<span class="ok">${score}/10</span>` : `<span class="bad">${score}/10</span>`;
-    saveState();
-    updateTotal();
+  function handleImportCps(ev){
+    const file = ev.target.files?.[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => { try{ const arr = JSON.parse(reader.result); if(Array.isArray(arr)){ state.cps = arr; persist(); renderCpTable(); alert('Импортировано.'); } } catch(e){ alert('Ошибка импорта'); } };
+    reader.readAsText(file);
   }
 
-  // Task 4
-  window.gradeT4 = function(){
-    const must = new Set(['d1','d2','d3','d4','d5','d7']);
-    const bad = new Set(['d6','d8']);
-    const chosen = $$('[data-t4]').map(cb=> cb.checked ? cb.getAttribute('data-t4') : null).filter(Boolean);
-    let score = 10;
-    must.forEach(k=>{ if(!chosen.includes(k)) score -= 1.5; });
-    bad.forEach(k=>{ if(chosen.includes(k)) score -= 1.5; });
-    score = Math.max(0, Math.round(score));
-    results[4] = score;
-    $('#r4').innerHTML = score>=8 ? `<span class="ok">${score}/10</span>` : `<span class="bad">${score}/10</span>`;
-    saveState();
-    updateTotal();
+  // ========== Transaction Monitoring ==========
+  function renderTm(){
+    const tbody = document.querySelector('#tm-table tbody');
+    tbody.innerHTML = '';
+    (state.tm.rows||[]).forEach((r,i)=>{
+      const tags = r.tags?.map(t=>`<span class="pill ${pillClass(t)}">${t}</span>`).join(' ')||'';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${fmtTs(r.ts)}</td><td>${escapeHtml(r.from)}</td><td>${escapeHtml(r.to)}</td><td>${fm.format(r.amt)} ₽</td><td>${escapeHtml(r.desc)}</td><td>${tags}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+  function pillClass(tag){
+    return tag==='Транзит'?'warn' : tag==='Обнал'?'danger' : tag==='P2P'?'warn' : tag==='Исп. документ'?'warn' : tag==='Кросс‑бордер'?'warn' : 'ok';
+  }
+  function fmtTs(ts){ return new Date(ts).toLocaleString('ru-RU'); }
+
+  document.getElementById('tm-demo').onclick=()=>{ state.tm.rows = DEMO_TX.slice(); persist(); renderTm(); };
+  document.getElementById('tm-clear').onclick=()=>{ state.tm.rows=[]; persist(); renderTm(); updateTmSummary([]); };
+  document.getElementById('tm-analyze').onclick=()=>{
+    const out = analyzeTm(state.tm.rows);
+    state.tm.rows = out.rows; persist(); renderTm(); updateTmSummary(out.summary);
+    document.getElementById('tm-memo').value = generateMemo(out.summary);
+  };
+
+  function analyzeTm(rows){
+    const res = rows.map(r=>({...r, tags:[...new Set([...(r.tags||[]), ...detectTags(r, rows)])]}));
+    // summary
+    const cnt = (tag)=> res.filter(r=>r.tags.includes(tag)).length;
+    const summary = [
+      {tag:'Транзит', n:cnt('Транзит'), tip:'Зачисление → быстрый вывод (≤ 1 час), несоответствие смысла платежей.'},
+      {tag:'Обнал', n:cnt('Обнал'), tip:'Снятия наличных крупными суммами/сериями, cash-out с corp‑карт.'},
+      {tag:'P2P', n:cnt('P2P'), tip:'Много мелких переводов физлицам, «агрегаторские» паттерны.'},
+      {tag:'Исп. документ', n:cnt('Исп. документ'), tip:'Высокие суммы по исполнительным документам между связанными лицами.'},
+      {tag:'Кросс‑бордер', n:cnt('Кросс‑бордер'), tip:'Переводы нерезидентам за немат. услуги/авансы (без подтверждений).'}
+    ];
+    return { rows: res, summary };
   }
 
-  // Task 5
-  window.gradeT5 = function(){
-    const stems = ['договор','акт','экономическ','оквед','назначени','контрагент','налог','ндфл','взнос','процент','прилож','реальн','обосн','сделк'];
-    const {hits} = countKeywordHits($('#t5text').value, stems);
-    const score = Math.min(10, hits);
-    results[5] = score;
-    $('#r5').innerHTML = score>=8 ? `<span class="ok">${score}/10</span>` : `<span class="bad">${score}/10</span>`;
-    saveState();
-    updateTotal();
+  function detectTags(r, all){
+    const tags=[];
+    // Транзит: ищем пару вход->выход с разницей ≤ 60 минут в цепочке
+    const t0 = new Date(r.ts).getTime();
+    const isOut = /договор|перевод|оплата|fee|услуг/i.test(r.desc);
+    const outs = all.filter(x=> new Date(x.ts).getTime()>=t0 && new Date(x.ts).getTime()-t0 <= 60*60*1000 && x.from.includes(r.to?.split('(')[0]?.trim()));
+    if(outs.length && isOut){ tags.push('Транзит'); }
+
+    // Обнал: снятие наличных крупными суммами (≥ 600k) или серия ≥ 2 за день
+    if(/Снятие наличных/.test(r.to) && r.amt>=600_000) tags.push('Обнал');
+    const sameDay = all.filter(x=> x.from===r.from && /Снятие наличных/.test(x.to) && x.ts.slice(0,10)===r.ts.slice(0,10));
+    if(sameDay.length>=2) tags.push('Обнал');
+
+    // P2P: множество мелких переводов физлицам из одного источника в короткий интервал
+    if(/P2P/.test(r.desc) || /ФЛ/.test(r.to)){
+      const window = all.filter(x=> x.from===r.from && /ФЛ|P2P/.test(x.to+x.desc));
+      if(window.length>=4) tags.push('P2P');
+    }
+
+    // Исполнительные документы
+    if(/Исполнительн(ый|ого) лист/i.test(r.desc)) tags.push('Исп. документ');
+
+    // Кросс‑бордер: нерезидент в получателе + немат. услуги/консалтинг
+    if(/\(|HK|Ltd|LLC|United|Overseas|BV|S.A.|AG|PLC|KZ|CN\)/i.test(r.to) && /consult|service|услу/i.test(r.desc)) tags.push('Кросс‑бордер');
+
+    return tags;
   }
 
-  // Task 6
-  window.gradeT6 = function(){
-    const stems = ['115','115-фз','провер','разблок','жалоб','обращен','прилож','срок','доказ','закон','банк россии'];
-    const {hits} = countKeywordHits($('#t6text').value, stems);
-    const score = Math.min(10, hits);
-    results[6] = score;
-    $('#r6').innerHTML = score>=8 ? `<span class="ok">${score}/10</span>` : `<span class="bad">${score}/10</span>`;
-    saveState();
-    updateTotal();
+  function updateTmSummary(list){
+    const ul = document.getElementById('tm-summary');
+    ul.innerHTML = list.length? list.map(x=>`<li><b>${x.tag}</b>: ${x.n} — <span class="muted">${x.tip}</span></li>`).join('') : '<li class="muted">Нажмите «Запустить анализ».</li>';
   }
 
-  // Task 7
-  window.gradeT7 = function(){
-    const must = new Set([1,2,4,5,7]);
-    const bad = new Set([3,6]);
-    const chosen = $$('[data-t7]').map((cb,i)=> cb.checked ? (i+1) : null).filter(Boolean);
-    let score = 10;
-    must.forEach(k=>{ if(!chosen.includes(k)) score -= 1.5; });
-    bad.forEach(k=>{ if(chosen.includes(k)) score -= 1.5; });
-    score = Math.max(0, Math.round(score));
-    results[7] = score;
-    $('#r7').innerHTML = score>=8 ? `<span class="ok">${score}/10</span>` : `<span class="bad">${score}/10</span>`;
-    saveState();
-    updateTotal();
+  // Memo generator
+  document.getElementById('tm-memo-generate').onclick=()=>{
+    const tbody = document.querySelector('#tm-table tbody');
+    const tags = new Set();
+    Array.from(tbody.querySelectorAll('tr')).forEach(tr=>{
+      const last = tr.lastElementChild.textContent; (last.match(/Транзит|Обнал|P2P|Исп. документ|Кросс‑бордер/g)||[]).forEach(t=>tags.add(t));
+    });
+    document.getElementById('tm-memo').value = generateMemo(Array.from(tags).map(t=>({tag:t, n:'?'})));
+  };
+  document.getElementById('tm-memo-copy').onclick=()=>{ const t=document.getElementById('tm-memo'); t.select(); document.execCommand('copy'); };
+  function generateMemo(items){
+    const dt = new Date().toLocaleString('ru-RU');
+    return `Пояснительная записка\nДата: ${dt}\n\nВ ходе внутреннего мониторинга выявлены события: ${items.map(i=>i.tag).join(', ')}.\n\nПриняты меры:\n• Получение первичных документов и обоснований экономического смысла.\n• Усиление лимитов и дополнительных проверок по операциям с повышенным риском.\n• Направление сведений в соответствующие системы внутреннего контроля.\n\nПриложения: выписки, договоры, акты, переписка.`;
   }
 
-  // Task 8
-  window.gradeT8 = function(){
-    const gold = {1:'Соответствует',2:'Соответствует',3:'Не соответствует',4:'Соответствует',5:'Не соответствует',6:'Соответствует'};
-    const sel = $$('[data-t8]');
-    let correct=0;
-    sel.forEach(s=>{ const i = s.getAttribute('data-t8'); if(s.value===gold[i]) correct++; });
-    const score = Math.round((correct/sel.length)*10);
-    results[8] = score;
-    $('#r8').innerHTML = score>=8 ? `<span class="ok">${score}/10</span>` : `<span class="bad">${score}/10</span>`;
-    saveState();
-    updateTotal();
+  // ========== Checklist & Docs ==========
+  function defaultChecklist(){
+    return {
+      docs: false,
+      econ: false,
+      tax: false,
+      okved: false,
+      zsk: false,
+      kyc: false,
+      cash: false,
+      agent: false,
+      upd: false
+    };
   }
-  function updateTotal(){
-    const sum = Object.values(results).reduce((a,b)=>a+b,0);
-    const maxSum = Object.keys(results).length * 10;
-    const pct = toPct((sum / maxSum) * 100);
-    $('#totalScore').textContent = pct + '%';
-    $('#progressBar').style.width = pct + '%';
-    const pass = pct >= 80;
-    const sb = $('#statusBox');
-    sb.classList.toggle('pass', pass);
-    sb.classList.toggle('fail', !pass && pct>0);
-    sb.querySelector('span+span').textContent = pass ? 'Пройден' : (pct>0 ? 'Выполнено частично' : 'Ожидает выполнения');
-    const pb = $('#passBanner');
-    pb.style.display = pass ? 'block' : 'none';
-    if(pass) fireConfetti();
-  }
+  const CL_ITEMS = [
+    ['docs','Папка‑архив документов по контрагентам (договор, счёт, акт, переписка)'],
+    ['econ','Пояснение экономического смысла каждой нестандартной операции'],
+    ['tax','Контроль доли налогов/ФОТ/НДФЛ к обороту (отчёты и графики)'],
+    ['okved','Сверка ОКВЭД ↔ фактические платежи, корректность назначений'],
+    ['zsk','Периодическая самопроверка и проверка контрагентов в ЗСК/реестрах'],
+    ['kyc','Назначен ответственный за ПОД/ФТ и взаимодействие с банком'],
+    ['cash','Минимизация наличных, авансовые отчёты и чеки в комплекте'],
+    ['agent','Контроль платёжных агентов/эквайринга (отсутствие нелегальной деятельн.)'],
+    ['upd','Актуальность реквизитов/ОКВЭД/бенефициаров в ФНС, обновление ежеквартально']
+  ];
 
-  // Confetti (tiny, vanilla)
-  function fireConfetti(){
-    const c = $('#confetti');
-    const ctx = c.getContext('2d');
-    const w = c.width = window.innerWidth; const h = c.height = window.innerHeight;
-    const N = 150; const parts = [];
-    for(let i=0;i<N;i++) parts.push({x:Math.random()*w,y:-Math.random()*h,vx:(Math.random()-0.5)*2,vy:Math.random()*2+1,size:Math.random()*4+2,life:Math.random()*120+60});
-    let frame=0; const id = setInterval(()=>{
-      ctx.clearRect(0,0,w,h);
-      parts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.vy+=0.02; p.life--; ctx.fillStyle=`hsl(${(p.x+p.y)%360},80%,60%)`; ctx.fillRect(p.x,p.y,p.size,p.size);});
-      if(++frame>160){ clearInterval(id); ctx.clearRect(0,0,w,h); }
-    },16);
+  function renderChecklist(){
+    const ul = document.getElementById('clist');
+    ul.innerHTML = '';
+    CL_ITEMS.forEach(([key, text])=>{
+      const id = 'cl-' + key;
+      const li = document.createElement('li');
+      li.innerHTML = `<label><input type="checkbox" id="${id}" ${state.cl[key]? 'checked':''}/> ${text}</label>`;
+      ul.appendChild(li);
+      document.getElementById(id).onchange = (e)=>{ state.cl[key] = e.target.checked; persist(); };
+    });
   }
-  // Global actions
-  function checkAll(){ gradeT1(); gradeT2(); gradeT3(); gradeT4(); gradeT5(); gradeT6(); gradeT7(); gradeT8(); }
-  $('#checkAll').addEventListener('click', checkAll);
-  $('#checkAllBottom').addEventListener('click', checkAll);
-  $('#save').addEventListener('click', ()=>{ saveState(); alert('Прогресс сохранён (если разрешено localStorage).'); });
-  $('#reset').addEventListener('click', ()=>{ if(confirm('Сбросить все ответы?')){ try{localStorage.removeItem(storeKey);}catch(e){}; location.reload(); }});
+  renderChecklist();
+  document.getElementById('cl-save').onclick=()=>{ persist(); alert('Сохранено.'); };
+  document.getElementById('cl-reset').onclick=()=>{ state.cl = defaultChecklist(); persist(); renderChecklist(); };
 
-  // Init
-  loadState();
-  updateTotal();
-})();
-</script>
+  // Docs generators
+  function docExplain(company, context){
+    return `Пояснительная записка\n\nКомпания: ${company}\nКонтекст: ${context}\n\n1) Экономический смысл: ...\n2) Перечень документов: договор, счёт, акт, ТЗ, переписка.\n3) Ожидаемые результаты/эффект: ...\n4) Ответственные лица и сроки: ...`;
+  }
+  function docLetter(company, context){
+    return `Письмо в банк\n\nУважаемые коллеги!\n\nВ ответ на запрос по операции сообщаем следующее:\nКомпания: ${company}.\nКонтекст операции: ${context}.\nПрилагаем обосновывающие документы и подтверждаем реальность хозяйственной операции.\nГотовы предоставить дополнительные сведения.\n\nС уважением,\n___________________`;
+  }
+  function setPreview(text){ document.getElementById('doc-preview').textContent = text; }
+  document.getElementById('doc-explain').onclick=()=> setPreview(docExplain(document.getElementById('doc-company').value, document.getElementById('doc-context').value));
+  document.getElementById('doc-letter').onclick=()=> setPreview(docLetter(document.getElementById('doc-company').value, document.getElementById('doc-context').value));
+  document.getElementById('doc-print').onclick=()=> window.print();
+
+  // ========== Quiz ==========
+  const Q = [
+    {q:'Какой индикатор чаще всего вызывает вопросы у банка при больших оборотах?', a:['Доля налогов/ФОТ/НДФЛ к обороту','Количество сотрудников','Возраст компании'], c:0},
+    {q:'Что из нижеперечисленного укажет на «транзитный характер» операций?', a:['Зачисление и почти мгновенное списание средств','Раз в месяц платёж аренды','Крупный единичный платёж поставщику за оборудование'], c:0},
+    {q:'Какой набор мер уместен при риске «исполнительные документы»?', a:['Взаимодействие с ФССП/суд. приставами, углублённая проверка, информирование уполномоченного органа','Игнорирование — платежи по листам всегда легальны','Увеличение снятия наличных'], c:0},
+    {q:'Какая операция относится к повышенному риску при кросс‑бордер переводах?', a:['Оплата нематериальных услуг нерезиденту без прозрачной оценки стоимости','Оплата импортного станка с таможенным оформлением','Выплата пошлины'], c:0},
+    {q:'Что из списка — признак компании‑однодневки?', a:['Массовый адрес/руководитель','Высокая выручка при большом штате','Долгая история и аудированный отчёт'], c:0},
+    {q:'Как корректнее подготовить документы под нестандартную операцию?', a:['Пояснительная записка + договорная и первичная документация','Только платёжное поручение','Только письмо в банк без документов'], c:0},
+    {q:'P2P операции высокого риска часто используют:', a:['Карты/кошельки подставных лиц (дропперов)','Казначейские счета федеральных органов','Исключительно SWIFT‑переводы'], c:0},
+    {q:'Что делать при несоответствии ОКВЭД фактическим платежам?', a:['Сверить и обновить коды, приложить документы','Ничего, это неважно','Переименовать компанию'], c:0},
+    {q:'Какой лимит даёт сигнал по «обналу» в примере?', a:['Снятия ≥ 600 000 ₽ и/или серия снятий за день','Любая оплата аренды','Выплата страховой премии'], c:0},
+    {q:'Как поступить, если контрагент в ЗСК имеет высокий риск?', a:['Запросить расширенный пакет DD/документов или отказаться от сделки','Продолжить без изменений','Перевести оплату на физлицо'], c:0}
+  ];
+
+  function renderQuiz(){
+    const box = document.getElementById('quiz-box');
+    const idx = [...Q.keys()].sort(()=>Math.random()-.5).slice(0,10);
+    state.quiz.idx = idx; persist();
+    box.innerHTML = idx.map((i,n)=>{
+      const q = Q[i];
+      return `<fieldset class="card"><legend><b>${n+1}.</b> ${q.q}</legend>
+        ${q.a.map((opt,j)=>`<label><input type="radio" name="q${i}" value="${j}"> ${opt}</label>`).join('<br>')}
+      </fieldset>`;
+    }).join('');
+  }
+  renderQuiz();
+
+  document.getElementById('quiz-submit').onclick=()=>{
+    const ans = {}; state.quiz.idx.forEach(i=>{
+      const sel = document.querySelector(`input[name="q${i}"]:checked`);
+      ans[i] = sel? +sel.value : -1;
+    });
+    const score = Object.entries(ans).reduce((s,[i,v])=> s + (v===Q[i].c?1:0), 0);
+    state.quiz.ans = ans; state.quiz.score = score; persist();
+    document.getElementById('quiz-res').textContent = `${score}/10 (${score>=8? 'зачёт':'незачёт'})`;
+  };
+  document.getElementById('quiz-reset').onclick=()=>{ state.quiz={}; persist(); renderQuiz(); document.getElementById('quiz-res').textContent='—'; };
+
+  // ========== Summary ==========
+  function renderSummary(){
+    const ul = document.getElementById('sum-list');
+    const done = {
+      cps: state.cps.length,
+      tm: (state.tm.rows||[]).filter(r=>r.tags?.length).length,
+      cl: Object.values(state.cl||{}).filter(Boolean).length,
+      quiz: state.quiz?.score||0
+    };
+    ul.innerHTML = `
+      <li>Проверено контрагентов: <b>${done.cps}</b></li>
+      <li>Отмечено событий мониторинга: <b>${done.tm}</b></li>
+      <li>Чек‑лист выполнен: <b>${done.cl}/${CL_ITEMS.length}</b></li>
+      <li>Тест: <b>${done.quiz}/10</b></li>`;
+  }
+  document.getElementById('sum-download').onclick=()=>{
+    const report = {
+      generatedAt: new Date().toISOString(),
+      counterparties: state.cps,
+      monitoring: state.tm,
+      checklist: state.cl,
+      quiz: state.quiz
+    };
+    downloadJSON('finmon_report.json', report);
+  };
+  document.getElementById('sum-copy').onclick=()=>{
+    const txt = JSON.stringify({cps:state.cps, tm:state.tm, cl:state.cl, quiz:state.quiz}, null, 2);
+    copyText(txt); alert('Скопировано в буфер.');
+  };
+
+  // ========== Utils ==========
+  function escapeHtml(s=''){ return s.replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
+  function downloadJSON(name, data){ const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); URL.revokeObjectURL(a.href); }
+  function copyText(text){ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+
+  // Initial renders
+  renderCpTable();
+  renderTm();
+  renderChecklist();
+  if(state.quiz?.score) document.getElementById('quiz-res').textContent = `${state.quiz.score}/10`;
+
+  </script>
 </body>
 </html>
