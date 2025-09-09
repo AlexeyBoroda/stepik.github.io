@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Практическое задание — Ошибки и правильные стратегии</title>
+<style>
+  :root{
+    --bg:#ffffff; --ink:#0f172a; --muted:#475569;
+    --brand:#1e3a8a; --accent:#0ea5e9; --ok:#059669; --warn:#b45309; --bad:#b91c1c;
+    --card:#f8fafc; --line:#e2e8f0; --radius:16px; --shadow:0 10px 30px rgba(2,6,23,.08);
+  }
+  html,body{background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;margin:0}
+  .wrap{max-width:1100px;margin:auto;padding:24px}
+  header{border:1px solid var(--line);border-radius:var(--radius);padding:24px;background:linear-gradient(180deg,rgba(30,58,138,.06),transparent);box-shadow:var(--shadow)}
+  h1{margin:0 0 .4rem;font-size:1.6rem}
+  .eyebrow{font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.06em;font-size:.8rem}
+  .subtitle{color:var(--muted);margin:.2rem 0 0}
+  .grid{display:grid;gap:18px;margin:22px 0}
+  .two{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+  .card h2{font-size:1.15rem;margin:.1rem 0 .6rem}
+  .kicker{display:flex;gap:.6ch;align-items:center;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-size:.8rem;margin-bottom:.3rem}
+  .dot{width:.6rem;height:.6rem;border-radius:99px;background:var(--accent);display:inline-block}
+  .note{border-left:4px solid var(--accent);background:linear-gradient(90deg,rgba(14,165,233,.08),transparent);padding:12px;border-radius:10px}
+  .btn{appearance:none;border:1px solid var(--line);background:#fff;border-radius:12px;padding:.6rem .9rem;cursor:pointer}
+  .btn.brand{background:var(--brand);border-color:var(--brand);color:#fff}
+  .btn.ghost{background:#fff}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .small{font-size:.92rem}
+  /* Drag & drop */
+  .pool,.bucket{min-height:160px;background:#fff;border:1px dashed var(--line);border-radius:12px;padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .bucket{grid-template-columns:1fr}
+  .chip{background:#eef2ff;border:1px solid #c7d2fe;border-radius:999px;padding:.5rem .65rem;font-size:.92rem;cursor:grab;user-select:none;box-shadow:0 2px 0 rgba(30,41,59,.08)}
+  .chip.dragging{opacity:.6}
+  .bucket h3{margin:.2rem 0 .5rem;font-size:1rem;color:#1e293b}
+  .bucket.drop{outline:3px dashed var(--accent)}
+  /* Checklist */
+  .checklist{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .item{display:flex;gap:8px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px}
+  .item label{cursor:pointer}
+  .hint{color:var(--muted);font-size:.9rem;margin-top:.3rem}
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92rem}
+  /* Form */
+  .field{display:grid;gap:6px;margin:.6rem 0}
+  textarea,input[type=text]{width:100%;padding:.7rem;border:1px solid var(--line);border-radius:10px;background:#fff}
+  .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:.15rem .5rem;font-size:.8rem;color:var(--muted);background:#fff;margin-right:.35rem}
+  /* Score */
+  .score{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .status{font-weight:800}
+  .status.ok{color:var(--ok)} .status.warn{color:var(--warn)} .status.bad{color:var(--bad)}
+  progress{width:240px;height:10px}
+  /* Footer */
+  footer{margin:22px 0 6px;color:var(--muted);font-size:.9rem}
+  @media (max-width:960px){.two{grid-template-columns:1fr}.pool{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="eyebrow">Коммуникация с банком · Практика</div>
+      <h1>Ошибки и правильные стратегии — интерактивное задание</h1>
+      <p class="subtitle">
+        Цель: за 12–15 минут отработать три навыка — <b>распознавание ошибок</b>, <b>сбор полного пакета</b> и <b>написание пояснения в экономической логике</b>.
+      </p>
+    </header>
+
+    <!-- Инструкция -->
+    <section class="card">
+      <div class="kicker"><span class="dot"></span><span>Как выполнить</span></div>
+      <ol class="small">
+        <li>Перетащите карточки в «Делаем» и «Не делаем» (Задание 1).</li>
+        <li>Отметьте, что включите в ответ банку и проверьте себя (Задание 2).</li>
+        <li>Составьте короткую пояснительную записку и назначение платежа (Задание 3).</li>
+      </ol>
+      <div class="note small">
+        Подсказка: думайте как комплаенс-офицер — видна ли <b>экономическая логика</b>, есть ли <b>связь с деятельностью</b>, соблюдены ли <b>сроки</b>?
+      </div>
+    </section>
+
+    <!-- Задание 1: drag & drop -->
+    <section class="card" id="task1">
+      <div class="kicker"><span class="dot"></span><span>Задание 1</span></div>
+      <h2>Разложите действия: «Делаем» vs «Не делаем»</h2>
+      <p class="small">Перетащите карточки из «Пул» в соответствующие корзины. Затем нажмите «Проверить».</p>
+
+      <div class="grid two">
+        <div>
+          <h3>Пул действий</h3>
+          <div class="pool" id="pool" aria-label="Пул действий"></div>
+        </div>
+
+        <div>
+          <div class="bucket" id="do" aria-label="Делаем">
+            <h3>✅ Делаем</h3>
+          </div>
+          <div style="height:12px"></div>
+          <div class="bucket" id="dont" aria-label="Не делаем">
+            <h3>⛔ Не делаем</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <button class="btn brand" id="check1">Проверить</button>
+        <button class="btn ghost" id="reset1">Сбросить</button>
+        <div class="score small" id="score1"></div>
+      </div>
+    </section>
+
+    <!-- Задание 2: чек-лист пакета -->
+    <section class="card" id="task2">
+      <div class="kicker"><span class="dot"></span><span>Задание 2</span></div>
+      <h2>Соберите полный пакет ответа банку</h2>
+      <p class="small">Отметьте, что вы приложите к письму. Нажмите «Проверить комплект».</p>
+
+      <div class="checklist" id="checklist">
+        <!-- генерируется скриптом -->
+      </div>
+      <p class="hint">Файлы называйте понятно, например: <span class="mono">2025-09-09_Dogovor_15.pdf</span>, <span class="mono">Akt_15_2025-09-30.pdf</span></p>
+
+      <div class="row" style="margin-top:12px">
+        <button class="btn brand" id="check2">Проверить комплект</button>
+        <button class="btn ghost" id="reset2">Сбросить</button>
+        <div class="score small" id="score2"></div>
+      </div>
+    </section>
+
+    <!-- Задание 3: пояснительная записка -->
+    <section class="card" id="task3">
+      <div class="kicker"><span class="dot"></span><span>Задание 3</span></div>
+      <h2>Напишите объяснение в экономической логике</h2>
+      <p class="small">Заполните поля. Автопроверка подсветит ключевые элементы: предмет, экономический смысл, связь с ОКВЭД, документы и назначение платежа.</p>
+
+      <div class="field">
+        <label for="purpose"><b>Назначение платежа (коротко, 1–2 строки)</b></label>
+        <input id="purpose" type="text" placeholder="Напр.: Оплата аренды офиса по договору №5 от 01.02.2025" />
+      </div>
+
+      <div class="field">
+        <label for="memo"><b>Пояснительная записка (5–7 строк)</b></label>
+        <textarea id="memo" rows="7" placeholder="Структура: 1) Предмет; 2) Экономический смысл; 3) Связь с ОКВЭД; 4) Документы; 5) Потоки/сроки"></textarea>
+      </div>
+
+      <div class="hint">
+        Вставьте ключевые элементы (подсвечиваются при проверке):
+        <span class="pill">договор</span>
+        <span class="pill">акт / УПД</span>
+        <span class="pill">счёт</span>
+        <span class="pill">экономический смысл</span>
+        <span class="pill">ОКВЭД</span>
+        <span class="pill">график оплат</span>
+        <span class="pill">поставка</span>
+        <span class="pill">ROMI / KPI</span>
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <button class="btn brand" id="check3">Проверить текст</button>
+        <button class="btn ghost" id="reset3">Сбросить</button>
+        <div class="score small" id="score3"></div>
+      </div>
+    </section>
+
+    <!-- Итог и отчёт -->
+    <section class="card" id="result">
+      <div class="kicker"><span class="dot"></span><span>Итоги</span></div>
+      <h2>Ваш результат</h2>
+      <div class="score">
+        <progress id="progress" value="0" max="100"></progress>
+        <span id="overall" class="status">0%</span>
+      </div>
+      <div class="note" id="report" style="margin-top:10px">
+        Выполните задания и нажмите «Собрать отчёт».
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn brand" id="buildReport">Собрать отчёт</button>
+        <button class="btn ghost" id="copyReport">Скопировать отчёт</button>
+        <button class="btn ghost" id="resetAll">Полный сброс</button>
+      </div>
+    </section>
+
+    <footer>Курс «Как вести бизнес, чтобы не заблокировали счета в банке» · Модуль «Коммуникация с банком» · Подтема «Ошибки и правильные стратегии»</footer>
+  </div>
+
+<script>
+/* ---------- Задание 1: drag & drop ---------- */
+const actions = [
+  { id:"a1", text:"Подтвердить получение запроса в день поступления", good:true },
+  { id:"a2", text:"Отправить только договор без актов и пояснения", good:false },
+  { id:"a3", text:"Дать промежуточный ответ с датой финальной выгрузки", good:true },
+  { id:"a4", text:"Использовать эмоциональные формулировки и упрёки", good:false },
+  { id:"a5", text:"Обозначить назначение платежей в экономической логике", good:true },
+  { id:"a6", text:"Игнорировать запрос до последнего дня", good:false },
+  { id:"a7", text:"Предупредить банк о крупном снятии и приложить документы", good:true },
+  { id:"a8", text:"Распределять ответы между разными сотрудниками без контроля", good:false }
+];
+
+const pool = document.querySelector('#pool');
+const doBucket = document.querySelector('#do');
+const dontBucket = document.querySelector('#dont');
+const score1 = document.querySelector('#score1');
+const check1 = document.querySelector('#check1');
+const reset1 = document.querySelector('#reset1');
+
+function renderPool(){
+  pool.innerHTML = '';
+  actions.forEach(a=>{
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.textContent = a.text;
+    chip.draggable = true;
+    chip.dataset.id = a.id;
+    chip.addEventListener('dragstart', e=>{ chip.classList.add('dragging'); e.dataTransfer.setData('text/plain', a.id); });
+    chip.addEventListener('dragend', ()=>chip.classList.remove('dragging'));
+    pool.appendChild(chip);
+  });
+}
+['dragover','drop','dragenter','dragleave'].forEach(evt=>{
+  [doBucket,dontBucket,pool].forEach(box=>{
+    box.addEventListener('dragover', e=>{ e.preventDefault(); box.classList.add('drop'); });
+    box.addEventListener('dragleave', ()=> box.classList.remove('drop'));
+    box.addEventListener('drop', e=>{
+      e.preventDefault();
+      const id = e.dataTransfer.getData('text/plain');
+      const chip = document.querySelector(`.chip[data-id="${id}"]`);
+      if(chip){ box.appendChild(chip); }
+      box.classList.remove('drop');
+      saveState();
+    });
+  });
+});
+
+function checkTask1(){
+  const goodInDo = [...doBucket.querySelectorAll('.chip')].filter(ch=> {
+    const a = actions.find(x=>x.id===ch.dataset.id);
+    return a && a.good;
+  }).length;
+  const badInDont = [...dontBucket.querySelectorAll('.chip')].filter(ch=>{
+    const a = actions.find(x=>x.id===ch.dataset.id);
+    return a && !a.good;
+  }).length;
+  const totalGood = actions.filter(a=>a.good).length;
+  const totalBad  = actions.filter(a=>!a.good).length;
+  const score = Math.round( ( (goodInDo/totalGood) + (badInDont/totalBad) ) / 2 * 100 );
+  score1.innerHTML = `Результат: <b>${score}%</b> — ${feedback(score)}`;
+  localStorage.setItem('t1', score);
+  updateOverall();
+}
+function resetTask1(){
+  renderPool(); doBucket.querySelectorAll('.chip').forEach(n=>n.remove());
+  dontBucket.querySelectorAll('.chip').forEach(n=>n.remove());
+  score1.textContent = '';
+  localStorage.removeItem('t1'); saveState(); updateOverall();
+}
+check1.addEventListener('click', checkTask1);
+reset1.addEventListener('click', resetTask1);
+
+/* ---------- Задание 2: чек-лист ---------- */
+const checklistSpec = [
+  {id:'c1', txt:'Договор/спецификация', must:true},
+  {id:'c2', txt:'Счёт/счёт-фактура', must:true},
+  {id:'c3', txt:'Акт/УПД/накладная', must:true},
+  {id:'c4', txt:'Пояснительная записка (экономическая логика)', must:true},
+  {id:'c5', txt:'Подтверждение поставки/оказания', must:true},
+  {id:'c6', txt:'Подтверждение оплаты (выписка/платёжка)', must:true},
+  {id:'c7', txt:'Медиаплан/отчёт по KPI (если это маркетинг)', must:false},
+  {id:'c8', txt:'Письмо-уведомление о нестандартной операции (при необходимости)', must:false},
+  {id:'c9', txt:'Скрин эмоций из переписки 😉', must:false},        // заведомо лишнее
+  {id:'c10', txt:'Учётная политика/ОКВЭД (при запросе)', must:false},
+];
+
+const checklistDiv = document.querySelector('#checklist');
+const score2 = document.querySelector('#score2');
+document.querySelector('#check2').addEventListener('click', ()=>{
+  const chosen = [...checklistDiv.querySelectorAll('input[type=checkbox]')].filter(c=>c.checked).map(c=>c.id);
+  const must = checklistSpec.filter(x=>x.must).map(x=>x.id);
+  const hasAllMust = must.every(id=>chosen.includes(id));
+  const hasBad = chosen.includes('c9'); // заведомо лишнее
+  let score = 0;
+  if(hasAllMust && !hasBad){
+    const opt = checklistSpec.filter(x=>!x.must && x.id!=='c9').map(x=>x.id);
+    const optChosen = opt.filter(id=>chosen.includes(id)).length;
+    score = Math.min(100, 70 + optChosen*10);
+  }else{
+    const mustCount = must.filter(id=>chosen.includes(id)).length;
+    score = Math.round( (mustCount / must.length) * 70 ) - (hasBad?20:0);
+    score = Math.max(0, score);
+  }
+  score2.innerHTML = `Комплект: <b>${score}%</b> — ${feedback(score)}`;
+  localStorage.setItem('t2', score);
+  updateOverall();
+});
+document.querySelector('#reset2').addEventListener('click', ()=>{
+  checklistDiv.querySelectorAll('input[type=checkbox]').forEach(c=>c.checked=false);
+  score2.textContent=''; localStorage.removeItem('t2'); updateOverall(); saveState();
+});
+
+function renderChecklist(){
+  checklistDiv.innerHTML='';
+  checklistSpec.forEach(x=>{
+    const el = document.createElement('div'); el.className='item';
+    el.innerHTML = `
+      <input id="${x.id}" type="checkbox" />
+      <label for="${x.id}">
+        ${x.txt} ${x.must?'<span class="pill">обязательно</span>':''}
+      </label>`;
+    checklistDiv.appendChild(el);
+  });
+  // restore
+  const saved = JSON.parse(localStorage.getItem('checklist')||'[]');
+  saved.forEach(id=>{
+    const c = document.getElementById(id);
+    if(c) c.checked = true;
+  });
+  checklistDiv.addEventListener('change', ()=>{
+    const chosen = [...checklistDiv.querySelectorAll('input[type=checkbox]')].filter(c=>c.checked).map(c=>c.id);
+    localStorage.setItem('checklist', JSON.stringify(chosen));
+  });
+}
+
+/* ---------- Задание 3: текст и автопроверка ---------- */
+const keyPhrases = [
+  /договор/i, /(акт|упд|накладн)/i, /сч[её]т/i, /экономическ.*смысл/i, /оквэд/i,
+  /(график|срок).*оплат/i, /(поставк|оказан)/i, /kpi|romi/i, /(назначени|оплата).*(по договору|за)/i
+];
+const score3Box = document.querySelector('#score3');
+document.querySelector('#check3').addEventListener('click', ()=>{
+  const purpose = document.querySelector('#purpose').value.trim();
+  const memo = document.querySelector('#memo').value.trim();
+  let text = (purpose + " " + memo).toLowerCase();
+  let hits = 0;
+  keyPhrases.forEach(rx=>{ if(rx.test(text)) hits++; });
+  // базовые требования: длина purpose > 25, memo > 200 символов
+  const lenBonus = (purpose.length>25 ? 1 : 0) + (memo.length>200 ? 1 : 0);
+  const score = Math.min(100, Math.round((hits/ keyPhrases.length)*90) + lenBonus*5);
+  score3Box.innerHTML = `Качество пояснения: <b>${score}%</b> — ${feedback(score)}`
+    + highlightFound(memo);
+  localStorage.setItem('t3', score);
+  localStorage.setItem('purpose', purpose);
+  localStorage.setItem('memo', memo);
+  updateOverall();
+});
+document.querySelector('#reset3').addEventListener('click', ()=>{
+  document.querySelector('#purpose').value='';
+  document.querySelector('#memo').value='';
+  score3Box.textContent=''; ['t3','purpose','memo'].forEach(k=>localStorage.removeItem(k));
+  updateOverall();
+});
+
+/* ---------- Итоги и отчёт ---------- */
+const progressEl = document.querySelector('#progress');
+const overallEl = document.querySelector('#overall');
+function updateOverall(){
+  const s1 = Number(localStorage.getItem('t1')||0);
+  const s2 = Number(localStorage.getItem('t2')||0);
+  const s3 = Number(localStorage.getItem('t3')||0);
+  const scores = [s1,s2,s3];
+  const filled = scores.filter(s=>s>0);
+  const avg = filled.length ? Math.round(filled.reduce((a,b)=>a+b,0)/filled.length) : 0;
+  progressEl.value = avg; overallEl.textContent = `${avg}%`;
+  overallEl.className = 'status ' + (avg>=85?'ok':avg>=60?'warn':'bad');
+}
+document.querySelector('#buildReport').addEventListener('click', ()=>{
+  const s1 = Number(localStorage.getItem('t1')||0);
+  const s2 = Number(localStorage.getItem('t2')||0);
+  const s3 = Number(localStorage.getItem('t3')||0);
+  const chosen = JSON.parse(localStorage.getItem('checklist')||'[]').map(id=>{
+    const spec = checklistSpec.find(x=>x.id===id); return spec?spec.txt:id;
+  });
+  const report = [
+    'Отчёт по практике — Коммуникация с банком',
+    '--------------------------------------------------',
+    `Задание 1 (распознавание действий): ${s1||0}%`,
+    `Задание 2 (комплект документов): ${s2||0}%`,
+    `Задание 3 (пояснительная записка): ${s3||0}%`,
+    `Общий результат: ${overallEl.textContent}`,
+    '',
+    'Выбранные документы:',
+    chosen.length?('• ' + chosen.join('\n• ')):'—',
+    '',
+    'Назначение платежа:',
+    localStorage.getItem('purpose')||'—',
+    '',
+    'Черновик пояснительной записки:',
+    (localStorage.getItem('memo')||'—').slice(0,4000),
+    '',
+    'Рекомендации:',
+    recs(Math.max(s1,s2,s3), Math.min(s1,s2,s3))
+  ].join('\n');
+  document.querySelector('#report').textContent = report;
+});
+document.querySelector('#copyReport').addEventListener('click', async()=>{
+  const txt = document.querySelector('#report').textContent;
+  try{ await navigator.clipboard.writeText(txt); toast('Отчёт скопирован в буфер обмена'); }
+  catch(e){ toast('Не удалось скопировать. Выделите текст и нажмите Ctrl+C'); }
+});
+document.querySelector('#resetAll').addEventListener('click', ()=>{
+  localStorage.clear(); location.reload();
+});
+
+/* ---------- helpers ---------- */
+function feedback(score){
+  if(score>=90) return 'отлично: логика прозрачна, риск низкий';
+  if(score>=75) return 'хорошо: есть мелкие недочёты';
+  if(score>=60) return 'удовлетворительно: доработайте комплект и формулировки';
+  return 'нужно улучшить: не хватает логики/документов';
+}
+function highlightFound(text){
+  const found = keyPhrases.filter(rx=>rx.test((text||'').toLowerCase())).length;
+  return `<div class="hint">Ключевых элементов: <b>${found}/${keyPhrases.length}</b></div>`;
+}
+function recs(maxS, minS){
+  const list = [];
+  if(minS<70) list.push('— Проверьте обязательные документы: договор, счёт, акт/УПД, пояснение, подтверждение поставки и оплаты.');
+  if(maxS<90) list.push('— Уточните экономический смысл и связь с ОКВЭД; добавьте график оплат и KPI/ROMI (для маркетинга).');
+  list.push('— Подтверждайте получение запроса в день поступления и используйте нейтральный деловой тон.');
+  return list.join('\n');
+}
+function toast(msg){
+  const t = document.createElement('div');
+  t.textContent = msg;
+  Object.assign(t.style,{
+    position:'fixed',bottom:'20px',left:'50%',transform:'translateX(-50%)',
+    background:'#111',color:'#fff',padding:'10px 14px',borderRadius:'10px',opacity:'0.95',zIndex:9999
+  });
+  document.body.appendChild(t); setTimeout(()=>t.remove(), 2200);
+}
+
+function saveState(){
+  // save pools
+  const idsPool = [...pool.querySelectorAll('.chip')].map(x=>x.dataset.id);
+  const idsDo   = [...doBucket.querySelectorAll('.chip')].map(x=>x.dataset.id);
+  const idsDont = [...dontBucket.querySelectorAll('.chip')].map(x=>x.dataset.id);
+  localStorage.setItem('pool', JSON.stringify(idsPool));
+  localStorage.setItem('do', JSON.stringify(idsDo));
+  localStorage.setItem('dont', JSON.stringify(idsDont));
+}
+function restoreState(){
+  const p = JSON.parse(localStorage.getItem('pool')||'[]');
+  const d = JSON.parse(localStorage.getItem('do')||'[]');
+  const n = JSON.parse(localStorage.getItem('dont')||'[]');
+  const makeChip = id=>{
+    const a = actions.find(x=>x.id===id); if(!a) return null;
+    const chip = document.createElement('div');
+    chip.className='chip'; chip.textContent=a.text; chip.draggable=true; chip.dataset.id=a.id;
+    chip.addEventListener('dragstart', e=>{ chip.classList.add('dragging'); e.dataTransfer.setData('text/plain', a.id); });
+    chip.addEventListener('dragend', ()=>chip.classList.remove('dragging'));
+    return chip;
+  };
+  if(p.length || d.length || n.length){
+    pool.innerHTML=''; [p,d,n].forEach((arr,i)=>{
+      arr.forEach(id=>{
+        const chip = makeChip(id);
+        if(!chip) return;
+        (i===0?pool: i===1?doBucket:dontBucket).appendChild(chip);
+      });
+    });
+  }
+}
+
+(function init(){
+  renderPool();
+  renderChecklist();
+  restoreState();
+  // restore text
+  const purpose = localStorage.getItem('purpose'); if(purpose) document.querySelector('#purpose').value = purpose;
+  const memo = localStorage.getItem('memo'); if(memo) document.querySelector('#memo').value = memo;
+  updateOverall();
+})();
+</script>
+</body>
+</html>
