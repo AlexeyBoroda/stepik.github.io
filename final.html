@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Итоговый проект — «Безопасный бизнес / ПОД/ФТ» (единый кейс)</title>
+  <title>Итоговый проект — «Безопасный бизнес / ПОД/ФТ» (единый файл)</title>
   <style>
     :root { 
       --bg:#ffffff; 
@@ -28,7 +28,7 @@
     @media(min-width:900px){.row{grid-template-columns:1fr 1fr}}
     .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px}
     .card h3{margin:0 0 8px;font-size:18px}
-    .pill{display:inline-flex;gap:8px;align-items:center;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.06);font-size:12px}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:4px 10px;border-radius:999px;background:var(--panel);border:1px solid var(--border);font-size:12px}
     textarea,input,button,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#ffffff;color:var(--ink)}
     textarea{min-height:110px;resize:vertical}
     .buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
@@ -45,9 +45,9 @@
     code.kwd{background:#f1f5f9;border:1px solid var(--border);padding:2px 6px;border-radius:8px}
     table{width:100%;border-collapse:collapse}
     th,td{border-bottom:1px solid var(--border);padding:8px;text-align:left}
-    $1
-  .congrats{border:1px dashed var(--good); background:#ecfdf5; color:#065f46; padding:12px; border-radius:12px}
-  .congrats .muted{color:#065f46; opacity:.9}
+    .overall{position:sticky;top:0;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.88));backdrop-filter: blur(10px);border-bottom:1px solid var(--border);z-index:10}
+    .congrats{border:1px dashed var(--good); background:#ecfdf5; color:#065f46; padding:12px; border-radius:12px}
+    .congrats .muted{color:#065f46; opacity:.9}
   </style>
 </head>
 <body>
@@ -57,7 +57,10 @@
       <div class="muted">Кейс: как построить <em>прозрачные процессы</em> и избежать блокировки счетов (115‑ФЗ, риски/контроль, коммуникация с банком).</div>
       <div class="row" style="margin:14px 0 8px">
         <div class="card">
-          <div class="pill">Статус итоговой работы: <span id="overallStatus" style="margin-left:6px" class="warn">—</span></div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <div class="pill">Статус: <span id="overallStatus" style="margin-left:6px" class="warn">—</span></div>
+            <div class="pill" id="engineBadge">JS: <b>инициализация…</b></div>
+          </div>
           <div style="display:grid;grid-template-columns:120px 1fr;gap:10px;align-items:center;margin-top:10px">
             <div class="muted">Выполнено задач</div>
             <div><div class="progress"><div id="overallBar" class="bar"></div></div></div>
@@ -75,12 +78,10 @@
               <a class="btn btn-primary" href="https://t.me/+CR-AWZgk0CMyYjdi" target="_blank" rel="noopener noreferrer">Перейти в закрытую группу в Telegram</a>
             </div>
           </div>
-            <div class="muted">Вы проделали большую работу. Помните, что вы всегда можете обратиться к автору в закрытой группе. Если нужна ссылка на группу — дайте знать, добавлю её в проект.</div>
-          </div>
         </div>
         <div class="card">
           <h3>Единый кейс (введение)</h3>
-          <div class="muted">Вы генеральный директор компании «Альфа», оборот 120 млн ₽/год. Банк запросил пояснения по <em>транзитным платежам</em>, <em>низкой налоговой нагрузке</em> и частым <em>снятиям наличных</em>. Нужен комплект решений: оценка рисков, политика ПОД/ФТ, чек‑листы и алгоритм общения с банком. По каждому заданию впишите ответ — будет проверка по ключевым словам/расчётам.</div>
+          <div class="muted">Вы — руководитель компании «Альфа», оборот 120 млн ₽/год. Банк запросил пояснения по <em>транзитным платежам</em>, <em>низкой налоговой нагрузке</em> и частым <em>снятиям наличных</em>. Нужен комплект решений: оценка рисков, политика ПОД/ФТ, чек‑листы и алгоритм общения с банком. По каждому заданию впишите ответ — будет проверка по ключевым словам/расчётам.</div>
         </div>
       </div>
     </div>
@@ -182,7 +183,7 @@
         <div class="muted">Опишите ограничения, документы и альтернативы (корпоративные карты, безнал).</div>
         <textarea data-input="T6" placeholder="Например: минимизировать наличные, авансовые отчёты и чеки, лимиты, бизнес‑карты, избегать cash‑out по корпоративным картам, планирование платежей..."></textarea>
         <details style="margin-top:8px"><summary>Подсказки</summary>
-          <div>Ключевые слова: <code class="kwd">минимиз</code>, <code class="kwd">авансов</code>, <code class="kwd">чеки</code>, <code class="kwd">лимит</code>, <code class="kwd">бизнес‑карта</code>, <code class="kwd">cash</code>, <code class="kwd">планир</code>.</div>
+          <div>Ключевые слова: <code class="kwd">минимиз</code>, <code class="kwd">авансов</code>, <code class="kwd">чек</code>, <code class="kwd">лимит</code>, <code class="kwd">бизнес</code>, <code class="kwd">cash</code>, <code class="kwd">планир</code>.</div>
         </details>
         <div class="buttons">
           <button class="btn btn-primary" data-action="grade" data-task="T6">Проверить задание 6</button>
@@ -197,7 +198,7 @@
         <div class="muted">Опишите роли, сроки реагирования, контроль задач.</div>
         <textarea data-input="T7" placeholder="Например: назначить ответственного по ПОД/ФТ, сроки ответа банку, чек‑листы, контроль пакета документов, регламент эскалации..."></textarea>
         <details style="margin-top:8px"><summary>Подсказки</summary>
-          <div>Ключевые слова: <code class="kwd">ответственн</code>, <code class="kwd">срок</code>, <code class="kwd">SLA</code>, <code class="kwd">пакет докум</code>, <code class="kwd">эскалац</code>, <code class="kwd">регламент</code>.</div>
+          <div>Ключевые слова: <code class="kwd">ответствен</code>, <code class="kwd">срок</code>, <code class="kwd">SLA</code>, <code class="kwd">пакет докум</code>, <code class="kwd">эскалац</code>, <code class="kwd">регламент</code>.</div>
         </details>
         <div class="buttons">
           <button class="btn btn-primary" data-action="grade" data-task="T7">Проверить задание 7</button>
@@ -212,7 +213,7 @@
         <div class="muted">Опишите признаки (дропперы, крипто, нелегальные казино) и контроли.</div>
         <textarea data-input="T8" placeholder="Например: P2P, дропперы, криптовалюта, онлайн‑казино, мониторинг по картам, блокировка аномалий, требования к агентам..."></textarea>
         <details style="margin-top:8px"><summary>Подсказки</summary>
-          <div>Ключевые слова: <code class="kwd">P2P</code>, <code class="kwd">дроппер</code>, <code class="kwd">крипто</code>, <code class="kwd">казино</code>, <code class="kwd">мониторинг</code>, <code class="kwd">агент</code>, <code class="kwd">блокиров</code>.</div>
+          <div>Ключевые слова: <code class="kwd">P2P</code>, <code class="kwd">дроппер</code>, <code class="kwd">крипт</code>, <code class="kwd">казин</code>, <code class="kwd">монитор</code>, <code class="kwd">агент</code>, <code class="kwd">блокиров</code>.</div>
         </details>
         <div class="buttons">
           <button class="btn btn-primary" data-action="grade" data-task="T8">Проверить задание 8</button>
@@ -247,6 +248,14 @@
   // ==== Утилиты ====
   const byId = id => document.getElementById(id);
   const norm = s => (s||"").toString().toLowerCase().replace(/[ё]/g,"е");
+
+  function engineReady(flag){
+    const el = byId('engineBadge');
+    if(!el) return;
+    el.innerHTML = flag ? 'JS: <b>готово</b>' : 'JS: <b>ошибка</b>';
+    el.style.borderColor = flag ? 'var(--good)' : 'var(--bad)';
+    el.style.color = flag ? 'var(--good)' : 'var(--bad)';
+  }
 
   // Подсчёт совпадений по ключевым словам (по подстроке)
   function countHits(text, keywords){
@@ -288,7 +297,6 @@
   }
 
   function calcT3(){
-    // вычисление без выставления результата
     const t = Number(document.querySelector('[data-num="turnover"]').value||0);
     const x = Number(document.querySelector('[data-num="taxes"]').value||0);
     const out = document.querySelector('[data-num="ratioOut"]');
@@ -302,7 +310,6 @@
     return false;
   }
 
-  // Сброс одного задания
   function resetTask(taskId){
     const cfg = TASKS[taskId];
     const resEl = byId(`res-${taskId}`);
@@ -318,10 +325,8 @@
     delete resEl.dataset.passed;
   }
 
-  function updateOverall(){$1
-    const congr = document.getElementById('congratsBanner');
-    if(congr){ congr.style.display = (pct >= 80) ? 'block' : 'none'; }
-  }`)?.dataset?.passed === '1');
+  function updateOverall(){
+    const results = Object.keys(TASKS).map(id => byId(`res-${id}`)?.dataset?.passed === '1');
     const total = results.length;
     const passed = results.filter(Boolean).length;
     const pct = total? Math.round((passed/total)*100) : 0;
@@ -330,9 +335,10 @@
     if(pct >= 80){ stEl.textContent = `Пройден (${pct}%)`; stEl.className = 'ok'; }
     else if(pct>0){ stEl.textContent = `Промежуточно (${pct}%)`; stEl.className='warn'; }
     else { stEl.textContent = '—'; stEl.className='warn'; }
+    const congr = document.getElementById('congratsBanner');
+    if(congr){ congr.style.display = (pct >= 80) ? 'block' : 'none'; }
   }
 
-  // ==== Слушатели событий (без inline-обработчиков) ====
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('button');
     if(!btn) return;
@@ -352,21 +358,13 @@
     if(action === 'run-tests') runTests();
   });
 
-  // ==== Автотесты ====
-  function expect(name, cond){
-    return {name, ok: !!cond};
-  }
-
+  function expect(name, cond){ return {name, ok: !!cond}; }
   function runTests(){
     const rows = [];
-    // T1: достаточно ключевых слов
     rows.push(expect('T1: ≥6 ключевых слов', countHits(TASKS.T1.sample, TASKS.T1.kw).hits >= TASKS.T1.minHits));
-    // T2
     rows.push(expect('T2: ≥6 ключевых слов', countHits(TASKS.T2.sample, TASKS.T2.kw).hits >= TASKS.T2.minHits));
-    // T3: расчёт порога 0.9%
-    { const turn=1_000_000, tax=20_000; const ok = (tax/turn) >= TASKS.T3.threshold; rows.push(expect('T3: 20k/1M >= 0.9%', ok)); }
-    { const turn=10_000_000, tax=10_000; const ok = (tax/turn) >= TASKS.T3.threshold; rows.push(expect('T3: 10k/10M < 0.9%', !ok)); }
-    // T4–T8: smoke
+    { const turn=1000000, tax=20000; const ok = (tax/turn) >= TASKS.T3.threshold; rows.push(expect('T3: 20k/1M >= 0.9%', ok)); }
+    { const turn=10000000, tax=10000; const ok = (tax/turn) >= TASKS.T3.threshold; rows.push(expect('T3: 10k/10M < 0.9%', !ok)); }
     rows.push(expect('T4: ≥6 ключевых слов', countHits(TASKS.T4.sample, TASKS.T4.kw).hits >= TASKS.T4.minHits));
     rows.push(expect('T5: ≥5 ключевых слов', countHits(TASKS.T5.sample, TASKS.T5.kw).hits >= TASKS.T5.minHits));
     rows.push(expect('T6: ≥5 ключевых слов', countHits(TASKS.T6.sample, TASKS.T6.kw).hits >= TASKS.T6.minHits));
@@ -392,9 +390,9 @@
     byId('testsOut').innerHTML = html;
   }
 
-  // Инициализация
   (function init(){
     updateOverall();
+    engineReady(true);
   })();
   </script>
 </body>
