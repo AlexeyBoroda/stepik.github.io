@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Коммуникация с банком — Практические задания (онлайн)</title>
+<style>
+  :root{
+    --bg:#ffffff;
+    --ink:#0f172a;      /* slate-900 */
+    --muted:#475569;    /* slate-600 */
+    --line:#e2e8f0;     /* slate-200 */
+    --card:#f8fafc;     /* slate-50 */
+    --brand:#1e3a8a;    /* indigo-900 */
+    --brand-2:#2563eb;  /* indigo-500 */
+    --ok:#16a34a;       /* green-600 */
+    --warn:#b45309;     /* amber-700 */
+    --bad:#b91c1c;      /* red-700 */
+    --drag:#e0f2fe;     /* sky-100 */
+  }
+  html,body{background:var(--bg); color:var(--ink); font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans","Helvetica Neue",sans-serif; margin:0; padding:0;}
+  .wrap{max-width:1080px; margin:0 auto; padding:28px 16px 48px;}
+  h1,h2,h3{line-height:1.25; margin:0 0 .6em}
+  h1{font-size:clamp(26px,3.4vw,38px)}
+  h2{font-size:clamp(20px,2.2vw,26px); margin-top:1.2em}
+  h3{font-size:clamp(18px,1.9vw,22px)}
+  p{margin:.6em 0}
+  a{color:var(--brand-2)}
+  .muted{color:var(--muted)}
+  /* Cards & layout */
+  .hero{border:1px solid var(--line); border-radius:16px; padding:20px; background:linear-gradient(180deg,#fff 0%,#f5f7ff 100%); margin-bottom:16px}
+  .grid{display:grid; gap:14px}
+  @media(min-width:920px){ .grid-2{grid-template-columns:1fr 1fr} .grid-3{grid-template-columns:1fr 1fr 1fr} }
+  .card{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px}
+  .ok{border-left:4px solid var(--ok); padding-left:12px}
+  .warn{border-left:4px solid var(--warn); padding-left:12px}
+  .bad{border-left:4px solid var(--bad); padding-left:12px}
+  /* Tabs */
+  .tabs{display:flex; gap:8px; flex-wrap:wrap; margin:12px 0 16px}
+  .tab-btn{border:1px solid var(--line); background:#fff; padding:10px 14px; border-radius:999px; cursor:pointer; font-weight:700}
+  .tab-btn.active{background:var(--brand-2); color:#fff; border-color:var(--brand-2)}
+  .tab{display:none}
+  .tab.active{display:block}
+  /* Buttons */
+  .btn{display:inline-block; padding:10px 14px; border-radius:12px; border:1px solid var(--brand-2); background:var(--brand-2); color:#fff; font-weight:700; cursor:pointer}
+  .btn.secondary{background:#fff; color:var(--brand-2)}
+  .btn.ghost{background:#fff; color:var(--ink); border-color:var(--line)}
+  .btn.small{padding:6px 10px; border-radius:10px; font-weight:600}
+  .btn-row{display:flex; gap:10px; flex-wrap:wrap}
+  /* Forms & inputs */
+  label{font-weight:700}
+  input[type="text"], input[type="number"], textarea, select{
+    width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:10px; font:inherit; background:#fff;
+  }
+  textarea{min-height:110px; resize:vertical}
+  /* Quiz */
+  .q{border:1px solid var(--line); border-radius:14px; padding:12px; background:#fff; margin:10px 0}
+  .q-title{font-weight:700}
+  .choices{display:grid; gap:8px; margin-top:8px}
+  .pill{
+    border:1px solid var(--line); border-radius:12px; padding:10px 12px; display:flex; gap:8px; align-items:flex-start; background:#fff; cursor:pointer;
+  }
+  .pill input{margin-top:2px}
+  .pill.correct{border-color:#bbf7d0; background:#f0fdf4}
+  .pill.wrong{border-color:#fecaca; background:#fef2f2}
+  .feedback{margin-top:8px; font-weight:700}
+  /* Drag & drop match */
+  .dnd-wrap{display:grid; gap:12px}
+  .cols{display:grid; gap:12px}
+  @media(min-width:920px){ .cols{grid-template-columns:1fr 1fr; align-items:start} }
+  .pool, .targets{min-height:100px; border:1px dashed var(--line); border-radius:12px; padding:10px; background:#fff}
+  .chip{
+    display:inline-block; padding:8px 10px; border-radius:999px; background:#eef2ff; color:var(--brand); border:1px solid #c7d2fe; margin:6px 6px 0 0; user-select:none;
+  }
+  .chip[draggable="true"]{cursor:grab}
+  .drop{border:1px dashed var(--brand-2); background:#f8fafc; border-radius:12px; padding:10px; min-height:48px}
+  .drop.over{background:var(--drag)}
+  .pair{margin-bottom:10px}
+  .pair h4{margin:0 0 6px 0}
+  /* Reorder */
+  .sortable-item{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    border:1px solid var(--line); border-radius:12px; padding:10px; background:#fff; margin:8px 0;
+  }
+  .index{font-weight:800; color:var(--brand)}
+  .order-good{border-color:#bbf7d0; background:#f0fdf4}
+  .order-bad{border-color:#fecaca; background:#fef2f2}
+  /* Preview */
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace; background:#f8fafc; border:1px dashed var(--line); padding:12px; border-radius:12px; white-space:pre-wrap}
+  /* Footer */
+  .footer{margin-top:26px; padding-top:14px; border-top:1px solid var(--line); display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap}
+  .tag{display:inline-block; padding:4px 10px; background:#eef2ff; color:var(--brand); border:1px solid #c7d2fe; border-radius:999px; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.06em;}
+</style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <h1>Практические задания — «Как вести диалог с банком»</h1>
+      <p class="muted">Интерактивная тренажёр-страница: тест на формулировки, сопоставление действий, порядок пакета документов и генератор пояснительной записки. Подойдёт для встраивания на Stepik через iframe (без всплывающих окон и внешних библиотек).</p>
+    </section>
+
+    <nav class="tabs" role="tablist" aria-label="Практические задания">
+      <button class="tab-btn active" data-tab="t1" role="tab" aria-controls="t1" aria-selected="true">Задание 1: Квиз</button>
+      <button class="tab-btn" data-tab="t2" role="tab" aria-controls="t2" aria-selected="false">Задание 2: Сопоставление</button>
+      <button class="tab-btn" data-tab="t3" role="tab" aria-controls="t3" aria-selected="false">Задание 3: Порядок пакета</button>
+      <button class="tab-btn" data-tab="t4" role="tab" aria-controls="t4" aria-selected="false">Задание 4: Пояснительная записка</button>
+    </nav>
+
+    <!-- TAB 1 — QUIZ -->
+    <section id="t1" class="tab active" role="tabpanel" aria-labelledby="Задание 1">
+      <h2>Задание 1. Выберите корректные формулировки</h2>
+      <p>Выберите лучший ответ — как написать назначение платежа и как отвечать на запрос банка. Наберите максимум баллов.</p>
+
+      <div class="card q" data-q="1" data-correct="b">
+        <div class="q-title">1) Как корректно указать назначение платежа?</div>
+        <div class="choices">
+          <label class="pill"><input type="radio" name="q1" value="a"> «Перевод Иванову за услуги»</label>
+          <label class="pill"><input type="radio" name="q1" value="b"> «Оплата аренды офиса по договору №15 от 12.03.2025, период 01–31.08.2025»</label>
+          <label class="pill"><input type="radio" name="q1" value="c"> «Оплата по договору, спасибо»</label>
+        </div>
+        <div class="feedback"></div>
+      </div>
+
+      <div class="card q" data-q="2" data-correct="c">
+        <div class="q-title">2) Срок ответа на запрос банка по сложной проверке:</div>
+        <div class="choices">
+          <label class="pill"><input type="radio" name="q2" value="a"> Не отвечать, если счёт работает</label>
+          <label class="pill"><input type="radio" name="q2" value="b"> 1–2 часа</label>
+          <label class="pill"><input type="radio" name="q2" value="c"> В пределах 5–7 рабочих дней (уточнить в запросе)</label>
+        </div>
+        <div class="feedback"></div>
+      </div>
+
+      <div class="card q" data-q="3" data-correct="a">
+        <div class="q-title">3) Что обязательно приложить к ответу на запрос?</div>
+        <div class="choices">
+          <label class="pill"><input type="radio" name="q3" value="a"> Договор/спецификацию, акты/УПД, счета, платежки/выписки</label>
+          <label class="pill"><input type="radio" name="q3" value="b"> Только письмо «всё нормально»</label>
+          <label class="pill"><input type="radio" name="q3" value="c"> Личные комментарии без документов</label>
+        </div>
+        <div class="feedback"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn" id="checkQuiz">Проверить</button>
+        <button class="btn secondary" id="resetQuiz">Сбросить</button>
+        <span id="quizScore" class="muted"></span>
+      </div>
+    </section>
+
+    <!-- TAB 2 — MATCHING DRAG & DROP -->
+    <section id="t2" class="tab" role="tabpanel" aria-labelledby="Задание 2">
+      <h2>Задание 2. Сопоставьте ситуацию и верный первый шаг</h2>
+      <p>Перетащите «карточки-действия» из левого столбца в соответствующие «зоны» справа.</p>
+
+      <div class="card dnd-wrap">
+        <div class="cols">
+          <div>
+            <h3>Действия (перетащите)</h3>
+            <div id="pool" class="pool">
+              <span class="chip" draggable="true" data-key="a">Подтвердить получение запроса и запросить дедлайн</span>
+              <span class="chip" draggable="true" data-key="b">Направить превентивное уведомление менеджеру</span>
+              <span class="chip" draggable="true" data-key="c">Запросить причину и перечень документов</span>
+              <span class="chip" draggable="true" data-key="d">Подать обращение в Банк России на cbr.ru/Reception/Message/Register</span>
+            </div>
+          </div>
+          <div>
+            <h3>Ситуации (отпустите карточку в область)</h3>
+            <div class="pair" data-answer="b">
+              <h4>1) Планируется нестандартная крупная операция</h4>
+              <div class="drop"></div>
+            </div>
+            <div class="pair" data-answer="a">
+              <h4>2) Получен запрос банка по операциям</h4>
+              <div class="drop"></div>
+            </div>
+            <div class="pair" data-answer="c">
+              <h4>3) Приостановлены операции по счёту</h4>
+              <div class="drop"></div>
+            </div>
+            <div class="pair" data-answer="d">
+              <h4>4) Диалог с банком зашёл в тупик, отказ без оснований</h4>
+              <div class="drop"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-row" style="margin-top:10px">
+          <button class="btn" id="checkDnd">Проверить</button>
+          <button class="btn secondary" id="resetDnd">Сбросить</button>
+          <span id="dndScore" class="muted"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3 — ORDER / PRIORITY -->
+    <section id="t3" class="tab" role="tabpanel" aria-labelledby="Задание 3">
+      <h2>Задание 3. Расставьте порядок подготовки ответа</h2>
+      <p>Установите правильную последовательность шагов для подготовки ответа на запрос банка. Используйте стрелки.</p>
+
+      <div class="card">
+        <div id="sortable">
+          <!-- Correct order target: 1,2,3,4,5 -->
+          <div class="sortable-item" data-id="3">
+            <span><span class="index">•</span> Собрать и пронумеровать документы (договор, акты, счета, платежки)</span>
+            <span>
+              <button class="btn small ghost up">↑</button>
+              <button class="btn small ghost down">↓</button>
+            </span>
+          </div>
+          <div class="sortable-item" data-id="1">
+            <span><span class="index">•</span> Подтвердить получение запроса и дедлайн</span>
+            <span>
+              <button class="btn small ghost up">↑</button>
+              <button class="btn small ghost down">↓</button>
+            </span>
+          </div>
+          <div class="sortable-item" data-id="5">
+            <span><span class="index">•</span> Отправить единым пакетом и запросить подтверждение получения</span>
+            <span>
+              <button class="btn small ghost up">↑</button>
+              <button class="btn small ghost down">↓</button>
+            </span>
+          </div>
+          <div class="sortable-item" data-id="2">
+            <span><span class="index">•</span> Уточнить у инициатора перечень нужных документов</span>
+            <span>
+              <button class="btn small ghost up">↑</button>
+              <button class="btn small ghost down">↓</button>
+            </span>
+          </div>
+          <div class="sortable-item" data-id="4">
+            <span><span class="index">•</span> Подготовить краткую пояснительную записку (1–2 стр.)</span>
+            <span>
+              <button class="btn small ghost up">↑</button>
+              <button class="btn small ghost down">↓</button>
+            </span>
+          </div>
+        </div>
+
+        <div class="btn-row" style="margin-top:10px">
+          <button class="btn" id="checkOrder">Проверить</button>
+          <button class="btn secondary" id="resetOrder">Сбросить</button>
+          <span id="orderScore" class="muted"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4 — EXPLANATION GENERATOR -->
+    <section id="t4" class="tab" role="tabpanel" aria-labelledby="Задание 4">
+      <h2>Задание 4. Сгенерируйте пояснительную записку</h2>
+      <p>Заполните форму — получите черновик пояснения на языке экономической логики. Можно скопировать в буфер обмена.</p>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="grid">
+            <label>Компания / ИНН
+              <input type="text" id="fCompany" placeholder="ООО «Пример», ИНН 7700000000">
+            </label>
+            <label>Номер и дата запроса банка
+              <input type="text" id="fReq" placeholder="Запрос №123 от 05.09.2025">
+            </label>
+            <label>Контекст деятельности (ОКВЭД, проект)
+              <textarea id="fContext" placeholder="Основной вид деятельности — 62.01. Проект: внедрение CRM для клиента ООО «Альфа»."></textarea>
+            </label>
+          </div>
+
+          <h3 style="margin-top:8px">Операции (добавьте строки)</h3>
+          <div id="ops"></div>
+          <div class="btn-row" style="margin-top:6px">
+            <button class="btn small" id="addOp">+ Добавить операцию</button>
+            <button class="btn small secondary" id="clearOps">Очистить</button>
+          </div>
+
+          <h3 style="margin-top:10px">Приложения</h3>
+          <textarea id="fApps" placeholder="1) Договор №15 от 12.03.2025; 2) Счёт №77 от 01.08.2025; 3) Акт №22 от 31.08.2025; 4) Платёжные поручения №..."></textarea>
+
+          <div class="btn-row" style="margin-top:10px">
+            <button class="btn" id="build">Сформировать черновик</button>
+            <button class="btn secondary" id="copy">Копировать текст</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Предпросмотр</h3>
+          <div id="preview" class="mono" style="min-height:280px">Текст появится здесь…</div>
+          <p class="muted" style="margin-top:8px">Подсказка: избегайте эмоциональных формулировок — только факты и документы. При затруднениях диалога — обращение в Банк России: cbr.ru/Reception/Message/Register?messageType=Complaint</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="footer">
+      <span class="tag">Безопасный бизнес</span>
+      <span class="muted">Практикум · без внешних библиотек</span>
+      <span><a href="https://borodulin.expert" target="_blank" rel="noopener">borodulin.expert</a></span>
+    </section>
+  </main>
+
+<script>
+/* ===== Tabs ===== */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active'); b.setAttribute('aria-selected','false')});
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected','true');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+    localStorage.setItem('kb_tab', btn.dataset.tab);
+  });
+});
+const savedTab = localStorage.getItem('kb_tab');
+if(savedTab && document.getElementById(savedTab)){
+  document.querySelectorAll('.tab-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.tab===savedTab);
+    b.setAttribute('aria-selected', b.dataset.tab===savedTab ? 'true':'false');
+  });
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.id===savedTab));
+}
+
+/* ===== Quiz ===== */
+function checkQuiz(){
+  let score = 0;
+  const total = document.querySelectorAll('.q').length;
+  document.querySelectorAll('.q').forEach(q=>{
+    const correct = q.dataset.correct;
+    const name = 'q'+q.dataset.q;
+    const picked = (q.querySelector('input[name="'+name+'"]:checked')||{}).value;
+    q.querySelectorAll('.pill').forEach(p=>{
+      p.classList.remove('correct','wrong');
+      if(p.querySelector('input')) {
+        const v = p.querySelector('input').value;
+        if(v === correct && picked){
+          p.classList.add('correct');
+        } else if(v === picked && picked !== correct){
+          p.classList.add('wrong');
+        }
+      }
+    });
+    const fb = q.querySelector('.feedback');
+    if(picked === correct){
+      score++;
+      fb.textContent = 'Верно ✔';
+      fb.style.color = 'var(--ok)';
+    } else if(picked) {
+      fb.textContent = 'Неверно ✘';
+      fb.style.color = 'var(--bad)';
+    } else {
+      fb.textContent = 'Выберите ответ';
+      fb.style.color = 'var(--warn)';
+    }
+  });
+  document.getElementById('quizScore').textContent = `Результат: ${score} / ${total}`;
+  localStorage.setItem('kb_quiz_score', score+'/'+total);
+}
+document.getElementById('checkQuiz').addEventListener('click', checkQuiz);
+document.getElementById('resetQuiz').addEventListener('click', ()=>{
+  document.querySelectorAll('.q .pill').forEach(p=>p.classList.remove('correct','wrong'));
+  document.querySelectorAll('.q input[type="radio"]').forEach(i=>i.checked=false);
+  document.querySelectorAll('.q .feedback').forEach(f=>f.textContent='');
+  document.getElementById('quizScore').textContent='';
+  localStorage.removeItem('kb_quiz_score');
+});
+
+/* ===== DnD Matching ===== */
+let dragged = null;
+function handleDragStart(e){
+  dragged = e.target;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', e.target.dataset.key);
+}
+function handleDragOver(e){ e.preventDefault(); e.currentTarget.classList.add('over'); }
+function handleDragLeave(e){ e.currentTarget.classList.remove('over'); }
+function handleDrop(e){
+  e.preventDefault();
+  e.currentTarget.classList.remove('over');
+  if(dragged){
+    // Make only one chip inside each drop
+    e.currentTarget.innerHTML = '';
+    e.currentTarget.appendChild(dragged);
+  }
+}
+function resetDnd(){
+  const pool = document.getElementById('pool');
+  document.querySelectorAll('.drop').forEach(d=>{
+    const chip = d.querySelector('.chip');
+    if(chip){ pool.appendChild(chip); }
+    d.classList.remove('okmark','badmark');
+  });
+  document.getElementById('dndScore').textContent='';
+}
+document.querySelectorAll('.chip[draggable="true"]').forEach(ch=>{
+  ch.addEventListener('dragstart', handleDragStart);
+});
+document.querySelectorAll('.drop').forEach(d=>{
+  d.addEventListener('dragover', handleDragOver);
+  d.addEventListener('dragleave', handleDragLeave);
+  d.addEventListener('drop', handleDrop);
+});
+document.getElementById('checkDnd').addEventListener('click', ()=>{
+  let score = 0, total = document.querySelectorAll('.pair').length;
+  document.querySelectorAll('.pair').forEach(p=>{
+    const need = p.dataset.answer;
+    const chip = p.querySelector('.drop .chip');
+    if(chip && chip.dataset.key === need){ score++; }
+  });
+  const out = document.getElementById('dndScore');
+  out.textContent = `Результат: ${score} / ${total}`;
+});
+document.getElementById('resetDnd').addEventListener('click', resetDnd);
+
+/* ===== Order / Priority ===== */
+const container = document.getElementById('sortable');
+function getItems(){ return Array.from(container.querySelectorAll('.sortable-item')); }
+function swapItems(i,j){
+  const items = getItems();
+  if(i<0 || j<0 || i>=items.length || j>=items.length) return;
+  if(i<j){ container.insertBefore(items[j], items[i]); }
+  else { container.insertBefore(items[i], items[j]); }
+}
+container.addEventListener('click', (e)=>{
+  if(e.target.classList.contains('up') || e.target.classList.contains('down')){
+    const item = e.target.closest('.sortable-item');
+    const items = getItems();
+    const idx = items.indexOf(item);
+    if(e.target.classList.contains('up') && idx>0){
+      container.insertBefore(item, items[idx-1]);
+    }
+    if(e.target.classList.contains('down') && idx<items.length-1){
+      container.insertBefore(items[idx+1], item);
+    }
+  }
+});
+document.getElementById('checkOrder').addEventListener('click', ()=>{
+  const ideal = ['1','2','3','4','5']; // correct data-id order
+  const current = getItems().map(x=>x.dataset.id);
+  let score = 0;
+  getItems().forEach((el,i)=>{
+    el.classList.remove('order-good','order-bad');
+    if(current[i] === ideal[i]){ el.classList.add('order-good'); score++; }
+    else { el.classList.add('order-bad'); }
+  });
+  document.getElementById('orderScore').textContent = `Позиции на местах: ${score} / ${ideal.length}`;
+});
+document.getElementById('resetOrder').addEventListener('click', ()=>{
+  // Reset to initial mixed order (matches DOM order at page load)
+  const initial = ['3','1','5','2','4'];
+  const map = {};
+  getItems().forEach(el=>map[el.dataset.id]=el);
+  initial.forEach(id=>container.appendChild(map[id]));
+  getItems().forEach(el=>el.classList.remove('order-good','order-bad'));
+  document.getElementById('orderScore').textContent='';
+});
+
+/* ===== Explanation Generator ===== */
+const opsBox = document.getElementById('ops');
+function opRowTemplate(i){
+  return `
+    <div class="card" data-op-row>
+      <div class="grid grid-2">
+        <label>Дата
+          <input type="text" placeholder="31.08.2025" data-op="date">
+        </label>
+        <label>Контрагент
+          <input type="text" placeholder="ООО «Альфа», ИНН 7700000000" data-op="cntr">
+        </label>
+      </div>
+      <div class="grid">
+        <label>Сумма и валюта
+          <input type="text" placeholder="450 000 ₽" data-op="amt">
+        </label>
+        <label>Назначение платежа (по сути)
+          <input type="text" placeholder="Оплата внедрения CRM по договору №15, этап 2" data-op="desc">
+        </label>
+        <label>Документ-основание
+          <input type="text" placeholder="Договор №15 от 12.03.2025, акт №22 от 31.08.2025" data-op="doc">
+        </label>
+      </div>
+      <div class="btn-row">
+        <button class="btn small ghost" onclick="this.closest('[data-op-row]').remove()">Удалить</button>
+      </div>
+    </div>
+  `;
+}
+function addOp(){ opsBox.insertAdjacentHTML('beforeend', opRowTemplate(Date.now())); }
+document.getElementById('addOp').addEventListener('click', addOp);
+document.getElementById('clearOps').addEventListener('click', ()=>{ opsBox.innerHTML=''; });
+
+function buildPreview(){
+  const company = document.getElementById('fCompany').value.trim() || '—';
+  const req = document.getElementById('fReq').value.trim() || '—';
+  const ctx = document.getElementById('fContext').value.trim() || '—';
+  const apps = document.getElementById('fApps').value.trim() || '—';
+
+  const ops = Array.from(document.querySelectorAll('[data-op-row]')).map(r=>{
+    const g = s=> (r.querySelector(`[data-op="${s}"]`)?.value.trim() || '—');
+    return {date:g('date'), cntr:g('cntr'), amt:g('amt'), desc:g('desc'), doc:g('doc')};
+  });
+
+  let opsTxt = ops.length ? ops.map(o=>`• ${o.date} — ${o.cntr} — ${o.amt}\n  Назначение: ${o.desc}\n  Документы: ${o.doc}`).join('\n') : '—';
+
+  const body = 
+`Пояснительная записка
+Компания: ${company}
+Запрос банка: ${req}
+
+1. Краткий контекст деятельности
+${ctx}
+
+2. Сведения по операциям
+${opsTxt}
+
+3. Приложения
+${apps}
+
+Итог: операции реальны и экономически обоснованы, подтверждены договорными документами и бухгалтерскими регистрами. Просим снять ограничения и возобновить проведение операций. При необходимости готовы предоставить дополнительные пояснения.
+
+Напоминание: при неэффективности диалога обращение подается на сайте Банка России:
+cbr.ru/Reception/Message/Register?messageType=Complaint`;
+
+  document.getElementById('preview').textContent = body;
+}
+document.getElementById('build').addEventListener('click', buildPreview);
+
+document.getElementById('copy').addEventListener('click', async ()=>{
+  const txt = document.getElementById('preview').textContent;
+  try{
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(txt);
+      alert('Текст скопирован в буфер обмена.');
+    } else {
+      // Fallback
+      const ta = document.createElement('textarea');
+      ta.value = txt;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+      alert('Текст скопирован в буфер обмена.');
+    }
+  }catch(e){
+    alert('Не удалось скопировать. Выделите текст вручную (Ctrl/Cmd + A, затем Ctrl/Cmd + C).');
+  }
+});
+
+// Initialize with one row
+addOp();
+</script>
+</body>
+</html>
